@@ -102,7 +102,7 @@ export default function Chat() {
           </div>
           <h2 className="text-2xl font-bold text-foreground mb-2">Sign In Required</h2>
           <p className="text-muted-foreground mb-6">Sign in to access the AI Workspaces.</p>
-          <a href={getLoginUrl()}><Button className="gradient-purple text-white border-0">Sign In</Button></a>
+          <a href="/login"><Button className="gradient-purple text-white border-0">Sign In</Button></a>
         </div>
       </div>
     );

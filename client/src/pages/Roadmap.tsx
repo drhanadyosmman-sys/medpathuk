@@ -94,7 +94,7 @@ export default function Roadmap() {
             <Target className="w-8 h-8 text-white" />
           </div>
           <h2 className="text-2xl font-bold text-foreground mb-2">Sign In to View Your Roadmap</h2>
-          <a href={getLoginUrl()}><Button className="gradient-purple text-white border-0">Sign In</Button></a>
+          <a href="/login"><Button className="gradient-purple text-white border-0">Sign In</Button></a>
         </div>
       </div>
     );

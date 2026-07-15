@@ -140,7 +140,7 @@ export default function Pricing() {
 
   const handleUpgrade = async (planId: string) => {
     if (!isAuthenticated) {
-      window.location.href = getLoginUrl();
+      window.location.href = "/login";
       return;
     }
     if (planId === "free") return;

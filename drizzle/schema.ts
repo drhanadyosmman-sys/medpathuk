@@ -54,6 +54,10 @@ export const users = mysqlTable("users", {
   goalTimelineMonths: int("goalTimelineMonths"),
   onboardingCompleted: boolean("onboardingCompleted").default(false).notNull(),
   readinessScore: int("readinessScore"),
+  // Email auth fields
+  passwordHash: varchar("passwordHash", { length: 256 }),
+  whatsappNumber: varchar("whatsappNumber", { length: 32 }),
+  graduationCountry: varchar("graduationCountry", { length: 64 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),

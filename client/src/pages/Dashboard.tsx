@@ -71,7 +71,7 @@ export default function Dashboard() {
           </div>
           <h2 className="text-2xl font-bold text-foreground mb-2">Sign In to Access Dashboard</h2>
           <p className="text-muted-foreground mb-6">Your personalised career dashboard awaits.</p>
-          <a href={getLoginUrl()}><Button className="gradient-purple text-white border-0">Sign In</Button></a>
+          <a href="/login"><Button className="gradient-purple text-white border-0">Sign In</Button></a>
         </div>
       </div>
     );

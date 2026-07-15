@@ -72,7 +72,7 @@ export default function Activate() {
           <p className="text-white/70 mb-6">
             You need to sign in before activating your access code. Your code is linked to a specific email address.
           </p>
-          <a href={getLoginUrl()}>
+          <a href="/login">
             <Button className="gradient-orange text-white border-0 w-full">
               Sign In to Continue <ArrowRight className="w-4 h-4 ml-2" />
             </Button>

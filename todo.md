@@ -107,3 +107,17 @@
 
 ## Bug Fix - Save to Roadmap
 - [x] Fix "Failed to save milestones to Roadmap" error in SAS results page — DB category enum was missing 'presentation', 'oet', 'application' values; migrated live DB
+
+## Email Auth System (Replace Manus OAuth)
+- [x] Add passwordHash, whatsappNumber, graduationCountry fields to users table in schema.ts
+- [x] Run DB migration to add new columns
+- [x] Install bcryptjs for password hashing
+- [x] Add register/login tRPC procedures in routers.ts
+- [x] Build Register page (name, email, graduationCountry, whatsapp, password)
+- [x] Build Login page (email + password)
+- [x] Update useAuth hook to work with email auth
+- [x] Update App.tsx to add /login and /register routes
+- [x] Update Home page to show Login/Register buttons
+- [x] Remove Manus OAuth dependency from auth flow
+- [x] Run tests and fix any errors
+- [ ] Save checkpoint to enable publishing

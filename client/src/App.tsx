@@ -16,11 +16,15 @@ import Pricing from "./pages/Pricing";
 import Admin from "./pages/Admin";
 import SASAssessment from "./pages/SASAssessment";
 import SASHistory from "./pages/SASHistory";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 
 function Router() {
   return (
     <Switch>
       <Route path={"/"} component={Home} />
+      <Route path={"/login"} component={Login} />
+      <Route path={"/register"} component={Register} />
       <Route path={"/activate"} component={Activate} />
       <Route path={"/dashboard"} component={Dashboard} />
       <Route path={"/onboarding"} component={Questionnaire} />

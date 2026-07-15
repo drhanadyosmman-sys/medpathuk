@@ -860,7 +860,7 @@ export default function SASAssessment() {
           <div className="mt-4 flex items-center gap-3 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
             <Lock className="w-4 h-4 text-amber-400 shrink-0" />
             <p className="text-xs text-amber-300">
-              <a href={getLoginUrl()} className="underline font-semibold">Sign in</a> to save your assessment results to your profile
+              <a href="/login" className="underline font-semibold">Sign in</a> to save your assessment results to your profile
             </p>
           </div>
         )}

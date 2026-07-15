@@ -98,14 +98,14 @@ export default function Home() {
                 </Link>
               ) : (
                 <>
-                  <a href={getLoginUrl()}>
+                  <a href="/login">
                     <Button variant="ghost" size="sm">Sign In</Button>
                   </a>
-                  <Link href="/activate">
+                  <a href="/register">
                     <Button size="sm" className="gradient-purple text-white border-0">
-                      Activate Access
+                      Get Started
                     </Button>
-                  </Link>
+                  </a>
                 </>
               )
             )}
@@ -150,12 +150,12 @@ export default function Home() {
                 </Link>
               ) : (
                 <>
-                  <Link href="/activate">
+                  <a href="/register">
                     <Button size="lg" className="gradient-orange text-white border-0 px-8 py-6 text-base font-semibold shadow-lg">
-                      Activate Your Access <ArrowRight className="w-5 h-5 ml-2" />
+                      Create Free Account <ArrowRight className="w-5 h-5 ml-2" />
                     </Button>
-                  </Link>
-                  <a href={getLoginUrl()}>
+                  </a>
+                  <a href="/login">
                     <Button size="lg" variant="outline" className="border-white/30 text-white bg-white/10 hover:bg-white/20 px-8 py-6 text-base">
                       Sign In
                     </Button>
@@ -164,10 +164,9 @@ export default function Home() {
               )}
             </div>
 
-            {/* Access code notice */}
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white/60 text-sm">
               <Lock className="w-3.5 h-3.5" />
-              Access requires an invitation code linked to your email
+              Free to join — no invitation code required
             </div>
           </div>
 

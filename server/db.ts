@@ -77,6 +77,38 @@ export async function getUserByOpenId(openId: string) {
   return result[0];
 }
 
+export async function getUserByEmail(email: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(users).where(eq(users.email, email.toLowerCase())).limit(1);
+  return result[0];
+}
+
+export async function createEmailUser(data: {
+  name: string;
+  email: string;
+  passwordHash: string;
+  whatsappNumber?: string | null;
+  graduationCountry?: string | null;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const openId = `email:${data.email.toLowerCase()}`;
+  await db.insert(users).values({
+    openId,
+    name: data.name,
+    email: data.email.toLowerCase(),
+    loginMethod: "email",
+    passwordHash: data.passwordHash,
+    whatsappNumber: data.whatsappNumber ?? null,
+    graduationCountry: data.graduationCountry ?? null,
+    isActivated: true,
+    lastSignedIn: new Date(),
+  });
+  const created = await getUserByEmail(data.email.toLowerCase());
+  return created!;
+}
+
 export async function updateUserProfile(userId: number, data: Partial<typeof users.$inferInsert>) {
   const db = await getDb();
   if (!db) return;

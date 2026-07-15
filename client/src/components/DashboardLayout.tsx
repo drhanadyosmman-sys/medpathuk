@@ -65,18 +65,26 @@ export default function DashboardLayout({
               Sign in to continue
             </h1>
             <p className="text-sm text-muted-foreground text-center max-w-sm">
-              Access to this dashboard requires authentication. Continue to launch the login flow.
+              Access to this dashboard requires authentication.
             </p>
           </div>
-          <Button
-            onClick={() => {
-              window.location.href = getLoginUrl();
-            }}
-            size="lg"
-            className="w-full shadow-lg hover:shadow-xl transition-all"
-          >
-            Sign in
-          </Button>
+          <div className="flex flex-col gap-3 w-full">
+            <Button
+              onClick={() => { window.location.href = "/login"; }}
+              size="lg"
+              className="w-full shadow-lg hover:shadow-xl transition-all"
+            >
+              Sign in
+            </Button>
+            <Button
+              onClick={() => { window.location.href = "/register"; }}
+              variant="outline"
+              size="lg"
+              className="w-full"
+            >
+              Create an account
+            </Button>
+          </div>
         </div>
       </div>
     );

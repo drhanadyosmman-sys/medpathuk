@@ -332,7 +332,7 @@ export default function SASHistory() {
           </div>
           <h2 className="text-xl font-bold text-white mb-2">Sign In Required</h2>
           <p className="text-gray-400 text-sm mb-6">Sign in to view your SAS assessment history and track your progress over time.</p>
-          <a href={getLoginUrl()}>
+          <a href="/login">
             <Button className="bg-purple-600 hover:bg-purple-700 text-white">Sign In</Button>
           </a>
         </div>
