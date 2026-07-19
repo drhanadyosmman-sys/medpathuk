@@ -97,6 +97,18 @@ export interface SASEvidenceGuidance {
   rules: string[];
 }
 
+/**
+ * How offers are made once ranking is settled.
+ *
+ * Only the rules that change what an applicant should do are recorded here.
+ * Deliberately excluded: the mechanics of the Oriel interface and regional
+ * programme detail. Both change between cycles, and stale guidance that looks
+ * current is the failure this data set is being corrected for.
+ */
+export interface SASOffersGuidance {
+  points: SASEligibilityRequirement[];
+}
+
 /** Provenance record for one specialty's scoring matrix. */
 export interface SASVerification {
   status: "verified" | "unverified";
@@ -142,6 +154,8 @@ export interface SASSpecialty {
   eligibility?: SASEligibility;
   /** What the applicant must be able to prove for the points they claim. */
   evidenceGuidance?: SASEvidenceGuidance;
+  /** How offers are made once ranking is settled. */
+  offersGuidance?: SASOffersGuidance;
 }
 
 export const SAS_SPECIALTIES: SASSpecialty[] = [
@@ -182,6 +196,25 @@ export const SAS_SPECIALTIES: SASSpecialty[] = [
         { area: "Clinical scenario — investigations, diagnosis, management (Station 2)", weighting: "x1.2", maxScore: 12 },
         { area: "Clinical scenario — patient handover (Station 2)", weighting: "x0.8", maxScore: 8 },
         { area: "Communication (Station 2)", weighting: "x1.6", maxScore: 16 },
+      ],
+    },
+    offersGuidance: {
+      points: [
+        {
+          title: "Every programme starts in 'not wanted'",
+          detail:
+            "Nothing is preferenced for you. If you miss the preference deadline you cannot be made an offer at all, however well you scored. Set aside real time for it — in a recent applicant survey 79% took over three hours and 37% took more than ten, choosing from over 1,500 options. The drag-and-drop interface does not work properly on phones or tablets, so use a laptop or desktop.",
+        },
+        {
+          title: "Ranking your preferences cannot game the outcome",
+          detail:
+            "Whether you get an offer depends only on your total score, the number of posts available, and how many programmes you preferenced. The order changes which post you are offered, not your chances of one. Putting an unpopular post first does not get you an offer sooner: once your rank is reached you are considered for all your preferences ahead of anyone ranked below you.",
+        },
+        {
+          title: "Only preference posts you would genuinely accept",
+          detail:
+            "Declining an offer takes you out of contention for the specialty entirely. Being unplaced and on the reserve list is a better position than holding an offer you do not want and hoping to upgrade, because by the holding deadline you must decline it and are then out. Include programmes showing zero places in the order you would want them — places are sometimes added later and there is no penalty for listing them.",
+        },
       ],
     },
     evidenceGuidance: {

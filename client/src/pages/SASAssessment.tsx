@@ -601,6 +601,36 @@ function ResultsView({
         </CardContent>
       </Card>
 
+      {/* Offers — the last stage, and the one with the most avoidable losses:
+          missing the preference deadline forfeits an offer outright no matter
+          how well the applicant scored. */}
+      {specialty.offersGuidance && (
+        <Card className="bg-white/3 border-white/8 mb-6">
+          <CardHeader>
+            <CardTitle className="text-base text-white flex items-center gap-2">
+              <Award className="w-4 h-4 text-emerald-400" />
+              After the interview: how offers are made
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-3">
+              {specialty.offersGuidance.points.map((p) => (
+                <li key={p.title}>
+                  <p className="text-sm font-medium text-white">{p.title}</p>
+                  <p className="text-xs text-gray-400 leading-relaxed mt-0.5">
+                    {p.detail}
+                  </p>
+                </li>
+              ))}
+            </ul>
+            <p className="text-xs text-gray-500 mt-4">
+              Programme details and regional information change every cycle —
+              check the official source for the round you are applying to.
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Evidence — placed straight after the breakdown, at the moment the
           applicant has just claimed a set of points and can still check they
           are able to prove each one. Scoring is self-assessed and rarely
