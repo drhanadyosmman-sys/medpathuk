@@ -1351,7 +1351,14 @@ export const SAS_SPECIALTIES: SASSpecialty[] = [
     ],
   },
 
-  // ─── 9. Clinical Radiology ────────────────────────────────────────────────
+  // ─── 9. Clinical Radiology ───────────────────────────────────────────────
+  // VERIFIED against the official Clinical Radiology ST1 Portfolio Review
+  // Guidance 2026 (NHS England).
+  //
+  // Five domains, each self-categorised A-E on Oriel with one piece of evidence
+  // submitted per domain. Categories score A=4, B=3, C=2, D=1, E=0, and Domain 1
+  // is double-weighted, giving a portfolio maximum of 24. The category is chosen
+  // by the applicant and then verified, so this tool can mirror it exactly.
   {
     id: "radiology",
     name: "Clinical Radiology",
@@ -1359,105 +1366,106 @@ export const SAS_SPECIALTIES: SASSpecialty[] = [
     applicationRoute: "Specialty Training",
     msraRequired: true,
     totalMaxScore: 24,
-    competitiveThreshold: 18,
-    sourceUrl: "https://medical.hee.nhs.uk/medical-training-recruitment/medical-specialty-training/clinical-radiology",
-    description: "5-year radiology specialty training from ST1. MSRA is used for shortlisting; the portfolio is self-assessed by category A-E across 5 domains and carries 30% of the final rank, with part of it explored at interview.",
+    competitiveThreshold: null,
+    sourceUrl: "https://medical.hee.nhs.uk/medical-training-recruitment/medical-specialty-training/clinical-radiology/core-clinical-radiology/clinical-radiology-st1-portfolio-review-guidance",
+    description: "5-year radiology specialty training from ST1. You self-categorise A-E across five portfolio domains on Oriel and submit one piece of evidence for each. Final ranking combines your MSRA score, the verified evidence score and your interview score.",
     domains: [
       {
-        id: "rad_qualifications",
-        name: "Qualifications",
-        maxScore: 4,
+        id: "rad_commitment",
+        name: "Commitment to Specialty",
+        maxScore: 8,
         criteria: [
           {
-            id: "rad_q1",
-            criterion: "Postgraduate qualification",
+            id: "rad_c1",
+            criterion: "Your strongest evidence of commitment to radiology (this domain is double-weighted)",
             score: 0,
-            evidence: "Degree certificate",
+            evidence: "One piece of evidence: a letter confirming attendance at a taster or placement, a course certificate, or a conference registration.",
             options: [
-              { label: "PhD or MD by research", score: 4 },
-              { label: "Masters degree", score: 3 },
-              { label: "Postgraduate diploma", score: 2 },
-              { label: "Postgraduate certificate", score: 1 },
-              { label: "None", score: 0 },
+              { label: "A — Multiple significant exposures to the work of a clinical radiology department", score: 8 },
+              { label: "B — One significant exposure to the work of a radiology department", score: 6 },
+              { label: "C — Attended a radiology-based course of at least one day in length", score: 4 },
+              { label: "D — Attended a radiology-related conference", score: 2 },
+              { label: "E — None of the above", score: 0 },
             ],
           },
         ],
       },
       {
-        id: "rad_research",
-        name: "Research & Publications",
-        maxScore: 6,
-        criteria: [
-          {
-            id: "rad_r1",
-            criterion: "Best publication",
-            score: 0,
-            evidence: "PubMed/DOI link",
-            options: [
-              { label: "First-author paper in peer-reviewed journal (indexed)", score: 6 },
-              { label: "First-author paper in peer-reviewed journal (not indexed)", score: 5 },
-              { label: "Co-author paper in peer-reviewed journal", score: 4 },
-              { label: "Published case report or letter", score: 2 },
-              { label: "Published abstract", score: 1 },
-              { label: "None", score: 0 },
-            ],
-          },
-        ],
-      },
-      {
-        id: "rad_presentations",
-        name: "Presentations",
+        id: "rad_leadership",
+        name: "Leadership and Management",
         maxScore: 4,
         criteria: [
           {
-            id: "rad_p1",
-            criterion: "Best presentation level",
+            id: "rad_l1",
+            criterion: "Your highest leadership or management role",
             score: 0,
-            evidence: "Conference programme",
+            evidence: "One piece of evidence confirming the role and its scope, such as a letter from the organisation or committee.",
             options: [
-              { label: "Oral presentation at national/international meeting", score: 4 },
-              { label: "Oral presentation at regional meeting", score: 3 },
-              { label: "Poster at national/international meeting", score: 2 },
-              { label: "Poster at regional meeting", score: 1 },
-              { label: "None", score: 0 },
-            ],
-          },
-        ],
-      },
-      {
-        id: "rad_audit",
-        name: "Audit / Quality Improvement",
-        maxScore: 4,
-        criteria: [
-          {
-            id: "rad_a1",
-            criterion: "Audit/QIP experience",
-            score: 0,
-            evidence: "Audit report",
-            options: [
-              { label: "Completed full audit cycle or QIP with improvement", score: 4 },
-              { label: "Completed audit without re-audit", score: 2 },
-              { label: "Participated in audit only", score: 1 },
-              { label: "None", score: 0 },
+              { label: "A — A national-level leadership or management role involving radiology", score: 4 },
+              { label: "B — A national healthcare role outside radiology, or a local or regional radiology role", score: 3 },
+              { label: "C — A national role outside healthcare, or a local healthcare role outside radiology", score: 2 },
+              { label: "D — A local or regional leadership or management role outside healthcare", score: 1 },
+              { label: "E — None of the above", score: 0 },
             ],
           },
         ],
       },
       {
         id: "rad_teaching",
-        name: "Teaching & Leadership",
-        maxScore: 6,
+        name: "Teaching and Training",
+        maxScore: 4,
         criteria: [
           {
             id: "rad_t1",
-            criterion: "Teaching and leadership experience",
+            criterion: "Your strongest teaching qualification or contribution",
             score: 0,
-            evidence: "Teaching records, leadership role description",
+            evidence: "One piece of evidence: a qualification certificate, confirmation of your role in a teaching programme, or a course certificate.",
             options: [
-              { label: "Formal teaching qualification AND significant leadership role", score: 6 },
-              { label: "Regular teaching OR significant leadership role", score: 4 },
-              { label: "Some teaching OR some leadership", score: 2 },
-              { label: "None", score: 0 },
+              { label: "A — A formal teaching qualification awarded at postgraduate level", score: 4 },
+              { label: "B — A major contribution to a national or international teaching programme", score: 3 },
+              { label: "C — Other training in teaching methods after study of at least two days", score: 2 },
+              { label: "D — Evidence of providing regional teaching", score: 1 },
+              { label: "E — None of the above", score: 0 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "rad_audit",
+        name: "Audit and Quality Improvement",
+        maxScore: 4,
+        criteria: [
+          {
+            id: "rad_a1",
+            criterion: "Your strongest audit or quality improvement involvement",
+            score: 0,
+            evidence: "Evidence of the project and your role in it. Category A is the one domain accepting two pieces of evidence, since it requires two projects.",
+            options: [
+              { label: "A — Led two or more audits or quality improvement projects relating to radiology", score: 4 },
+              { label: "B — Led an audit or quality improvement project relating to radiology", score: 3 },
+              { label: "C — Led an audit or quality improvement project outside radiology", score: 2 },
+              { label: "D — Contributed to, but did not lead, an audit or quality improvement project", score: 1 },
+              { label: "E — None of the above", score: 0 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "rad_academic",
+        name: "Academic Achievements",
+        maxScore: 4,
+        criteria: [
+          {
+            id: "rad_ac1",
+            criterion: "Your strongest academic achievement",
+            score: 0,
+            evidence: "One piece of evidence: the degree certificate, the publication citation, or confirmation of the presentation.",
+            options: [
+              { label: "A — A postgraduate research degree, or first-author radiology publication", score: 4 },
+              { label: "B — Co-authored radiology publication, first-author non-radiology publication, or a radiology case report", score: 3 },
+              { label: "C — Co-authored publication, non-radiology case report, or a regional presentation", score: 2 },
+              { label: "D — A non-radiology presentation, or involvement in research", score: 1 },
+              { label: "E — None of the above", score: 0 },
             ],
           },
         ],
@@ -2916,11 +2924,11 @@ export const SAS_VERIFICATION: Record<string, SASVerification> = {
     note: "Matrix not checked against the official source.",
   },
   radiology: {
-    status: "unverified",
-    scoringModel: "interview-portfolio",
-    checkedOn: null,
-    cycle: null,
-    note: "Self-assessment is by category A-E across 5 domains (reduced from 7), and the portfolio contributes 30% of the final rank with part of it explored at interview. The 24-point numeric matrix above does not reflect this. Its sourceUrl was a dead link when checked in July 2026 and now points to the NHS England specialty hub rather than an invented deep link.",
+    status: "verified",
+    scoringModel: "self-assessment",
+    checkedOn: "2026-07-19",
+    cycle: "2026",
+    note: "Five domains self-categorised A-E on Oriel, transcribed from the official ST1 Portfolio Review Guidance. Categories score A=4 down to E=0, with Commitment to Specialty double-weighted, giving a maximum of 24. The previous matrix reached the same 24 through invented domains: it scored Qualifications and Presentations, neither of which exists in the guidance, and omitted Commitment to Specialty entirely — the largest domain, worth a third of the portfolio. The original sourceUrl was also a dead link. Outstanding: the published weighting between the verified evidence score, MSRA and interview in the final rank.",
   },
   ophthalmology: {
     status: "unverified",
