@@ -106,7 +106,7 @@ export default function Register() {
             Your UK Medical Career Starts Here
           </h1>
           <p className="text-muted-foreground text-lg leading-relaxed">
-            Join thousands of international medical graduates navigating their path to UK training. Get AI-powered guidance, SAS assessments, and personalised roadmaps.
+            Built for international medical graduates navigating their path to UK training. Get AI-powered guidance, self-assessment against official recruitment criteria, and a personalised roadmap.
           </p>
           <div className="space-y-3">
             {[

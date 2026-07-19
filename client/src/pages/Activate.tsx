@@ -96,7 +96,7 @@ export default function Activate() {
           <div className="w-14 h-14 rounded-2xl gradient-purple flex items-center justify-center mx-auto mb-3 shadow-xl">
             <Stethoscope className="w-7 h-7 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-white">Manas</h1>
+          <h1 className="text-2xl font-bold text-white">MedPath UK</h1>
           <p className="text-white/60 text-sm">by Health Care Quality School</p>
         </div>
 

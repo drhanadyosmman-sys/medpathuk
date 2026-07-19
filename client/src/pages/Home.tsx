@@ -66,10 +66,12 @@ const PLANS = [
   },
 ];
 
+// Only claims that can be checked against the product itself. A "500+ doctors
+// supported" and "95% success rate" previously sat here; both were invented,
+// and outcome claims of that kind cannot be made on a paid service without
+// evidence to support them.
 const STATS = [
-  { value: "10+", label: "AI Workspaces" },
-  { value: "500+", label: "Doctors Supported" },
-  { value: "95%", label: "Success Rate" },
+  { value: "10", label: "AI Workspaces" },
   { value: "24/7", label: "AI Availability" },
 ];
 
@@ -85,7 +87,7 @@ export default function Home() {
             <div className="w-8 h-8 rounded-lg gradient-purple flex items-center justify-center">
               <Stethoscope className="w-4 h-4 text-white" />
             </div>
-            <span className="font-bold text-lg text-foreground">Manas</span>
+            <span className="font-bold text-lg text-foreground">MedPath UK</span>
             <Badge variant="secondary" className="text-xs hidden sm:flex">by Health Care Quality School</Badge>
           </div>
           <div className="flex items-center gap-3">
@@ -171,7 +173,7 @@ export default function Home() {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-20 max-w-3xl mx-auto">
+          <div className="grid grid-cols-2 gap-6 mt-20 max-w-md mx-auto">
             {STATS.map((stat) => (
               <div key={stat.label} className="text-center glass rounded-xl p-4">
                 <div className="text-3xl font-bold text-white mb-1">{stat.value}</div>
@@ -341,7 +343,7 @@ export default function Home() {
         <div className="container relative z-10 text-center">
           <h2 className="text-4xl font-bold text-white mb-4">Ready to Begin Your UK Journey?</h2>
           <p className="text-white/70 text-lg mb-8 max-w-xl mx-auto">
-            Join hundreds of healthcare professionals who have structured their UK career with Manas.
+            Assess your portfolio against official recruitment criteria, and build a plan around what actually moves your application.
           </p>
           <Link href="/activate">
             <Button size="lg" className="gradient-orange text-white border-0 px-10 py-6 text-base font-semibold shadow-xl">
@@ -360,7 +362,7 @@ export default function Home() {
               <div className="w-7 h-7 rounded-lg gradient-purple flex items-center justify-center">
                 <Stethoscope className="w-3.5 h-3.5 text-white" />
               </div>
-              <span className="font-bold text-foreground">Manas</span>
+              <span className="font-bold text-foreground">MedPath UK</span>
               <span className="text-muted-foreground text-sm">by Health Care Quality School</span>
             </div>
             <div className="flex items-center gap-6 text-sm text-muted-foreground">
@@ -369,7 +371,7 @@ export default function Home() {
               <Link href="/activate">Activate</Link>
             </div>
             <p className="text-xs text-muted-foreground">
-              © 2025 Manas. This platform supports planning and preparation but does not replace official regulatory requirements.
+              © 2025 MedPath UK. This platform supports planning and preparation but does not replace official regulatory requirements.
             </p>
           </div>
         </div>

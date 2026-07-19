@@ -104,7 +104,7 @@ function PageHeader({ tier }: { tier: string }) {
           <div className="w-8 h-8 rounded-lg gradient-purple flex items-center justify-center">
             <Stethoscope className="w-4 h-4 text-white" />
           </div>
-          <span className="font-bold text-foreground">Manas</span>
+          <span className="font-bold text-foreground">MedPath UK</span>
         </div>
         <nav className="hidden md:flex items-center gap-1">
           {[
@@ -261,7 +261,7 @@ export default function Pricing() {
               },
               {
                 q: "Is the access code required?",
-                a: "Yes, Manas is currently invite-only. Each access code is linked to one email address and allows a single registration.",
+                a: "Yes, MedPath UK is currently invite-only. Each access code is linked to one email address and allows a single registration.",
               },
               {
                 q: "Can I upgrade or downgrade?",

@@ -51,7 +51,7 @@ const SUGGESTED: Record<WorkspaceKey, string[]> = {
   oet: ["Explain the OET Writing sub-test format", "Help me practice an OET Speaking roleplay for a doctor", "What score do I need for GMC registration?", "Give me tips for the OET Reading sub-test"],
   pathway: ["What is the PLAB pathway for international doctors?", "How do I apply through Oriel for specialty training?", "What are the steps to register with the GMC?", "How do I find NHS jobs as an IMG?"],
   cv: ["Review my medical CV structure", "What should I include in a specialty training application CV?", "How do I map my portfolio evidence to a person specification?", "What are the most important CV sections for a surgical application?"],
-  general: ["What is the typical timeline to get a training post in the UK?", "What's the difference between CMT and IMT?", "How do I build a competitive portfolio in 12 months?", "What support does Manas offer for my career stage?"],
+  general: ["What is the typical timeline to get a training post in the UK?", "What's the difference between CMT and IMT?", "How do I build a competitive portfolio in 12 months?", "What support does MedPath UK offer for my career stage?"],
 };
 
 export default function Chat() {

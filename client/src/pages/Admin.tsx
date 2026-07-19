@@ -108,7 +108,7 @@ export default function Admin() {
             <div className="w-8 h-8 rounded-lg gradient-purple flex items-center justify-center">
               <Stethoscope className="w-4 h-4 text-white" />
             </div>
-            <span className="font-bold text-foreground">Manas</span>
+            <span className="font-bold text-foreground">MedPath UK</span>
             <Badge className="bg-red-100 text-red-700 ml-2">Admin</Badge>
           </div>
           <nav className="hidden md:flex items-center gap-1">

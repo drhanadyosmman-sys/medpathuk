@@ -44,7 +44,7 @@
 
 :root {
   --radius: 0.75rem;
-  /* Manas - Premium Purple/Orange Medical SaaS Theme */
+  /* MedPath UK - Premium Purple/Orange Medical SaaS Theme */
   --background: oklch(0.98 0.005 285);
   --foreground: oklch(0.13 0.025 285);
   --card: oklch(1 0 0);
@@ -120,7 +120,6 @@
   }
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    direction: ltr;
   }
   html {
     scroll-behavior: smooth;

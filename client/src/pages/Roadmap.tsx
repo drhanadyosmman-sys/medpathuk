@@ -43,7 +43,7 @@ function PageHeader({ tier }: { tier: string }) {
           <div className="w-8 h-8 rounded-lg gradient-purple flex items-center justify-center">
             <Stethoscope className="w-4 h-4 text-white" />
           </div>
-          <span className="font-bold text-foreground">Manas</span>
+          <span className="font-bold text-foreground">MedPath UK</span>
         </div>
         <nav className="hidden md:flex items-center gap-1">
           {[

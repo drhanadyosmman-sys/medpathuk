@@ -167,7 +167,7 @@ export default function Questionnaire() {
               <div className="w-7 h-7 rounded-lg gradient-purple flex items-center justify-center">
                 <Stethoscope className="w-3.5 h-3.5 text-white" />
               </div>
-              <span className="font-bold text-foreground">Manas</span>
+              <span className="font-bold text-foreground">MedPath UK</span>
             </div>
             <Badge variant="secondary">Step {step + 1} of {STEPS.length}</Badge>
           </div>
