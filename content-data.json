@@ -1,0 +1,114 @@
+{
+  "specialties": [
+    { "id": "internal_medicine", "name": "الطب الباطني", "nameEn": "Internal Medicine / IMT", "exam": "MRCP", "coreYears": 3, "higherYears": 4, "totalYears": 7 },
+    { "id": "surgery", "name": "الجراحة العامة", "nameEn": "General Surgery", "exam": "MRCS", "coreYears": 2, "higherYears": 6, "totalYears": 8 },
+    { "id": "gp", "name": "طب الأسرة", "nameEn": "General Practice (GP)", "exam": "MRCGP", "coreYears": 3, "higherYears": 0, "totalYears": 3 },
+    { "id": "psychiatry", "name": "الطب النفسي", "nameEn": "Psychiatry", "exam": "MRCPsych", "coreYears": 3, "higherYears": 3, "totalYears": 6 },
+    { "id": "paediatrics", "name": "طب الأطفال", "nameEn": "Paediatrics", "exam": "MRCPCH", "coreYears": 3, "higherYears": 3, "totalYears": 6 },
+    { "id": "emergency", "name": "طب الطوارئ", "nameEn": "Emergency Medicine", "exam": "FRCEM", "coreYears": 3, "higherYears": 3, "totalYears": 6 },
+    { "id": "anaesthesia", "name": "التخدير", "nameEn": "Anaesthesia", "exam": "FRCA", "coreYears": 3, "higherYears": 3, "totalYears": 6 },
+    { "id": "radiology", "name": "الأشعة التشخيصية", "nameEn": "Clinical Radiology", "exam": "FRCR", "coreYears": 5, "higherYears": 0, "totalYears": 5 },
+    { "id": "cardiology", "name": "أمراض القلب", "nameEn": "Cardiology", "exam": "MRCP + SCE", "coreYears": 3, "higherYears": 4, "totalYears": 7 },
+    { "id": "neurology", "name": "طب الأعصاب", "nameEn": "Neurology", "exam": "MRCP + SCE", "coreYears": 3, "higherYears": 4, "totalYears": 7 },
+    { "id": "orthopaedics", "name": "جراحة العظام", "nameEn": "Trauma & Orthopaedics", "exam": "MRCS + FRCS", "coreYears": 2, "higherYears": 6, "totalYears": 8 },
+    { "id": "obstetrics", "name": "النساء والتوليد", "nameEn": "Obstetrics & Gynaecology", "exam": "MRCOG", "coreYears": 3, "higherYears": 4, "totalYears": 7 }
+  ],
+  "careerLevels": [
+    { "id": "f1_f2", "name": "Foundation Year (F1/F2)", "description": "السنة الأولى والثانية من التدريب الأساسي" },
+    { "id": "core_training", "name": "Core Training (CT1-CT3)", "description": "التدريب الأساسي في التخصص" },
+    { "id": "specialty_training", "name": "Specialty Training (ST3+)", "description": "التدريب المتخصص العالي" },
+    { "id": "sas_doctor", "name": "SAS Doctor", "description": "طبيب متخصص وخبير" },
+    { "id": "consultant", "name": "Consultant", "description": "استشاري" },
+    { "id": "img_new", "name": "IMG - حديث الوصول", "description": "طبيب دولي وصل حديثاً لبريطانيا" }
+  ],
+  "portfolioRequirements": {
+    "research": {
+      "title": "الأبحاث العلمية",
+      "description": "نشر أبحاث في مجلات محكّمة يُعزز ملفك المهني بشكل كبير",
+      "types": [
+        { "type": "Original Research", "points": "High", "difficulty": "High", "timeMonths": "12-24" },
+        { "type": "Case Report", "points": "Medium", "difficulty": "Low", "timeMonths": "3-6" },
+        { "type": "Systematic Review", "points": "High", "difficulty": "Medium", "timeMonths": "6-12" },
+        { "type": "Letter to Editor", "points": "Low", "difficulty": "Low", "timeMonths": "1-2" },
+        { "type": "Audit Publication", "points": "Medium", "difficulty": "Medium", "timeMonths": "6-12" }
+      ]
+    },
+    "qip": {
+      "title": "Quality Improvement Projects (QIP)",
+      "description": "مشاريع تحسين الجودة ضرورية لجميع التخصصات",
+      "steps": [
+        "تحديد مشكلة في الممارسة السريرية",
+        "مراجعة الإرشادات الحالية (NICE Guidelines)",
+        "قياس الوضع الحالي (Baseline Audit)",
+        "تطبيق التغيير (Change Intervention)",
+        "إعادة القياس (Re-audit)",
+        "توثيق النتائج في البورتفوليو"
+      ]
+    },
+    "clinicalAudit": {
+      "title": "Clinical Audit",
+      "description": "التدقيق السريري لقياس الممارسة مقابل المعايير",
+      "steps": [
+        "اختيار موضوع الأوديت",
+        "تحديد المعايير (Standards)",
+        "جمع البيانات",
+        "تحليل النتائج",
+        "تقديم التوصيات",
+        "إعادة الأوديت بعد التغيير"
+      ]
+    }
+  },
+  "ukLinks": [
+    { "category": "التسجيل والترخيص", "name": "General Medical Council (GMC)", "url": "https://www.gmc-uk.org", "description": "الهيئة المنظمة للأطباء في بريطانيا - التسجيل والترخيص" },
+    { "category": "التسجيل والترخيص", "name": "NHS Jobs", "url": "https://www.jobs.nhs.uk", "description": "البوابة الرسمية لوظائف NHS" },
+    { "category": "التدريب", "name": "NHS England - Medical Training", "url": "https://www.england.nhs.uk/medical-revalidation/", "description": "معلومات التدريب الطبي من NHS England" },
+    { "category": "التدريب", "name": "Oriel - Specialty Training Applications", "url": "https://www.oriel.nhs.uk", "description": "منصة التقديم لبرامج التدريب المتخصص" },
+    { "category": "التدريب", "name": "Health Education England (HEE)", "url": "https://www.hee.nhs.uk", "description": "هيئة التعليم الصحي - برامج التدريب" },
+    { "category": "الكليات الملكية", "name": "Royal College of Physicians (RCP)", "url": "https://www.rcplondon.ac.uk", "description": "الكلية الملكية للأطباء - MRCP" },
+    { "category": "الكليات الملكية", "name": "Royal College of Surgeons (RCS)", "url": "https://www.rcseng.ac.uk", "description": "الكلية الملكية للجراحين - MRCS" },
+    { "category": "الكليات الملكية", "name": "Royal College of GPs (RCGP)", "url": "https://www.rcgp.org.uk", "description": "الكلية الملكية لأطباء الأسرة - MRCGP" },
+    { "category": "الكليات الملكية", "name": "Royal College of Psychiatrists", "url": "https://www.rcpsych.ac.uk", "description": "الكلية الملكية للطب النفسي - MRCPsych" },
+    { "category": "الكليات الملكية", "name": "Royal College of Paediatrics", "url": "https://www.rcpch.ac.uk", "description": "الكلية الملكية لطب الأطفال - MRCPCH" },
+    { "category": "الأبحاث", "name": "PubMed / NCBI", "url": "https://pubmed.ncbi.nlm.nih.gov", "description": "قاعدة بيانات الأبحاث الطبية العالمية" },
+    { "category": "الأبحاث", "name": "BMJ (British Medical Journal)", "url": "https://www.bmj.com", "description": "المجلة الطبية البريطانية - نشر الأبحاث" },
+    { "category": "الأبحاث", "name": "The Lancet", "url": "https://www.thelancet.com", "description": "مجلة The Lancet الطبية المرموقة" },
+    { "category": "الأبحاث", "name": "NIHR - Research for Patient Benefit", "url": "https://www.nihr.ac.uk", "description": "المعهد الوطني للبحث الصحي - فرص التمويل" },
+    { "category": "الأبحاث", "name": "Cochrane Library", "url": "https://www.cochranelibrary.com", "description": "مكتبة كوكرين للمراجعات المنهجية" },
+    { "category": "التقديم والاستشارة", "name": "The Savvy IMG", "url": "https://thesavvyimg.co.uk", "description": "دليل شامل للأطباء الدوليين في بريطانيا" },
+    { "category": "التقديم والاستشارة", "name": "Road to UK", "url": "https://blog.roadtouk.com", "description": "مدونة ومعلومات للأطباء القادمين لبريطانيا" },
+    { "category": "التقديم والاستشارة", "name": "BMA - British Medical Association", "url": "https://www.bma.org.uk", "description": "نقابة الأطباء البريطانية - حقوق وإرشادات" },
+    { "category": "التقديم والاستشارة", "name": "UKFPO - Foundation Programme", "url": "https://www.foundationprogramme.nhs.uk", "description": "برنامج التدريب الأساسي للأطباء" },
+    { "category": "الامتحانات", "name": "MRCP UK", "url": "https://www.mrcpuk.org", "description": "امتحانات MRCP للتخصصات الباطنية" },
+    { "category": "الامتحانات", "name": "Intercollegiate Exams (MRCS)", "url": "https://www.intercollegiate.org.uk", "description": "امتحانات MRCS للجراحة" },
+    { "category": "الامتحانات", "name": "PLAB - Professional and Linguistic Assessments Board", "url": "https://www.gmc-uk.org/registration-and-licensing/join-our-registers/plab", "description": "امتحان PLAB للأطباء الدوليين" },
+    { "category": "الوكالات والتوظيف", "name": "Locum's Nest", "url": "https://locumsnest.co.uk", "description": "منصة توظيف الأطباء المؤقتين" },
+    { "category": "الوكالات والتوظيف", "name": "Doctors.net.uk", "url": "https://www.doctors.net.uk", "description": "شبكة الأطباء البريطانية" }
+  ],
+  "interviewGuide": {
+    "title": "دليل المقابلات الطبية في بريطانيا",
+    "types": [
+      {
+        "type": "Specialty Training Interview",
+        "format": "Multiple Mini Interviews (MMI) أو Panel Interview",
+        "stations": ["Clinical Scenario", "Portfolio Station", "Prioritisation", "Communication", "Audit/QIP", "Teaching & Leadership"],
+        "tips": [
+          "استخدم STAR framework في إجاباتك (Situation, Task, Action, Result)",
+          "احضر أمثلة محددة من تجربتك السريرية",
+          "اعرف إرشادات NICE المتعلقة بتخصصك",
+          "تدرب على أسئلة الأولويات والسيناريوهات السريرية",
+          "اعرف قيم NHS (NHS Values) وكيف تطبقها"
+        ]
+      }
+    ],
+    "commonQuestions": [
+      "Why this specialty?",
+      "Why this deanery/region?",
+      "Tell me about a clinical audit or QIP you've done",
+      "Describe a time you dealt with a difficult colleague",
+      "How do you manage your time and prioritise tasks?",
+      "What are your weaknesses and how are you addressing them?",
+      "Tell me about a teaching experience",
+      "Describe a significant clinical event and what you learned"
+    ]
+  }
+}
