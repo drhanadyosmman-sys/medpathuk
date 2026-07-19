@@ -145,9 +145,16 @@ function SpecialtySelector({ onSelect }: { onSelect: (s: SASSpecialty) => void }
               {specialty.name}
             </h3>
             <p className="text-xs text-gray-500 mb-3 line-clamp-2">{specialty.description}</p>
-            {/* Scores are only presented as figures once the matrix behind them
+            {/* Three states. A specialty with no self-scorable portfolio says so
+                whether or not it is verified — a max score would be meaningless
+                there. Otherwise figures appear only once the matrix behind them
                 has been checked against the official source. */}
-            {isVerified(specialty.id) ? (
+            {!isScorable(specialty.id) ? (
+              <div className="flex items-center gap-1.5 text-xs text-blue-300/90">
+                <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                Not scored by portfolio — see details
+              </div>
+            ) : isVerified(specialty.id) ? (
               <div className="flex items-center justify-between text-xs">
                 <span className="text-gray-500">Max score: <span className="text-purple-400 font-semibold">{specialty.totalMaxScore}</span></span>
                 {specialty.competitiveThreshold && (
@@ -157,9 +164,7 @@ function SpecialtySelector({ onSelect }: { onSelect: (s: SASSpecialty) => void }
             ) : (
               <div className="flex items-center gap-1.5 text-xs text-amber-400/90">
                 <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-                {isScorable(specialty.id)
-                  ? "Scoring under review — figures not yet confirmed"
-                  : "Not scored by portfolio — see details"}
+                Scoring under review — figures not yet confirmed
               </div>
             )}
             {specialty.msraRequired && (
@@ -912,9 +917,38 @@ function NotPortfolioScored({
         <p className="text-gray-300 leading-relaxed mb-4">{note}</p>
         <p className="text-gray-400 text-sm leading-relaxed mb-6">
           Because there is no portfolio score, a self-assessment cannot tell you
-          anything useful here — your rank comes from your MSRA performance.
-          Preparing for that exam is what moves your application.
+          anything useful here. Preparing for what is actually assessed is what
+          moves your application.
         </p>
+
+        {/* Where the specialty ranks on an interview, showing what that
+            interview marks is the closest thing to actionable guidance we can
+            give in place of a score. */}
+        {specialty.interviewScoring && (
+          <div className="mb-6 rounded-xl border border-white/10 bg-white/3 p-4">
+            <p className="text-sm font-medium text-white mb-2">
+              What you are assessed on instead
+            </p>
+            <p className="text-xs text-gray-400 leading-relaxed">
+              {specialty.interviewScoring.description}
+            </p>
+            {specialty.interviewScoring.weightedAreas && (
+              <div className="overflow-x-auto mt-3">
+                <table className="w-full text-xs">
+                  <tbody>
+                    {specialty.interviewScoring.weightedAreas.map((a) => (
+                      <tr key={a.area} className="border-b border-white/5">
+                        <td className="py-1.5 pr-3 text-gray-400">{a.area}</td>
+                        <td className="py-1.5 pr-3 text-gray-500 whitespace-nowrap">{a.weighting}</td>
+                        <td className="py-1.5 text-right text-gray-300 whitespace-nowrap">/{a.maxScore}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
         <div className="flex flex-col sm:flex-row gap-3">
           <a
             href={specialty.sourceUrl}

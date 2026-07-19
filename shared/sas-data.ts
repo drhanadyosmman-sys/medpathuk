@@ -19,13 +19,20 @@
  *  - "msra-only"           No portfolio is scored at any stage; ranking comes
  *                          from the MSRA exam. There is nothing to self-score,
  *                          so the assessment form is not shown.
+ *  - "msra-and-interview"  Shortlisting is on the MSRA and ranking on a
+ *                          competency interview. No portfolio is self-scored,
+ *                          so again there is no assessment to offer.
  *  - "unknown"             Not yet established. Treated as unverified.
  */
 export type SASScoringModel =
   | "self-assessment"
   | "interview-portfolio"
   | "msra-only"
+  | "msra-and-interview"
   | "unknown";
+
+/** Models where the applicant has no portfolio to score themselves against. */
+const NON_SCORABLE_MODELS: SASScoringModel[] = ["msra-only", "msra-and-interview"];
 
 /**
  * How the interview stage is scored, where a specialty publishes it.
@@ -999,11 +1006,26 @@ export const SAS_SPECIALTIES: SASSpecialty[] = [
     name: "Anaesthetics / ACCS (Anaesthesia)",
     shortName: "Anaesthetics",
     applicationRoute: "Core Training",
-    msraRequired: false,
-    totalMaxScore: 50,
-    competitiveThreshold: 35,
-    sourceUrl: "https://www.rcoa.ac.uk/training-careers/training-anaesthesia/applying-anaesthesia-training",
-    description: "Core Anaesthetics Training (CAT) or ACCS Anaesthesia. Portfolio-based scoring at interview. RCoA oversees training.",
+    msraRequired: true,
+    totalMaxScore: 100,
+    competitiveThreshold: null,
+    sourceUrl: "https://anro.wm.hee.nhs.uk/ct1",
+    description: "CT1 Anaesthetics or ACCS Anaesthetics, recruited nationally through ANRO via Oriel. Shortlisting is on the MSRA; ranking is on a two-station competency interview scored out of 100. There is no self-assessed portfolio at CT1 — that applies at ST4 entry.",
+    interviewScoring: {
+      rawMaxScore: 100,
+      shortlistingScoreCarriesForward: false,
+      description:
+        "A two-station interview: Station 1 covers clinical judgement, Station 2 is a general interview. Four assessors score in total, two per station. Six attributes are each marked out of 5 by two assessors, giving 10 apiece, and each of the four assessors also awards a global rating out of 10. Each station totals 50, for an interview score out of 100.",
+      weightedAreas: [
+        { area: "Professional Behaviour & Communication", weighting: "2 assessors × 5", maxScore: 10 },
+        { area: "Clinical Judgement & Decision Making", weighting: "2 assessors × 5", maxScore: 10 },
+        { area: "Team Working", weighting: "2 assessors × 5", maxScore: 10 },
+        { area: "Reflective Practice", weighting: "2 assessors × 5", maxScore: 10 },
+        { area: "Commitment to Specialty", weighting: "2 assessors × 5", maxScore: 10 },
+        { area: "Working Under Pressure", weighting: "2 assessors × 5", maxScore: 10 },
+        { area: "Global Rating", weighting: "4 assessors × 10", maxScore: 40 },
+      ],
+    },
     domains: [
       {
         id: "anaes_qualifications",
@@ -2849,11 +2871,11 @@ export const SAS_VERIFICATION: Record<string, SASVerification> = {
     note: "The 150 total is real but is not a self-assessment score: it is 50 marks from the MSRA plus 100 from the online interview. An applicant cannot self-score an interview they have not sat.",
   },
   anaesthetics: {
-    status: "unverified",
-    scoringModel: "unknown",
-    checkedOn: null,
-    cycle: null,
-    note: "Matrix not checked against the official source.",
+    status: "verified",
+    scoringModel: "msra-and-interview",
+    checkedOn: "2026-07-19",
+    cycle: "2026",
+    note: "CT1 Anaesthetics has no self-assessed portfolio. Shortlisting is on the MSRA and ranking on a two-station interview scored out of 100, transcribed from the official CT1 Interview Scoring Matrix 2026. The 50-point portfolio assessment this tool previously offered appears to have been taken from ST4 entry, which does have a verified self-assessment plus a Portfolio Organisation Score — a different application route several years further on. The entry also recorded that the MSRA was not required, which is the opposite of the case.",
   },
   em: {
     status: "unverified",
@@ -2960,7 +2982,7 @@ export function isVerified(specialtyId: string): boolean {
   return getVerification(specialtyId).status === "verified";
 }
 
-/** True when the specialty has no self-scorable portfolio at all. */
+/** True when the specialty has a portfolio the applicant can score themselves. */
 export function isScorable(specialtyId: string): boolean {
-  return getVerification(specialtyId).scoringModel !== "msra-only";
+  return !NON_SCORABLE_MODELS.includes(getVerification(specialtyId).scoringModel);
 }
