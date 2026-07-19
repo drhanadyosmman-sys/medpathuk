@@ -15,6 +15,7 @@ import {
   type SASSpecialty,
   type SASDomain,
 } from "../../../shared/sas-data";
+import { courseForDomain } from "../../../shared/courses";
 import {
   AlertCircle,
   Award,
@@ -685,16 +686,47 @@ function ResultsView({
             const domainScore = domain.criteria.reduce((sum, c) => sum + (answers[c.id] ?? 0), 0);
             const gap = domain.maxScore - domainScore;
             if (gap === 0) return null;
+            // Suggest one of our own courses only where it answers this
+            // specific gap, and only while the gap is substantial — a doctor
+            // one point short does not need a course, and showing one there
+            // turns guidance into advertising.
+            const course =
+              gap >= Math.ceil(domain.maxScore / 2)
+                ? courseForDomain(specialty.id, domain.name)
+                : null;
             return (
               <div key={domain.id} className="flex items-start gap-3 p-3 rounded-lg bg-white/2 border border-white/5">
                 <div className="w-6 h-6 rounded-full bg-orange-500/20 flex items-center justify-center shrink-0 mt-0.5">
                   <span className="text-xs font-bold text-orange-400">+{gap}</span>
                 </div>
-                <div>
+                <div className="min-w-0">
                   <p className="text-sm text-gray-200 font-medium">{domain.name}</p>
                   <p className="text-xs text-gray-500">
                     You scored {domainScore}/{domain.maxScore} — {gap} point{gap !== 1 ? "s" : ""} available
                   </p>
+                  {course && (
+                    <a
+                      href={course.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-2 flex items-start gap-2 rounded-lg border border-teal-500/25 bg-teal-500/8 px-2.5 py-2 hover:border-teal-500/45 transition-colors group/course"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5 text-teal-400 shrink-0 mt-0.5" />
+                      <span className="min-w-0">
+                        <span className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-xs font-medium text-teal-100 group-hover/course:text-white transition-colors">
+                            {course.title}
+                          </span>
+                          <Badge variant="secondary" className="text-[10px] px-1.5 py-0 font-normal">
+                            Our course
+                          </Badge>
+                        </span>
+                        <span className="block text-[11px] text-gray-400 mt-0.5 leading-relaxed">
+                          {course.blurb}
+                        </span>
+                      </span>
+                    </a>
+                  )}
                 </div>
               </div>
             );
