@@ -67,12 +67,18 @@ export interface SASInterviewScoring {
   shortlistingScoreCarriesForward?: boolean;
   /** Hard gates that make an application unappointable regardless of rank. */
   appointabilityCriteria?: string[];
-  /** Weighted assessment areas making up the ranked total. */
+  /** Assessment areas making up the ranked total. */
   weightedAreas?: {
     area: string;
-    /** Multiplier applied to the two interviewers' marks. */
+    /** How the area is marked, e.g. a multiplier or number of assessors. */
     weighting: string;
-    maxScore: number;
+    /**
+     * Marks available. Omitted where the official guidance names the assessed
+     * areas but does not publish their point values — listing the areas is
+     * still useful, and inventing the numbers is what this audit exists to
+     * undo.
+     */
+    maxScore?: number;
   }[];
 }
 
@@ -427,10 +433,23 @@ export const SAS_SPECIALTIES: SASSpecialty[] = [
     shortName: "CST",
     applicationRoute: "Core Training",
     msraRequired: true,
-    totalMaxScore: 60,
-    competitiveThreshold: 42,
-    sourceUrl: "https://medical.hee.nhs.uk/medical-training-recruitment/medical-specialty-training/surgery/core-surgery",
-    description: "2-year core surgical training. Portfolio is graded A-E across 5 domains and assessed at interview, where it carries 45% of the overall score.",
+    totalMaxScore: 0,
+    competitiveThreshold: null,
+    sourceUrl: "https://medical.hee.nhs.uk/medical-training-recruitment/medical-specialty-training/surgery/core-surgery/core-surgical-training-portfolio-guidance-for-candidates",
+    description: "2-year core surgical training. You categorise yourself A-E across five portfolio domains and upload evidence, which is then assessed at interview — two of the domains are explored through structured questions. The point values behind the categories are not published.",
+    interviewScoring: {
+      rawMaxScore: 0,
+      shortlistingScoreCarriesForward: true,
+      description:
+        "Five portfolio domains, each categorised A to E with evidence uploaded ahead of interview. Assessors review the portfolio and then question you on two domains of their choosing. NHS England names the domains and the category descriptors but does not publish what each category scores, so no total is shown here — check the current guidance for the round you are applying to.",
+      weightedAreas: [
+        { area: "Commitment to Specialty (operative experience)", weighting: "categories A-E" },
+        { area: "Surgical Experience (taster week or elective)", weighting: "categories A-B" },
+        { area: "Quality Improvement / Clinical Audit", weighting: "categories A-E" },
+        { area: "Presentations and Publications", weighting: "categories A-E" },
+        { area: "Teaching Experience", weighting: "categories A-E" },
+      ],
+    },
     domains: [
       {
         id: "cst_commitment",
@@ -2875,11 +2894,11 @@ export const SAS_VERIFICATION: Record<string, SASVerification> = {
     note: "Domains, options and scores transcribed from the official IMT 2026 application scoring guidance; eligibility and interview scoring from the same site. Shortlisting is by rank against interview capacity, so there is no published pass mark — competitiveThreshold is deliberately null. msraRequired is false: the scoring page states shortlisting scores are generated in exactly two ways (self-assessment plus unique-applicant points) and neither the scoring nor eligibility guidance mentions the MSRA. NHS England states this guidance also applies to 2027, with the site due to be updated in autumn 2026. The shortlisting score does not carry into ranking — the assessment-methods guidance states the interview alone forms all marks used for the total score, and that neither the self-assessment nor the unique-applicant points contribute to the score used for offers. Achievements are still discussed at interview and contribute there. Assessment runs in three stages: longlisting on eligibility, shortlisting on the score out of 35, then interview. Nothing outstanding.",
   },
   cst: {
-    status: "unverified",
+    status: "verified",
     scoringModel: "interview-portfolio",
-    checkedOn: null,
-    cycle: null,
-    note: "The numeric 60-point matrix above no longer reflects the process. CST scoring moved to letter grades A-E across 5 domains, assessed at interview and worth 45% of the overall score, not a self-assessed total.",
+    checkedOn: "2026-07-19",
+    cycle: "2026",
+    note: "Domain names and category structure taken from the official NHS England portfolio guidance for candidates. The 60-point numeric matrix with a 42-point threshold that this tool previously showed does not exist: CST grades five domains A-E, and assessors question you on two of them at interview. NHS England publishes the domains and category descriptors but not what each category scores, so no total is claimed here — the previous figures had no source. Outstanding: the point value of each category and the portfolio's share of the overall score.",
   },
   gp: {
     status: "unverified",

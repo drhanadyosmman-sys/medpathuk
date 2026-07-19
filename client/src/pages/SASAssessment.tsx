@@ -565,7 +565,7 @@ function ResultsView({
                         <tr key={a.area} className="border-b border-white/5">
                           <td className="py-1.5 pr-3 text-gray-400">{a.area}</td>
                           <td className="py-1.5 pr-3 text-gray-500 whitespace-nowrap">{a.weighting}</td>
-                          <td className="py-1.5 text-right text-gray-300 whitespace-nowrap">/{a.maxScore}</td>
+                          <td className="py-1.5 text-right text-gray-300 whitespace-nowrap">{a.maxScore === undefined ? "—" : `/${a.maxScore}`}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -985,7 +985,7 @@ function NotPortfolioScored({
                       <tr key={a.area} className="border-b border-white/5">
                         <td className="py-1.5 pr-3 text-gray-400">{a.area}</td>
                         <td className="py-1.5 pr-3 text-gray-500 whitespace-nowrap">{a.weighting}</td>
-                        <td className="py-1.5 text-right text-gray-300 whitespace-nowrap">/{a.maxScore}</td>
+                        <td className="py-1.5 text-right text-gray-300 whitespace-nowrap">{a.maxScore === undefined ? "—" : `/${a.maxScore}`}</td>
                       </tr>
                     ))}
                   </tbody>
