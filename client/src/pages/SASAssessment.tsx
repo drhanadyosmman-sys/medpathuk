@@ -25,6 +25,7 @@ import {
   ChevronRight,
   ClipboardList,
   ExternalLink,
+  FileText,
   Lock,
   RotateCcw,
   Sparkles,
@@ -507,9 +508,15 @@ function ResultsView({
                       of {specialty.interviewScoring.weightedMaxScore}, awarded
                       on the day.
                     </>
-                  )}{" "}
-                  Once you are comfortably shortlisted, interview preparation
-                  moves your application further than more portfolio evidence.
+                  )}
+                </p>
+                <p className="text-sm text-amber-200/85 leading-relaxed mt-2">
+                  Your achievements still matter after shortlisting, but as
+                  something you discuss rather than a score you carry: they are
+                  assessed at interview under "Application and achievements".
+                  So once you are comfortably shortlisted, being able to talk
+                  about the evidence you already have beats gathering more of
+                  it.
                 </p>
               </div>
             )}
@@ -593,6 +600,42 @@ function ResultsView({
           })}
         </CardContent>
       </Card>
+
+      {/* Evidence — placed straight after the breakdown, at the moment the
+          applicant has just claimed a set of points and can still check they
+          are able to prove each one. Scoring is self-assessed and rarely
+          audited, so the cost of over-claiming surfaces far too late. */}
+      {specialty.evidenceGuidance && (
+        <Card className="bg-white/3 border-white/8 mb-6">
+          <CardHeader>
+            <CardTitle className="text-base text-white flex items-center gap-2">
+              <FileText className="w-4 h-4 text-purple-400" />
+              Can you prove what you claimed?
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2 mb-4">
+              {specialty.evidenceGuidance.hardFails.map((f) => (
+                <div
+                  key={f}
+                  className="flex gap-2 rounded-lg border border-red-500/25 bg-red-500/8 px-3 py-2"
+                >
+                  <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+                  <p className="text-xs text-red-200/90 leading-relaxed">{f}</p>
+                </div>
+              ))}
+            </div>
+            <ul className="space-y-2">
+              {specialty.evidenceGuidance.rules.map((r) => (
+                <li key={r} className="flex gap-2 text-xs text-gray-400 leading-relaxed">
+                  <span className="text-purple-400 shrink-0">•</span>
+                  {r}
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Guidance */}
       <Card className="bg-white/3 border-white/8 mb-6">

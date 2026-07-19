@@ -83,6 +83,20 @@ export interface SASEligibility {
   requirements: SASEligibilityRequirement[];
 }
 
+/**
+ * What an applicant must be able to prove for the points they claim.
+ *
+ * Scoring is self-assessed and usually unaudited, which makes it easy to claim
+ * points you cannot document. The consequences of that land later and are
+ * severe, so the requirements belong next to the score, not in a separate guide.
+ */
+export interface SASEvidenceGuidance {
+  /** Conditions that stop an application progressing, regardless of score. */
+  hardFails: string[];
+  /** Practical rules for preparing and submitting evidence. */
+  rules: string[];
+}
+
 /** Provenance record for one specialty's scoring matrix. */
 export interface SASVerification {
   status: "verified" | "unverified";
@@ -126,6 +140,8 @@ export interface SASSpecialty {
   interviewScoring?: SASInterviewScoring;
   /** Entry requirements, shown before the applicant scores themselves. */
   eligibility?: SASEligibility;
+  /** What the applicant must be able to prove for the points they claim. */
+  evidenceGuidance?: SASEvidenceGuidance;
 }
 
 export const SAS_SPECIALTIES: SASSpecialty[] = [
@@ -166,6 +182,22 @@ export const SAS_SPECIALTIES: SASSpecialty[] = [
         { area: "Clinical scenario — investigations, diagnosis, management (Station 2)", weighting: "x1.2", maxScore: 12 },
         { area: "Clinical scenario — patient handover (Station 2)", weighting: "x0.8", maxScore: 8 },
         { area: "Communication (Station 2)", weighting: "x1.6", maxScore: 16 },
+      ],
+    },
+    evidenceGuidance: {
+      hardFails: [
+        "Supplying no evidence at all, or no evidence for three or more of your scored achievements, stops your application progressing",
+        "Patient-identifiable data found in your documents — including hospital or NHS ID numbers — is likely to be reported to your employer, supervisor and region. Redact everything before you upload",
+      ],
+      rules: [
+        "You will usually not be asked for evidence — it is requested only in a randomised fairness audit, or if there are concerns about your self-assessment. You must still have documentation available for every achievement you claim from the moment you apply.",
+        "You cannot upload anything before a request is sent. If asked, you get at least one week to supply it.",
+        "Upload only what justifies the option you selected. If you claimed a national presentation, do not include your other presentations; if you claimed a book chapter, include only enough pages to verify it.",
+        "Do not include evidence for courses or commitment-to-specialty entries unless they relate to a scored option.",
+        "Tag each document to the domain it supports. One document can be tagged to more than one domain — a presentation based on a QI project can count for both.",
+        "PDFs or image files only, maximum 5MB each.",
+        "Anything not in English must be translated for credit to be given.",
+        "Assessors verify evidence quickly, and poorly organised documents may mean an achievement cannot be verified at all.",
       ],
     },
     eligibility: {
@@ -2746,7 +2778,7 @@ export const SAS_VERIFICATION: Record<string, SASVerification> = {
     scoringModel: "self-assessment",
     checkedOn: "2026-07-19",
     cycle: "2026",
-    note: "Domains, options and scores transcribed from the official IMT 2026 application scoring guidance; eligibility and interview scoring from the same site. Shortlisting is by rank against interview capacity, so there is no published pass mark — competitiveThreshold is deliberately null. msraRequired is false: the scoring page states shortlisting scores are generated in exactly two ways (self-assessment plus unique-applicant points) and neither the scoring nor eligibility guidance mentions the MSRA. NHS England states this guidance also applies to 2027, with the site due to be updated in autumn 2026. Outstanding: the weighting applied when the raw interview score is combined with the shortlisting score.",
+    note: "Domains, options and scores transcribed from the official IMT 2026 application scoring guidance; eligibility and interview scoring from the same site. Shortlisting is by rank against interview capacity, so there is no published pass mark — competitiveThreshold is deliberately null. msraRequired is false: the scoring page states shortlisting scores are generated in exactly two ways (self-assessment plus unique-applicant points) and neither the scoring nor eligibility guidance mentions the MSRA. NHS England states this guidance also applies to 2027, with the site due to be updated in autumn 2026. The shortlisting score does not carry into ranking — the assessment-methods guidance states the interview alone forms all marks used for the total score, and that neither the self-assessment nor the unique-applicant points contribute to the score used for offers. Achievements are still discussed at interview and contribute there. Assessment runs in three stages: longlisting on eligibility, shortlisting on the score out of 35, then interview. Nothing outstanding.",
   },
   cst: {
     status: "unverified",
