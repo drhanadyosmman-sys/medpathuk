@@ -626,7 +626,7 @@ export const SAS_SPECIALTIES: SASSpecialty[] = [
     msraRequired: true,
     totalMaxScore: 40,
     competitiveThreshold: 28,
-    sourceUrl: "https://www.rcpsych.ac.uk/training/training-in-the-uk/core-training",
+    sourceUrl: "https://medical.hee.nhs.uk/medical-training-recruitment/medical-specialty-training/psychiatry",
     description: "3-year core psychiatry training. Selection is on MSRA score alone — there is no interview and no portfolio scoring.",
     domains: [
       {
@@ -760,7 +760,7 @@ export const SAS_SPECIALTIES: SASSpecialty[] = [
     msraRequired: false,
     totalMaxScore: 25,
     competitiveThreshold: 18,
-    sourceUrl: "https://www.rcpch.ac.uk/resources/paediatric-specialty-training-recruitment",
+    sourceUrl: "https://medical.hee.nhs.uk/medical-training-recruitment/medical-specialty-training/paediatrics",
     description: "Paediatric training from CT1 level. Portfolio-based scoring with interview. RCPCH oversees training.",
     domains: [
       {
@@ -1307,7 +1307,7 @@ export const SAS_SPECIALTIES: SASSpecialty[] = [
     msraRequired: true,
     totalMaxScore: 24,
     competitiveThreshold: 18,
-    sourceUrl: "https://www.rcr.ac.uk/clinical-radiology/recruitment/clinical-radiology-recruitment/",
+    sourceUrl: "https://medical.hee.nhs.uk/medical-training-recruitment/medical-specialty-training/clinical-radiology",
     description: "5-year radiology specialty training from ST1. MSRA is used for shortlisting; the portfolio is self-assessed by category A-E across 5 domains and carries 30% of the final rank, with part of it explored at interview.",
     domains: [
       {
@@ -1574,7 +1574,7 @@ export const SAS_SPECIALTIES: SASSpecialty[] = [
     msraRequired: false,
     totalMaxScore: 45,
     competitiveThreshold: 32,
-    sourceUrl: "https://www.boa.ac.uk/careers-and-training/specialty-training/",
+    sourceUrl: "https://medical.hee.nhs.uk/medical-training-recruitment/medical-specialty-training/surgery",
     description: "Core Surgical Training (CST) with orthopaedic focus, then ST3 orthopaedics. BOA and JCST oversee training.",
     domains: [
       {
@@ -1708,7 +1708,7 @@ export const SAS_SPECIALTIES: SASSpecialty[] = [
     msraRequired: true,
     totalMaxScore: 36,
     competitiveThreshold: 26,
-    sourceUrl: "https://www.sbns.org.uk/index.php/education-and-training/specialty-training/",
+    sourceUrl: "https://medical.hee.nhs.uk/medical-training-recruitment/medical-specialty-training/surgery",
     description: "8-year run-through neurosurgery training from ST1. MSRA used for shortlisting. SBNS oversees training. Highly competitive.",
     domains: [
       {
@@ -1841,7 +1841,7 @@ export const SAS_SPECIALTIES: SASSpecialty[] = [
     msraRequired: false,
     totalMaxScore: 32,
     competitiveThreshold: 24,
-    sourceUrl: "https://www.bsdermatology.co.uk/training/specialty-training/",
+    sourceUrl: "https://medical.hee.nhs.uk/medical-training-recruitment/medical-specialty-training/medicine",
     description: "ST3 entry specialty. Highly competitive with portfolio-based shortlisting via Oriel. Requires strong academic and clinical evidence.",
     domains: [
       {
@@ -2306,7 +2306,7 @@ export const SAS_SPECIALTIES: SASSpecialty[] = [
     msraRequired: false,
     totalMaxScore: 32,
     competitiveThreshold: 24,
-    sourceUrl: "https://www.bsg.org.uk/education-training/training/specialty-training/",
+    sourceUrl: "https://medical.hee.nhs.uk/medical-training-recruitment/medical-specialty-training/medicine",
     description: "ST3 entry after IMT. Portfolio-based shortlisting. Research output and endoscopy experience are highly valued.",
     domains: [
       {
@@ -2461,7 +2461,7 @@ export const SAS_SPECIALTIES: SASSpecialty[] = [
     msraRequired: false,
     totalMaxScore: 32,
     competitiveThreshold: 23,
-    sourceUrl: "https://www.sfebes.org.uk/training-education/specialty-training/",
+    sourceUrl: "https://medical.hee.nhs.uk/medical-training-recruitment/medical-specialty-training/medicine",
     description: "ST3 entry after IMT. Portfolio-based shortlisting. Research in diabetes/endocrinology and clinical experience are key.",
     domains: [
       {
@@ -2616,7 +2616,7 @@ export const SAS_SPECIALTIES: SASSpecialty[] = [
     msraRequired: false,
     totalMaxScore: 32,
     competitiveThreshold: 23,
-    sourceUrl: "https://www.brit-thoracic.org.uk/education-and-research/training-and-education/",
+    sourceUrl: "https://medical.hee.nhs.uk/medical-training-recruitment/medical-specialty-training/medicine",
     description: "ST3 entry after IMT. Portfolio-based shortlisting. Research output and respiratory clinical experience are key differentiators.",
     domains: [
       {
@@ -2832,14 +2832,14 @@ export const SAS_VERIFICATION: Record<string, SASVerification> = {
     scoringModel: "msra-only",
     checkedOn: null,
     cycle: null,
-    note: "Core Psychiatry selects on MSRA alone, with no interview and no portfolio. The 40-point scoring this tool previously showed does not correspond to anything in Psychiatry recruitment.",
+    note: "Core Psychiatry selects on MSRA alone, with no interview and no portfolio. The 40-point scoring this tool previously showed does not correspond to anything in Psychiatry recruitment. Its sourceUrl was a dead link when checked in July 2026 and now points to the NHS England specialty hub rather than an invented deep link.",
   },
   paediatrics: {
     status: "unverified",
     scoringModel: "unknown",
     checkedOn: null,
     cycle: null,
-    note: "Matrix not checked against the official source.",
+    note: "Matrix not checked against the official source. Its sourceUrl was a dead link when checked in July 2026 and now points to the NHS England specialty hub rather than an invented deep link.",
   },
   og: {
     status: "unverified",
@@ -2867,7 +2867,7 @@ export const SAS_VERIFICATION: Record<string, SASVerification> = {
     scoringModel: "interview-portfolio",
     checkedOn: null,
     cycle: null,
-    note: "Self-assessment is by category A-E across 5 domains (reduced from 7), and the portfolio contributes 30% of the final rank with part of it explored at interview. The 24-point numeric matrix above does not reflect this.",
+    note: "Self-assessment is by category A-E across 5 domains (reduced from 7), and the portfolio contributes 30% of the final rank with part of it explored at interview. The 24-point numeric matrix above does not reflect this. Its sourceUrl was a dead link when checked in July 2026 and now points to the NHS England specialty hub rather than an invented deep link.",
   },
   ophthalmology: {
     status: "unverified",
@@ -2881,14 +2881,14 @@ export const SAS_VERIFICATION: Record<string, SASVerification> = {
     scoringModel: "unknown",
     checkedOn: null,
     cycle: null,
-    note: "Matrix not checked against the official source.",
+    note: "Matrix not checked against the official source. Its sourceUrl was a dead link when checked in July 2026 and now points to the NHS England specialty hub rather than an invented deep link.",
   },
   neurosurgery: {
     status: "unverified",
     scoringModel: "unknown",
     checkedOn: null,
     cycle: null,
-    note: "Matrix not checked against the official source.",
+    note: "Matrix not checked against the official source. Its sourceUrl was a dead link when checked in July 2026 and now points to the NHS England specialty hub rather than an invented deep link.",
   },
   // The six specialties below were added in one batch and all carry an
   // identical 32-point maximum, differing only in threshold. Real recruitment
@@ -2899,7 +2899,7 @@ export const SAS_VERIFICATION: Record<string, SASVerification> = {
     scoringModel: "unknown",
     checkedOn: null,
     cycle: null,
-    note: "Part of a batch of six specialties sharing an identical 32-point maximum, which real recruitment matrices do not.",
+    note: "Part of a batch of six specialties sharing an identical 32-point maximum, which real recruitment matrices do not. Its sourceUrl was a dead link when checked in July 2026 and now points to the NHS England specialty hub rather than an invented deep link.",
   },
   cardiology: {
     status: "unverified",
@@ -2920,21 +2920,21 @@ export const SAS_VERIFICATION: Record<string, SASVerification> = {
     scoringModel: "unknown",
     checkedOn: null,
     cycle: null,
-    note: "Part of a batch of six specialties sharing an identical 32-point maximum, which real recruitment matrices do not.",
+    note: "Part of a batch of six specialties sharing an identical 32-point maximum, which real recruitment matrices do not. Its sourceUrl was a dead link when checked in July 2026 and now points to the NHS England specialty hub rather than an invented deep link.",
   },
   endocrinology: {
     status: "unverified",
     scoringModel: "unknown",
     checkedOn: null,
     cycle: null,
-    note: "Part of a batch of six specialties sharing an identical 32-point maximum, which real recruitment matrices do not.",
+    note: "Part of a batch of six specialties sharing an identical 32-point maximum, which real recruitment matrices do not. Its sourceUrl was a dead link when checked in July 2026 and now points to the NHS England specialty hub rather than an invented deep link.",
   },
   respiratory: {
     status: "unverified",
     scoringModel: "unknown",
     checkedOn: null,
     cycle: null,
-    note: "Part of a batch of six specialties sharing an identical 32-point maximum, which real recruitment matrices do not.",
+    note: "Part of a batch of six specialties sharing an identical 32-point maximum, which real recruitment matrices do not. Its sourceUrl was a dead link when checked in July 2026 and now points to the NHS England specialty hub rather than an invented deep link.",
   },
 };
 

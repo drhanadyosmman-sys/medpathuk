@@ -21,7 +21,7 @@ const LINK_CATEGORIES = [
     links: [
       { title: "GMC – General Medical Council", url: "https://www.gmc-uk.org", desc: "Medical registration, PLAB, revalidation" },
       { title: "PLAB Information", url: "https://www.gmc-uk.org/registration-and-licensing/join-the-register/plab", desc: "PLAB 1 & 2 guidance and booking" },
-      { title: "OET Official Website", url: "https://www.occupationalenglishtest.com", desc: "English language test for healthcare" },
+      { title: "OET Official Website", url: "https://www.occupationalenglishtest.org", desc: "English language test for healthcare" },
       { title: "NHS Employers", url: "https://www.nhsemployers.org", desc: "Employment guidance for NHS staff" },
     ],
   },
@@ -64,6 +64,7 @@ const LINK_CATEGORIES = [
   {
     id: "quality", label: "Quality Improvement", icon: TrendingUp, color: "from-teal-500 to-teal-700",
     links: [
+      { title: "QIP in Healthcare — training course", url: "https://www.healthcarequalityschools.com/p/quality-improvement-project-in-healthcare512244112131", desc: "Structured QIP training. Run by Health Care Quality School, who operate this platform", ours: true },
       { title: "HQIP – Healthcare Quality Improvement Partnership", url: "https://www.hqip.org.uk", desc: "National clinical audit programmes" },
       { title: "NHS Improvement", url: "https://improvement.nhs.uk", desc: "QI resources and tools" },
       { title: "IHI – Institute for Healthcare Improvement", url: "https://www.ihi.org", desc: "QI methodology and training" },
@@ -234,7 +235,17 @@ export default function Links() {
                         <ExternalLink className="w-3.5 h-3.5 text-white" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="font-medium text-sm text-foreground group-hover:text-primary transition-colors">{link.title}</div>
+                        <div className="font-medium text-sm text-foreground group-hover:text-primary transition-colors flex items-center gap-1.5 flex-wrap">
+                          {link.title}
+                          {/* Every other entry here is an independent or official
+                              body. Our own commercial course is marked so it
+                              cannot be mistaken for a neutral recommendation. */}
+                          {"ours" in link && link.ours && (
+                            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 font-normal">
+                              Our course
+                            </Badge>
+                          )}
+                        </div>
                         <div className="text-xs text-muted-foreground mt-0.5">{link.desc}</div>
                       </div>
                     </a>
