@@ -52,6 +52,7 @@ const LINK_CATEGORIES = [
   {
     id: "research", label: "Research & Publications", icon: Microscope, color: "from-indigo-500 to-indigo-700",
     links: [
+      { title: "Research Methodology & Publication — training courses", url: "https://www.healthcarequalityschools.com/p/home", desc: "Specialty-specific research and publication courses. Run by Health Care Quality School, who operate this platform", ours: true },
       { title: "NIHR – National Institute for Health Research", url: "https://www.nihr.ac.uk", desc: "Research funding and opportunities" },
       { title: "BMJ – British Medical Journal", url: "https://www.bmj.com", desc: "Leading medical journal" },
       { title: "BMJ Case Reports", url: "https://casereports.bmj.com", desc: "Submit case reports" },
@@ -65,6 +66,7 @@ const LINK_CATEGORIES = [
     id: "quality", label: "Quality Improvement", icon: TrendingUp, color: "from-teal-500 to-teal-700",
     links: [
       { title: "QIP in Healthcare — training course", url: "https://www.healthcarequalityschools.com/p/quality-improvement-project-in-healthcare512244112131", desc: "Structured QIP training. Run by Health Care Quality School, who operate this platform", ours: true },
+      { title: "Clinical Audit — training course", url: "https://www.healthcarequalityschools.com/p/clinical-audit-training", desc: "Clinical audit training. Run by Health Care Quality School, who operate this platform", ours: true },
       { title: "HQIP – Healthcare Quality Improvement Partnership", url: "https://www.hqip.org.uk", desc: "National clinical audit programmes" },
       { title: "NHS Improvement", url: "https://improvement.nhs.uk", desc: "QI resources and tools" },
       { title: "IHI – Institute for Healthcare Improvement", url: "https://www.ihi.org", desc: "QI methodology and training" },
