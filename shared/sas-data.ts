@@ -11,28 +11,34 @@
  * How a specialty's recruitment score is actually produced. This decides
  * whether a self-assessment tool can model the specialty at all.
  *
- *  - "self-assessment"     Applicant self-scores on Oriel and that score is
- *                          the shortlisting score. A tool can mirror this.
- *  - "interview-portfolio" Portfolio is scored by assessors at interview. A
- *                          tool can estimate readiness, never predict the
- *                          awarded score.
+ *  - "self-assessment"     Applicant assigns their own score or category on the
+ *                          application form, and that is what gets used. A tool
+ *                          can mirror this exactly.
+ *  - "interview-portfolio" Portfolio content is scored, but by a panel at
+ *                          interview rather than on the form. The portfolio
+ *                          matters a great deal here — it simply cannot be
+ *                          self-scored in advance, so the tool shows what the
+ *                          panel marks instead of producing a number.
  *  - "msra-only"           No portfolio is scored at any stage; ranking comes
- *                          from the MSRA exam. There is nothing to self-score,
- *                          so the assessment form is not shown.
- *  - "msra-and-interview"  Shortlisting is on the MSRA and ranking on a
- *                          competency interview. No portfolio is self-scored,
- *                          so again there is no assessment to offer.
+ *                          from the MSRA exam alone. Distinct from the case
+ *                          above, and the difference changes what an applicant
+ *                          should spend their time on.
  *  - "unknown"             Not yet established. Treated as unverified.
  */
 export type SASScoringModel =
   | "self-assessment"
   | "interview-portfolio"
   | "msra-only"
-  | "msra-and-interview"
   | "unknown";
 
-/** Models where the applicant has no portfolio to score themselves against. */
-const NON_SCORABLE_MODELS: SASScoringModel[] = ["msra-only", "msra-and-interview"];
+/**
+ * Models where the applicant cannot put a number on themselves in advance.
+ *
+ * Note this includes "interview-portfolio", where the portfolio is scored but
+ * by a panel on the day. Offering a self-assessed total there would be
+ * inventing a figure that does not exist in the process.
+ */
+const NON_SCORABLE_MODELS: SASScoringModel[] = ["msra-only", "interview-portfolio"];
 
 /**
  * How the interview stage is scored, where a specialty publishes it.
@@ -877,12 +883,37 @@ export const SAS_SPECIALTIES: SASSpecialty[] = [
     id: "og",
     name: "Obstetrics and Gynaecology (O&G)",
     shortName: "O&G",
-    applicationRoute: "Core Training",
+    applicationRoute: "Specialty Training",
     msraRequired: true,
     totalMaxScore: 150,
-    competitiveThreshold: 100,
-    sourceUrl: "https://www.rcog.org.uk/careers-and-training/starting-your-og-career/specialty-training/",
-    description: "O&G specialty training from ST1. The final score is out of 150 — 50 marks from the MSRA plus 100 from the online interview — so it is not a portfolio total you can self-assess in advance.",
+    competitiveThreshold: null,
+    sourceUrl: "https://medical.hee.nhs.uk/medical-training-recruitment/medical-specialty-training/obstetrics-and-gynaecology/st1-obstetrics-and-gynaecology/scoring-overview",
+    description: "O&G specialty training from ST1. Ranking is out of 150: the MSRA scaled to 0-50 plus a 100-mark online interview. Your portfolio is assessed — quality improvement, research and teaching, and leadership are scored areas of the structured interview — but by the panel on the day rather than on the application form.",
+    interviewScoring: {
+      rawMaxScore: 100,
+      weightedMaxScore: 150,
+      shortlistingScoreCarriesForward: true,
+      description:
+        "The MSRA is scaled to 0-50 (Clinical Problem Solving 0-25, Professional Dilemmas 0-25) and carries forward as 33.3% of the final total. The online interview adds 100 marks across three sections, each question marked by two panel members. Note that the structured interview is where your portfolio is assessed: quality improvement, research and teaching, and leadership are each worth 10 marks. The top 75 applicants by MSRA score bypass the interview entirely.",
+      appointabilityCriteria: [
+        "You must score at least 50% on the online interview (50/100) to be found appointable",
+        "Responses to the clinical prioritisation exercise that raise serious patient-safety concerns can make an application unappointable regardless of overall score",
+      ],
+      weightedAreas: [
+        { area: "MSRA — Clinical Problem Solving", weighting: "scaled", maxScore: 25 },
+        { area: "MSRA — Professional Dilemmas", weighting: "scaled", maxScore: 25 },
+        { area: "Structured interview — Commitment to specialty", weighting: "2 panel × 5", maxScore: 10 },
+        { area: "Structured interview — Quality improvement measures", weighting: "2 panel × 5", maxScore: 10 },
+        { area: "Structured interview — Research and teaching", weighting: "2 panel × 5", maxScore: 10 },
+        { area: "Structured interview — Experience outside medicine, leadership and teamworking", weighting: "2 panel × 5", maxScore: 10 },
+        { area: "Clinical prioritisation — Ability to prioritise", weighting: "2 panel × 4", maxScore: 8 },
+        { area: "Clinical prioritisation — Priority 1", weighting: "2 panel × 6", maxScore: 12 },
+        { area: "Clinical prioritisation — Priority 2", weighting: "2 panel × 4", maxScore: 8 },
+        { area: "Clinical prioritisation — Priority 3", weighting: "2 panel × 4", maxScore: 8 },
+        { area: "Clinical prioritisation — Priority 4", weighting: "2 panel × 2", maxScore: 4 },
+        { area: "Ethics and Governance", weighting: "2 panel × 10", maxScore: 20 },
+      ],
+    },
     domains: [
       {
         id: "og_qualifications",
@@ -2864,15 +2895,15 @@ export const SAS_VERIFICATION: Record<string, SASVerification> = {
     note: "Matrix not checked against the official source. Its sourceUrl was a dead link when checked in July 2026 and now points to the NHS England specialty hub rather than an invented deep link.",
   },
   og: {
-    status: "unverified",
+    status: "verified",
     scoringModel: "interview-portfolio",
-    checkedOn: null,
-    cycle: null,
-    note: "The 150 total is real but is not a self-assessment score: it is 50 marks from the MSRA plus 100 from the online interview. An applicant cannot self-score an interview they have not sat.",
+    checkedOn: "2026-07-19",
+    cycle: "2026",
+    note: "The 150 total is real but is 50 scaled MSRA marks plus a 100-mark online interview, not a portfolio self-assessment with a 100-point threshold as this tool previously showed. The portfolio is genuinely assessed, however: quality improvement, research and teaching, and leadership are each worth 10 marks of the structured interview, so 40 of the 150 marks turn on portfolio content — it is scored by the panel rather than declared on the form. Full breakdown from the NHS England ST1 O&G scoring overview, page last reviewed February 2026.",
   },
   anaesthetics: {
     status: "verified",
-    scoringModel: "msra-and-interview",
+    scoringModel: "interview-portfolio",
     checkedOn: "2026-07-19",
     cycle: "2026",
     note: "CT1 Anaesthetics has no self-assessed portfolio. Shortlisting is on the MSRA and ranking on a two-station interview scored out of 100, transcribed from the official CT1 Interview Scoring Matrix 2026. The 50-point portfolio assessment this tool previously offered appears to have been taken from ST4 entry, which does have a verified self-assessment plus a Portfolio Organisation Score — a different application route several years further on. The entry also recorded that the MSRA was not required, which is the opposite of the case.",

@@ -153,7 +153,9 @@ function SpecialtySelector({ onSelect }: { onSelect: (s: SASSpecialty) => void }
             {!isScorable(specialty.id) ? (
               <div className="flex items-center gap-1.5 text-xs text-blue-300/90">
                 <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-                Not scored by portfolio — see details
+                {getVerification(specialty.id).scoringModel === "interview-portfolio"
+                  ? "Portfolio scored at interview — see details"
+                  : "Not scored by portfolio — see details"}
               </div>
             ) : isVerified(specialty.id) ? (
               <div className="flex items-center justify-between text-xs">
@@ -935,7 +937,14 @@ function NotPortfolioScored({
   specialty: SASSpecialty;
   onBack: () => void;
 }) {
-  const { note } = getVerification(specialty.id);
+  const { note, scoringModel } = getVerification(specialty.id);
+
+  // Two very different situations reach this screen, and conflating them would
+  // mislead badly. Under "interview-portfolio" the portfolio is worth real
+  // marks and is simply scored by a panel; under "msra-only" it earns nothing
+  // anywhere. Telling an O&G applicant their portfolio is not scored would
+  // send them away from 40 of the 150 marks available to them.
+  const panelScored = scoringModel === "interview-portfolio";
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-16">
@@ -944,13 +953,15 @@ function NotPortfolioScored({
           <AlertCircle className="w-6 h-6 text-amber-400" />
         </div>
         <h1 className="text-2xl font-bold text-white mb-3">
-          {specialty.name} is not scored by portfolio
+          {panelScored
+            ? `${specialty.name} is scored at interview, not on the form`
+            : `${specialty.name} is not scored by portfolio`}
         </h1>
         <p className="text-gray-300 leading-relaxed mb-4">{note}</p>
         <p className="text-gray-400 text-sm leading-relaxed mb-6">
-          Because there is no portfolio score, a self-assessment cannot tell you
-          anything useful here. Preparing for what is actually assessed is what
-          moves your application.
+          {panelScored
+            ? "Your portfolio still carries real marks here — it is assessed by the panel on the day rather than declared on your application, so no self-assessment can predict the score. What it can do is show you which areas the panel marks, so you arrive with evidence for each."
+            : "Because no portfolio is scored at any stage, a self-assessment cannot tell you anything useful here. Preparing for what is actually assessed is what moves your application."}
         </p>
 
         {/* Where the specialty ranks on an interview, showing what that
@@ -959,7 +970,9 @@ function NotPortfolioScored({
         {specialty.interviewScoring && (
           <div className="mb-6 rounded-xl border border-white/10 bg-white/3 p-4">
             <p className="text-sm font-medium text-white mb-2">
-              What you are assessed on instead
+              {panelScored
+                ? "What the panel marks you on"
+                : "What you are assessed on instead"}
             </p>
             <p className="text-xs text-gray-400 leading-relaxed">
               {specialty.interviewScoring.description}
