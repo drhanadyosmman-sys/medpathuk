@@ -1949,133 +1949,247 @@ export const SAS_SPECIALTIES: SASSpecialty[] = [
     ],
   },
 
-  // ─── 11. Orthopaedic Surgery ──────────────────────────────────────────────
+  // ─── Trauma & Orthopaedic Surgery (ST3) ──────────────────────────────────
+  // VERIFIED against the official 2026 T&O National Recruitment Self-Assessment
+  // Scoring System (NHS England).
+  //
+  // Twelve self-assessed questions. Q5-Q8 are open counts scored per item
+  // rather than by band, and the recruitment office divides those raw counts
+  // through a published weighting before they reach the final score — the
+  // weighting document is separate and has not been read, so the caps applied
+  // here are the ones stated in the scoring system itself (Q8 is capped at 2)
+  // and the open counts are bounded at a reasonable ceiling for the tool. The
+  // unweighted total is therefore indicative of where evidence is thin, not a
+  // prediction of the score the panel will record.
   {
     id: "orthopaedics",
-    name: "Orthopaedic Surgery",
-    shortName: "Orthopaedics",
-    applicationRoute: "Core Training",
+    name: "Trauma & Orthopaedic Surgery",
+    shortName: "T&O",
+    applicationRoute: "Specialty Training",
     msraRequired: false,
-    totalMaxScore: 45,
-    competitiveThreshold: 32,
-    sourceUrl: "https://medical.hee.nhs.uk/medical-training-recruitment/medical-specialty-training/surgery",
-    description: "Core Surgical Training (CST) with orthopaedic focus, then ST3 orthopaedics. BOA and JCST oversee training.",
+    totalMaxScore: 41,
+    competitiveThreshold: null,
+    sourceUrl: "https://www.yorksandhumberdeanery.nhs.uk/recruitment/national-recruitment/national-trauma-orthopaedic-surgery-st3-recruitment",
+    description: "Trauma & Orthopaedic Surgery at ST3, recruited nationally through Yorkshire and Humber. Twelve self-assessed questions covering experience, operative logbook, publications, presentations, audit, higher degrees, leadership and teaching. A published weighting is applied to the counts you record before they reach your final score.",
     domains: [
       {
-        id: "orth_qualifications",
-        name: "Qualifications",
-        maxScore: 8,
+        id: "to_experience",
+        name: "Post-Foundation Experience",
+        maxScore: 5,
         criteria: [
           {
-            id: "orth_q1",
-            criterion: "Postgraduate qualification",
+            id: "to_q1",
+            criterion: "Months in any medical post after foundation, by end of July or completion of core training if later",
             score: 0,
-            evidence: "Degree certificate",
+            evidence: "Evidence of completion of training posts. For non-training posts, the front page of your employment contract showing start and finish dates; if it does not show both, a letter from HR, head of service or your supervising consultant.",
             options: [
-              { label: "PhD or MD by research", score: 8 },
-              { label: "Masters degree", score: 6 },
-              { label: "Postgraduate diploma", score: 4 },
-              { label: "MRCS Part A passed", score: 2 },
-              { label: "None", score: 0 },
+              { label: "77 months or more", score: 5 },
+              { label: "64 to 76 months", score: 4 },
+              { label: "52 to 63 months", score: 3 },
+              { label: "40 to 51 months", score: 2 },
+              { label: "0 to 39 months", score: 1 },
             ],
           },
         ],
       },
       {
-        id: "orth_logbook",
-        name: "Surgical Logbook",
+        id: "to_specialty_time",
+        name: "Time in Trauma & Orthopaedics",
         maxScore: 8,
         criteria: [
           {
-            id: "orth_l1",
-            criterion: "Orthopaedic/surgical cases in logbook",
+            id: "to_q2",
+            criterion: "Months in a primarily T&O placement after foundation, in any country",
             score: 0,
-            evidence: "Surgical logbook (eLogbook)",
+            evidence: "As for post-foundation experience. Note the scoring is not a straight line — 10 to 42 months scores highest, and longer periods score progressively less.",
             options: [
-              { label: "40 or more cases", score: 8 },
-              { label: "30–39 cases", score: 6 },
-              { label: "20–29 cases", score: 4 },
-              { label: "10–19 cases", score: 2 },
-              { label: "Fewer than 10 cases", score: 0 },
+              { label: "10 to 42 months", score: 8 },
+              { label: "43 to 59 months", score: 4 },
+              { label: "4 to 9 months", score: 2 },
+              { label: "60 months or more", score: 1 },
+              { label: "0 to 3 months", score: 0 },
             ],
           },
         ],
       },
       {
-        id: "orth_research",
-        name: "Research & Publications",
-        maxScore: 8,
+        id: "to_complementary",
+        name: "Complementary Specialties",
+        maxScore: 2,
         criteria: [
           {
-            id: "orth_r1",
-            criterion: "Best publication",
+            id: "to_q3",
+            criterion: "At least 4 months in plastics, neurosurgery, vascular, ENT, cardiothoracic, emergency medicine, ITU, urology, OMFS, paediatric surgery or general surgery since foundation",
             score: 0,
-            evidence: "PubMed/DOI link",
+            evidence: "Evidence of completion of training posts, or contract front pages for non-training posts.",
             options: [
-              { label: "First-author paper in peer-reviewed journal", score: 8 },
-              { label: "Co-author paper in peer-reviewed journal", score: 6 },
-              { label: "Published case report or letter", score: 4 },
-              { label: "Published abstract", score: 2 },
-              { label: "None", score: 0 },
+              { label: "At least 4 months in posts in 2 or more of these specialties", score: 2 },
+              { label: "At least 4 months in a post in 1 of these specialties", score: 1 },
+              { label: "I will not have spent 4 months in any of these specialties", score: 0 },
             ],
           },
         ],
       },
       {
-        id: "orth_presentations",
-        name: "Presentations",
+        id: "to_operative",
+        name: "Operative Experience",
+        maxScore: 4,
+        criteria: [
+          {
+            id: "to_q4",
+            criterion: "Wholly completed operations for fracture of neck of femur performed as STS or STU",
+            score: 0,
+            evidence: "Consultant-validated logbook consolidation sheets. These must be recorded in a consultant-validated logbook to count.",
+            options: [
+              { label: "18 or more", score: 4 },
+              { label: "7 to 17", score: 2 },
+              { label: "0 to 6", score: 0 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "to_first_author",
+        name: "First Author Publications",
         maxScore: 6,
         criteria: [
           {
-            id: "orth_p1",
-            criterion: "Best presentation level",
+            id: "to_q5",
+            criterion: "PubMed-indexed first author publications, excluding abstracts, case reports, letters and technical tips (2 points per paper, before weighting)",
             score: 0,
-            evidence: "Conference programme",
+            evidence: "A PMID for each paper. Collaborative group names cannot count as first authorship.",
             options: [
-              { label: "Oral presentation at national/international meeting", score: 6 },
-              { label: "Oral presentation at regional meeting", score: 4 },
-              { label: "Poster at national/international meeting", score: 3 },
-              { label: "Poster at regional meeting", score: 2 },
-              { label: "Local presentation only", score: 1 },
+              { label: "3 or more first author papers", score: 6 },
+              { label: "2 first author papers", score: 4 },
+              { label: "1 first author paper", score: 2 },
               { label: "None", score: 0 },
             ],
           },
         ],
       },
       {
-        id: "orth_audit_teaching",
-        name: "Audit, QIP & Teaching",
-        maxScore: 8,
+        id: "to_other_pubs",
+        name: "Other Publications",
+        maxScore: 3,
         criteria: [
           {
-            id: "orth_at1",
-            criterion: "Audit/QIP and teaching experience",
+            id: "to_q6",
+            criterion: "Other PubMed-indexed publications, excluding abstracts, case reports, letters and technical tips (1 point per paper, before weighting)",
             score: 0,
-            evidence: "Audit report, teaching records",
+            evidence: "A PMID for each paper. Collaborative work counts only with clear evidence of a significant role — study design, data analysis or writing.",
             options: [
-              { label: "Completed full audit cycle AND evidence of regular teaching", score: 8 },
-              { label: "Completed full audit cycle OR evidence of regular teaching", score: 5 },
-              { label: "Completed audit without re-audit OR some teaching", score: 3 },
+              { label: "3 or more other papers", score: 3 },
+              { label: "2 other papers", score: 2 },
+              { label: "1 other paper", score: 1 },
               { label: "None", score: 0 },
             ],
           },
         ],
       },
       {
-        id: "orth_leadership",
-        name: "Leadership & Commitment",
-        maxScore: 7,
+        id: "to_presentations",
+        name: "National & International Presentations",
+        maxScore: 3,
         criteria: [
           {
-            id: "orth_lc1",
-            criterion: "Leadership and commitment to orthopaedics",
+            id: "to_q7",
+            criterion: "National and international presentations of work you are a listed author on, excluding posters (1 point per project, before weighting)",
             score: 0,
-            evidence: "Role description, taster week letter",
+            evidence: "The relevant page of each meeting programme. Each project counts once however many meetings it was presented at. Collaborative work needs clear evidence of a significant role.",
             options: [
-              { label: "Significant leadership role AND orthopaedic taster/elective", score: 7 },
-              { label: "Significant leadership role OR orthopaedic taster/elective", score: 4 },
-              { label: "Some leadership OR some orthopaedic exposure", score: 2 },
+              { label: "3 or more projects presented", score: 3 },
+              { label: "2 projects presented", score: 2 },
+              { label: "1 project presented", score: 1 },
               { label: "None", score: 0 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "to_audit",
+        name: "Audit & Quality Improvement",
+        maxScore: 2,
+        criteria: [
+          {
+            id: "to_q8",
+            criterion: "Audits against a published standard, or QI projects, that resulted in presentation of the results",
+            score: 0,
+            evidence: "Authenticated evidence of completion and presentation — a validated certificate or letter from the audit lead clinician. Do not supply slides or meeting agendas. Both cycles of a closed loop count separately. The weighted score for this question is capped at 2.",
+            options: [
+              { label: "2 or more audits or QI projects presented", score: 2 },
+              { label: "1 audit or QI project presented", score: 1 },
+              { label: "None", score: 0 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "to_degree",
+        name: "Higher Degree",
+        maxScore: 2,
+        criteria: [
+          {
+            id: "to_q9",
+            criterion: "Stand-alone UK higher degree or equivalent examined by thesis or dissertation (intercalated degrees do not count)",
+            score: 0,
+            evidence: "Your degree certificate. For degrees taken outside the UK, evidence of equivalence — a letter from the institution confirming it followed a research-based thesis and full examination, plus your transcript and a translation if needed.",
+            options: [
+              { label: "PhD or MD", score: 2 },
+              { label: "Masters (e.g. MSc, MMedEd, MS, MCh(Orth), ChM)", score: 1 },
+              { label: "None", score: 0 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "to_leadership",
+        name: "Leadership & Management",
+        maxScore: 2,
+        criteria: [
+          {
+            id: "to_q10",
+            criterion: "Your highest leadership or management role since starting medical school, within or outside medicine",
+            score: 0,
+            evidence: "Evidence supporting your response, such as a signed letter from a recognised body.",
+            options: [
+              { label: "A national or international formal leadership or management role", score: 2 },
+              { label: "A local or regional leadership or management role", score: 1 },
+              { label: "No evidence of involvement in leadership or management", score: 0 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "to_teaching",
+        name: "Teaching Experience",
+        maxScore: 2,
+        criteria: [
+          {
+            id: "to_q11",
+            criterion: "Your teaching experience",
+            score: 0,
+            evidence: "Observation of Teaching forms or delegate feedback. A teaching role must have been within the last five years and lasted at least six months. Attendance at courses such as ATLS Instructor or Training the Trainer does not count.",
+            options: [
+              { label: "Formal teaching qualification (PG Masters, Diploma, Certificate or equivalent to 60 university credits), or a formal substantive teaching role", score: 2 },
+              { label: "Regular formal teaching over the last 2 years (4 or more sessions per year) with portfolio evidence", score: 1 },
+              { label: "Little or none", score: 0 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "to_evidence_org",
+        name: "Evidence Organisation",
+        maxScore: 2,
+        criteria: [
+          {
+            id: "to_q12",
+            criterion: "Will you provide your evidence in an organised manner as instructed?",
+            score: 0,
+            evidence: "The first page of evidence for each domain must be a summary page clearly showing where each piece of relevant evidence is found.",
+            options: [
+              { label: "Yes", score: 2 },
+              { label: "No", score: 0 },
             ],
           },
         ],
@@ -2354,11 +2468,11 @@ export const SAS_VERIFICATION: Record<string, SASVerification> = {
     note: "Matrix not checked against the official source.",
   },
   orthopaedics: {
-    status: "unverified",
-    scoringModel: "unknown",
-    checkedOn: null,
-    cycle: null,
-    note: "Matrix not checked against the official source. Its sourceUrl was a dead link when checked in July 2026 and now points to the NHS England specialty hub rather than an invented deep link.",
+    status: "verified",
+    scoringModel: "self-assessment",
+    checkedOn: "2026-07-19",
+    cycle: "2026",
+    note: "All twelve questions transcribed from the official 2026 T&O National Recruitment Self-Assessment Scoring System. Entry is at ST3, recruited nationally through Yorkshire and Humber — the previous entry described it as core surgical training with a 45-point matrix and a 32-point threshold, neither of which exists. Q5 to Q8 are open counts scored per item, and the recruitment office applies a published weighting to them before they reach the final score; that weighting document has not been read, so those four domains are bounded here at a sensible ceiling and the total is indicative rather than predictive. Q8 is capped at 2 by the scoring system itself. No pass mark is published, so none is claimed.",
   },
   neurosurgery: {
     status: "unverified",
