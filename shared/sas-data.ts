@@ -186,6 +186,175 @@ export interface SASSpecialty {
   offersGuidance?: SASOffersGuidance;
 }
 
+// ─── PHST shared self-assessment ──────────────────────────────────────────────
+// Physician Higher Specialty Training runs one national round for the higher
+// medical specialties, and every specialty in it is scored on the same
+// self-assessment: 38 points across seven domains. Defined once here rather
+// than copied per specialty, so a change to the matrix cannot leave some
+// specialties on an old version — which is how the invented figures this file
+// used to carry went unnoticed.
+//
+// Two things sit outside these 38 points and are deliberately not scored here:
+//   - 2 marks for how well evidence documents are organised, awarded by
+//     assessors; poor presentation can stop an application being shortlisted
+//     outright.
+//   - Commitment to specialty, worth 20 marks at shortlisting for the
+//     specialties that assess it, judged by two assessors from the form. It
+//     does not carry into the final ranking, and either assessor marking an
+//     applicant unappointable stops them being shortlisted regardless of score.
+// Both are recorded in each specialty's evidenceGuidance and interviewScoring.
+//
+// Source: https://phstrecruitment.org.uk — self-assessment and application
+// scoring, verified July 2026.
+function phstDomains(prefix: string): SASDomain[] {
+  return [
+    {
+      id: `${prefix}_pg`,
+      name: "Postgraduate Degrees & Qualifications",
+      maxScore: 4,
+      criteria: [
+        {
+          id: `${prefix}_pg1`,
+          criterion: "Highest postgraduate degree or qualification",
+          score: 0,
+          evidence:
+            "Qualification certificate, or a letter from the awarding body. This domain requires the evidence pro forma from the PHST Document Library. Intercalated degrees cannot be claimed anywhere. Teaching qualifications belong in Training in Teaching. MRCP(UK) is claimed in its own domain, not here.",
+          options: [
+            { label: "PhD or MD by research (can include non-medical qualifications)", score: 4 },
+            { label: "Masters level degree e.g. MSc, MA, MRes (can include non-medical). Typically 8 months or longer, full-time equivalent", score: 3 },
+            { label: "Other relevant postgraduate diploma or certificate, typically one to ten months whole-time equivalent — or an additional membership exam beyond the one required for entry, or specialist registration in another specialty", score: 1 },
+            { label: "None of the above", score: 0 },
+          ],
+        },
+      ],
+    },
+    {
+      id: `${prefix}_mrcp`,
+      name: "MRCP(UK)",
+      maxScore: 8,
+      criteria: [
+        {
+          id: `${prefix}_mrcp1`,
+          criterion: "Progress through MRCP(UK), or the alternative stated on the person specification",
+          score: 0,
+          evidence:
+            "Your MRCP(UK) certificate, a letter from the college confirming individual components, or a screenshot of your My MRCP(UK) account showing your name and what you have completed. Part 1 scores nothing — it is an eligibility requirement.",
+          options: [
+            { label: "Passed both Part 2 Written and PACES, or a stated alternative", score: 8 },
+            { label: "Passed PACES but not Part 2 Written, or a stated alternative", score: 6 },
+            { label: "Passed Part 2 Written but not PACES, or a stated alternative", score: 2 },
+            { label: "Passed neither Part 2 Written nor PACES, nor a stated alternative", score: 0 },
+          ],
+        },
+      ],
+    },
+    {
+      id: `${prefix}_pres`,
+      name: "Presentations / Posters",
+      maxScore: 6,
+      criteria: [
+        {
+          id: `${prefix}_pres1`,
+          criterion: "Best presentation or poster at a medical meeting (first or second author only)",
+          score: 0,
+          evidence:
+            "Confirmation the presentation or poster was accepted and included — a letter, certificate, or the meeting's abstracts book — plus the abstract and a copy of the slides or poster. National and international claims without an abstracts document may be downgraded. Requires the evidence pro forma.",
+          options: [
+            { label: "Oral presentation, first or second author, at a national or international medical meeting", score: 6 },
+            { label: "Poster, first or second author, shown at a national or international medical meeting", score: 4 },
+            { label: "Oral presentation, first or second author, at a regional medical meeting", score: 3 },
+            { label: "Oral presentation, first or second author, at a local medical meeting", score: 2 },
+            { label: "Poster, first or second author, shown at a regional or local medical meeting", score: 2 },
+            { label: "None of the above", score: 0 },
+          ],
+        },
+      ],
+    },
+    {
+      id: `${prefix}_pub`,
+      name: "Publications",
+      maxScore: 8,
+      criteria: [
+        {
+          id: `${prefix}_pub1`,
+          criterion: "Best publication",
+          score: 0,
+          evidence:
+            "A screenshot of the PubMed citation plus the link; for 'in press' items, confirmation of acceptance from the publisher. For books: cover page, contents, author list, ISBN and the publisher's website. Requires the evidence pro forma.",
+          options: [
+            { label: "First author, joint-first author or corresponding author of one or more PubMed-cited original research publication (or in press)", score: 8 },
+            { label: "Co-author of one or more PubMed-cited original research publication (or in press)", score: 6 },
+            { label: "Author or co-author of more than one PubMed-cited other publication (or in press) — editorials, reviews, abstracts, case reports, letters", score: 5 },
+            { label: "Written one or more chapters of a book related to medicine (not self-published)", score: 5 },
+            { label: "Author or co-author of one PubMed-cited other publication (or in press)", score: 3 },
+            { label: "Published one or more abstracts, non peer-reviewed articles, or articles that are not PubMed-cited", score: 1 },
+            { label: "None of the above", score: 0 },
+          ],
+        },
+      ],
+    },
+    {
+      id: `${prefix}_teach`,
+      name: "Teaching Experience",
+      maxScore: 5,
+      criteria: [
+        {
+          id: `${prefix}_teach1`,
+          criterion: "Teaching experience delivered",
+          score: 0,
+          evidence:
+            "Evidence of formal feedback is required for every scoring option — senior observation, a Developing the Clinical Teacher or Teaching Observation form, or collected participant feedback with a summary. The top two options also need a letter from your tutor confirming your role, on headed paper, plus the programme timetable. Requires the evidence pro forma.",
+          options: [
+            { label: "Worked with local tutors to organise a teaching programme and taught on it regularly for approximately three months or longer, with evidence of formal feedback", score: 5 },
+            { label: "Provided regular teaching as part of a defined programme or course for approximately three months or longer, with evidence of formal feedback", score: 3 },
+            { label: "Taught medical students or healthcare professionals occasionally (at least three sessions), with evidence of formal feedback", score: 1 },
+            { label: "None of the above", score: 0 },
+          ],
+        },
+      ],
+    },
+    {
+      id: `${prefix}_teachtrain`,
+      name: "Training in Teaching",
+      maxScore: 3,
+      criteria: [
+        {
+          id: `${prefix}_teachtrain1`,
+          criterion: "Training received in teaching methods",
+          score: 0,
+          evidence:
+            "A certificate of completion from the course provider, or a letter confirming attendance, plus a course outline confirming duration and delivery.",
+          options: [
+            { label: "Higher qualification in teaching, e.g. PG Cert or PG Diploma (university accredited, graduate entry only, at least 60 credit points)", score: 3 },
+            { label: "Training in teaching methods below PG Cert or PG Diploma level (at least six hours of live teaching, beyond your primary medical qualification)", score: 1 },
+            { label: "No training in teaching methods", score: 0 },
+          ],
+        },
+      ],
+    },
+    {
+      id: `${prefix}_qi`,
+      name: "Quality Improvement",
+      maxScore: 4,
+      criteria: [
+        {
+          id: `${prefix}_qi1`,
+          criterion: "Involvement in quality improvement projects",
+          score: 0,
+          evidence:
+            "A QIPAT form is preferred. Otherwise a headed document from your supervisor covering the topic and aims, the measures identified, the QI methodology used, change implementation with a run chart, evaluation against predictions, and future application. Requires the evidence pro forma.",
+          options: [
+            { label: "All aspects of two cycles of an original QI project, in a leadership capacity supervising other team members", score: 4 },
+            { label: "All aspects of two cycles of a QI project", score: 3 },
+            { label: "One aspect of a completed multi-cycle QI project, or two or more aspects of a single-cycle project", score: 1 },
+            { label: "None of the above", score: 0 },
+          ],
+        },
+      ],
+    },
+  ];
+}
+
 export const SAS_SPECIALTIES: SASSpecialty[] = [
   // ─── 1. Internal Medicine Training (IMT) ─────────────────────────────────
   // VERIFIED against the official IMT 2026 application scoring guidance.
@@ -1944,152 +2113,35 @@ export const SAS_SPECIALTIES: SASSpecialty[] = [
     shortName: "Derm",
     applicationRoute: "Specialty Training",
     msraRequired: false,
-    totalMaxScore: 32,
-    competitiveThreshold: 24,
+    totalMaxScore: 38,
+    competitiveThreshold: null,
     sourceUrl: "https://www.phstrecruitment.org.uk",
-    description: "ST3 entry specialty. Highly competitive with portfolio-based shortlisting via Oriel. Requires strong academic and clinical evidence.",
-    domains: [
-      {
-        id: "derm_qualifications",
-        name: "Postgraduate Degrees & Qualifications",
-        maxScore: 4,
-        criteria: [
-          {
-            id: "derm_q1",
-            criterion: "Highest postgraduate degree or qualification",
-            score: 0,
-            evidence: "Certificate/transcript of degree",
-            options: [
-              { label: "PhD or MD by research", score: 4 },
-              { label: "Masters degree (MSc, MRes, MA) – ≥8 months", score: 3 },
-              { label: "Postgraduate diploma (PgDip) – ≥4 months", score: 2 },
-              { label: "Postgraduate certificate (PgCert) – ≥2 months", score: 1 },
-              { label: "None of the above", score: 0 },
-            ],
-          },
-        ],
-      },
-      {
-        id: "derm_publications",
-        name: "Publications",
-        maxScore: 8,
-        criteria: [
-          {
-            id: "derm_pub1",
-            criterion: "Best publication level",
-            score: 0,
-            evidence: "PubMed/DOI link or journal citation",
-            options: [
-              { label: "First author paper in peer-reviewed journal (PubMed indexed)", score: 8 },
-              { label: "First author paper in peer-reviewed journal (not indexed)", score: 6 },
-              { label: "Co-author paper in peer-reviewed journal (PubMed indexed)", score: 5 },
-              { label: "Co-author paper in peer-reviewed journal (not indexed)", score: 3 },
-              { label: "Published case report or letter", score: 2 },
-              { label: "Published abstract only", score: 1 },
-              { label: "None", score: 0 },
-            ],
-          },
-        ],
-      },
-      {
-        id: "derm_presentations",
-        name: "Presentations & Posters",
-        maxScore: 6,
-        criteria: [
-          {
-            id: "derm_pres1",
-            criterion: "Best level of presentation at a medical meeting",
-            score: 0,
-            evidence: "Programme/certificate with your name and title",
-            options: [
-              { label: "Oral presentation at national or international meeting", score: 6 },
-              { label: "Oral presentation at regional meeting", score: 4 },
-              { label: "Poster at national or international meeting", score: 3 },
-              { label: "Poster at regional meeting", score: 2 },
-              { label: "Presentation at local (trust) meeting", score: 1 },
-              { label: "None", score: 0 },
-            ],
-          },
-        ],
-      },
-      {
-        id: "derm_teaching",
-        name: "Teaching & Education",
-        maxScore: 4,
-        criteria: [
-          {
-            id: "derm_t1",
-            criterion: "Evidence of formal teaching or teaching qualification",
-            score: 0,
-            evidence: "Certificate or teaching portfolio evidence",
-            options: [
-              { label: "Formal teaching qualification (PgCert in Medical Education or equivalent)", score: 4 },
-              { label: "Sustained teaching programme with feedback (≥3 sessions)", score: 3 },
-              { label: "Some formal teaching with feedback (1–2 sessions)", score: 2 },
-              { label: "Informal teaching only", score: 1 },
-              { label: "None", score: 0 },
-            ],
-          },
-        ],
-      },
-      {
-        id: "derm_audit_qip",
-        name: "Audit & Quality Improvement",
-        maxScore: 4,
-        criteria: [
-          {
-            id: "derm_aud1",
-            criterion: "Completed clinical audit or QIP",
-            score: 0,
-            evidence: "Audit report or QI project documentation",
-            options: [
-              { label: "Completed full audit cycle or QIP with re-audit", score: 4 },
-              { label: "Completed audit or QIP (no re-audit)", score: 3 },
-              { label: "Participated in audit data collection", score: 1 },
-              { label: "None", score: 0 },
-            ],
-          },
-        ],
-      },
-      {
-        id: "derm_leadership",
-        name: "Leadership & Management",
-        maxScore: 3,
-        criteria: [
-          {
-            id: "derm_lead1",
-            criterion: "Leadership or management role",
-            score: 0,
-            evidence: "Letter or certificate confirming role",
-            options: [
-              { label: "National or regional leadership role (committee, society officer)", score: 3 },
-              { label: "Local leadership role (department lead, rota coordinator)", score: 2 },
-              { label: "Participated in leadership activity", score: 1 },
-              { label: "None", score: 0 },
-            ],
-          },
-        ],
-      },
-      {
-        id: "derm_clinical_exp",
-        name: "Dermatology Clinical Experience",
-        maxScore: 3,
-        criteria: [
-          {
-            id: "derm_clin1",
-            criterion: "Relevant dermatology clinical experience",
-            score: 0,
-            evidence: "Supervisor letter or job description",
-            options: [
-              { label: "≥6 months dermatology post (SHO or above)", score: 3 },
-              { label: "Dermatology taster week or elective (≥4 weeks)", score: 2 },
-              { label: "Attended dermatology course or conference", score: 1 },
-              { label: "None", score: 0 },
-            ],
-          },
-        ],
-      },
-    ],
+    description: "ST3 entry specialty. Highly competitive with portfolio-based shortlisting via Oriel. Requires strong academic and clinical evidence. Applications are scored by self-assessment on Oriel — 38 points across the domains plus 2 marks for evidence organisation — and then verified against uploaded evidence, which can raise or lower the score.",
+    interviewScoring: {
+      rawMaxScore: 0,
+      shortlistingScoreCarriesForward: true,
+      description: "Your verified self-assessment score carries into the final score used for ranking and offers. Some specialties also score commitment to specialty at shortlisting: two assessors mark it 10, 2 or 0 each, worth 20 marks and a third of the 60 available at that stage. That score does not carry forward — commitment is assessed again at interview for every specialty — but if either assessor marks you unappointable you are not shortlisted at all, however high your self-assessment score. Whether a specialty scores it at shortlisting is stated in its 'Planning your application' section.",
+      appointabilityCriteria: [
+              "Either assessor marking you unappointable on commitment to specialty stops you being shortlisted, regardless of your self-assessment score",
+              "Supplying no evidence, or no evidence for domains you scored yourself in, is likely to stop your application being shortlisted"
+      ],
+    },
+    evidenceGuidance: {
+      hardFails: [
+              "Supplying no evidence, or none for a domain you scored yourself in, is likely to mean your application is not shortlisted",
+              "Evidence organised poorly enough can stop an application being shortlisted regardless of score, and that judgement cannot be appealed"
+      ],
+      rules: [
+              "You are contacted after applications close to upload evidence — there is no need to supply anything at the time of applying, though you can prepare it.",
+              "Assessors award a further 2 marks for how well your evidence is organised. If presentation is sufficiently poor it can stop your application being shortlisted whatever else you scored, and this mark cannot be appealed.",
+              "Verification can move your score either way: where an achievement is unclear or hard to verify, assessors are told to award only what they can confidently confirm.",
+              "Five domains need an evidence pro forma from the PHST Document Library: postgraduate degrees and qualifications, presentations and posters, publications, teaching experience, and quality improvement.",
+              "You cannot amend a submitted application, but you may upload evidence for achievements gained between submission and the upload deadline, and may flag a mistake with a short explanatory document.",
+              "Anything not in English needs a certified, authenticated translation.",
+              "Every application is assessed independently with no cross-referencing, so the same achievement can score differently in another specialty or round. That alone is not grounds for appeal."
+      ],
+    },
+    domains: phstDomains("derm"),
   },
 
   // ─── 14. Cardiology (ST3) ─────────────────────────────────────────────────
@@ -2099,152 +2151,35 @@ export const SAS_SPECIALTIES: SASSpecialty[] = [
     shortName: "Cardio",
     applicationRoute: "Specialty Training",
     msraRequired: false,
-    totalMaxScore: 32,
-    competitiveThreshold: 25,
+    totalMaxScore: 38,
+    competitiveThreshold: null,
     sourceUrl: "https://www.phstrecruitment.org.uk",
-    description: "ST3 entry after IMT/ACCS. Highly competitive. Portfolio-based shortlisting with strong emphasis on research and academic output.",
-    domains: [
-      {
-        id: "cardio_qualifications",
-        name: "Postgraduate Degrees & Qualifications",
-        maxScore: 4,
-        criteria: [
-          {
-            id: "cardio_q1",
-            criterion: "Highest postgraduate degree or qualification",
-            score: 0,
-            evidence: "Certificate/transcript of degree",
-            options: [
-              { label: "PhD or MD by research", score: 4 },
-              { label: "Masters degree (MSc, MRes, MA) – ≥8 months", score: 3 },
-              { label: "Postgraduate diploma (PgDip) – ≥4 months", score: 2 },
-              { label: "Postgraduate certificate (PgCert) – ≥2 months", score: 1 },
-              { label: "None of the above", score: 0 },
-            ],
-          },
-        ],
-      },
-      {
-        id: "cardio_publications",
-        name: "Publications",
-        maxScore: 8,
-        criteria: [
-          {
-            id: "cardio_pub1",
-            criterion: "Best publication level",
-            score: 0,
-            evidence: "PubMed/DOI link or journal citation",
-            options: [
-              { label: "First author paper in peer-reviewed journal (PubMed indexed)", score: 8 },
-              { label: "First author paper in peer-reviewed journal (not indexed)", score: 6 },
-              { label: "Co-author paper in peer-reviewed journal (PubMed indexed)", score: 5 },
-              { label: "Co-author paper in peer-reviewed journal (not indexed)", score: 3 },
-              { label: "Published case report or letter", score: 2 },
-              { label: "Published abstract only", score: 1 },
-              { label: "None", score: 0 },
-            ],
-          },
-        ],
-      },
-      {
-        id: "cardio_presentations",
-        name: "Presentations & Posters",
-        maxScore: 6,
-        criteria: [
-          {
-            id: "cardio_pres1",
-            criterion: "Best level of presentation at a medical meeting",
-            score: 0,
-            evidence: "Programme/certificate with your name and title",
-            options: [
-              { label: "Oral presentation at national or international meeting", score: 6 },
-              { label: "Oral presentation at regional meeting", score: 4 },
-              { label: "Poster at national or international meeting", score: 3 },
-              { label: "Poster at regional meeting", score: 2 },
-              { label: "Presentation at local (trust) meeting", score: 1 },
-              { label: "None", score: 0 },
-            ],
-          },
-        ],
-      },
-      {
-        id: "cardio_teaching",
-        name: "Teaching & Education",
-        maxScore: 4,
-        criteria: [
-          {
-            id: "cardio_t1",
-            criterion: "Evidence of formal teaching or teaching qualification",
-            score: 0,
-            evidence: "Certificate or teaching portfolio evidence",
-            options: [
-              { label: "Formal teaching qualification (PgCert in Medical Education or equivalent)", score: 4 },
-              { label: "Sustained teaching programme with feedback (≥3 sessions)", score: 3 },
-              { label: "Some formal teaching with feedback (1–2 sessions)", score: 2 },
-              { label: "Informal teaching only", score: 1 },
-              { label: "None", score: 0 },
-            ],
-          },
-        ],
-      },
-      {
-        id: "cardio_audit_qip",
-        name: "Audit & Quality Improvement",
-        maxScore: 4,
-        criteria: [
-          {
-            id: "cardio_aud1",
-            criterion: "Completed clinical audit or QIP",
-            score: 0,
-            evidence: "Audit report or QI project documentation",
-            options: [
-              { label: "Completed full audit cycle or QIP with re-audit", score: 4 },
-              { label: "Completed audit or QIP (no re-audit)", score: 3 },
-              { label: "Participated in audit data collection", score: 1 },
-              { label: "None", score: 0 },
-            ],
-          },
-        ],
-      },
-      {
-        id: "cardio_leadership",
-        name: "Leadership & Management",
-        maxScore: 3,
-        criteria: [
-          {
-            id: "cardio_lead1",
-            criterion: "Leadership or management role",
-            score: 0,
-            evidence: "Letter or certificate confirming role",
-            options: [
-              { label: "National or regional leadership role (committee, society officer)", score: 3 },
-              { label: "Local leadership role (department lead, rota coordinator)", score: 2 },
-              { label: "Participated in leadership activity", score: 1 },
-              { label: "None", score: 0 },
-            ],
-          },
-        ],
-      },
-      {
-        id: "cardio_clinical_exp",
-        name: "Cardiology Clinical Experience",
-        maxScore: 3,
-        criteria: [
-          {
-            id: "cardio_clin1",
-            criterion: "Relevant cardiology or IMT clinical experience",
-            score: 0,
-            evidence: "Supervisor letter or job description",
-            options: [
-              { label: "Completed IMT/ACCS with cardiology attachment or ≥6 months cardiology", score: 3 },
-              { label: "Cardiology taster week or elective (≥4 weeks)", score: 2 },
-              { label: "Attended cardiology course or conference (e.g., BSE echo)", score: 1 },
-              { label: "None", score: 0 },
-            ],
-          },
-        ],
-      },
-    ],
+    description: "ST3 entry after IMT/ACCS. Highly competitive. Portfolio-based shortlisting with strong emphasis on research and academic output. Applications are scored by self-assessment on Oriel — 38 points across the domains plus 2 marks for evidence organisation — and then verified against uploaded evidence, which can raise or lower the score.",
+    interviewScoring: {
+      rawMaxScore: 0,
+      shortlistingScoreCarriesForward: true,
+      description: "Your verified self-assessment score carries into the final score used for ranking and offers. Some specialties also score commitment to specialty at shortlisting: two assessors mark it 10, 2 or 0 each, worth 20 marks and a third of the 60 available at that stage. That score does not carry forward — commitment is assessed again at interview for every specialty — but if either assessor marks you unappointable you are not shortlisted at all, however high your self-assessment score. Whether a specialty scores it at shortlisting is stated in its 'Planning your application' section.",
+      appointabilityCriteria: [
+              "Either assessor marking you unappointable on commitment to specialty stops you being shortlisted, regardless of your self-assessment score",
+              "Supplying no evidence, or no evidence for domains you scored yourself in, is likely to stop your application being shortlisted"
+      ],
+    },
+    evidenceGuidance: {
+      hardFails: [
+              "Supplying no evidence, or none for a domain you scored yourself in, is likely to mean your application is not shortlisted",
+              "Evidence organised poorly enough can stop an application being shortlisted regardless of score, and that judgement cannot be appealed"
+      ],
+      rules: [
+              "You are contacted after applications close to upload evidence — there is no need to supply anything at the time of applying, though you can prepare it.",
+              "Assessors award a further 2 marks for how well your evidence is organised. If presentation is sufficiently poor it can stop your application being shortlisted whatever else you scored, and this mark cannot be appealed.",
+              "Verification can move your score either way: where an achievement is unclear or hard to verify, assessors are told to award only what they can confidently confirm.",
+              "Five domains need an evidence pro forma from the PHST Document Library: postgraduate degrees and qualifications, presentations and posters, publications, teaching experience, and quality improvement.",
+              "You cannot amend a submitted application, but you may upload evidence for achievements gained between submission and the upload deadline, and may flag a mistake with a short explanatory document.",
+              "Anything not in English needs a certified, authenticated translation.",
+              "Every application is assessed independently with no cross-referencing, so the same achievement can score differently in another specialty or round. That alone is not grounds for appeal."
+      ],
+    },
+    domains: phstDomains("cardio"),
   },
 
   // ─── 15. Neurology (ST3) ──────────────────────────────────────────────────
@@ -2254,152 +2189,35 @@ export const SAS_SPECIALTIES: SASSpecialty[] = [
     shortName: "Neuro",
     applicationRoute: "Specialty Training",
     msraRequired: false,
-    totalMaxScore: 32,
-    competitiveThreshold: 24,
+    totalMaxScore: 38,
+    competitiveThreshold: null,
     sourceUrl: "https://www.phstrecruitment.org.uk",
-    description: "ST3 entry after IMT. Portfolio-based shortlisting. Strong academic output and neurology experience are key differentiators.",
-    domains: [
-      {
-        id: "neuro_st3_qualifications",
-        name: "Postgraduate Degrees & Qualifications",
-        maxScore: 4,
-        criteria: [
-          {
-            id: "neuro_st3_q1",
-            criterion: "Highest postgraduate degree or qualification",
-            score: 0,
-            evidence: "Certificate/transcript of degree",
-            options: [
-              { label: "PhD or MD by research", score: 4 },
-              { label: "Masters degree (MSc, MRes, MA) – ≥8 months", score: 3 },
-              { label: "Postgraduate diploma (PgDip) – ≥4 months", score: 2 },
-              { label: "Postgraduate certificate (PgCert) – ≥2 months", score: 1 },
-              { label: "None of the above", score: 0 },
-            ],
-          },
-        ],
-      },
-      {
-        id: "neuro_st3_publications",
-        name: "Publications",
-        maxScore: 8,
-        criteria: [
-          {
-            id: "neuro_st3_pub1",
-            criterion: "Best publication level",
-            score: 0,
-            evidence: "PubMed/DOI link or journal citation",
-            options: [
-              { label: "First author paper in peer-reviewed journal (PubMed indexed)", score: 8 },
-              { label: "First author paper in peer-reviewed journal (not indexed)", score: 6 },
-              { label: "Co-author paper in peer-reviewed journal (PubMed indexed)", score: 5 },
-              { label: "Co-author paper in peer-reviewed journal (not indexed)", score: 3 },
-              { label: "Published case report or letter", score: 2 },
-              { label: "Published abstract only", score: 1 },
-              { label: "None", score: 0 },
-            ],
-          },
-        ],
-      },
-      {
-        id: "neuro_st3_presentations",
-        name: "Presentations & Posters",
-        maxScore: 6,
-        criteria: [
-          {
-            id: "neuro_st3_pres1",
-            criterion: "Best level of presentation at a medical meeting",
-            score: 0,
-            evidence: "Programme/certificate with your name and title",
-            options: [
-              { label: "Oral presentation at national or international meeting", score: 6 },
-              { label: "Oral presentation at regional meeting", score: 4 },
-              { label: "Poster at national or international meeting", score: 3 },
-              { label: "Poster at regional meeting", score: 2 },
-              { label: "Presentation at local (trust) meeting", score: 1 },
-              { label: "None", score: 0 },
-            ],
-          },
-        ],
-      },
-      {
-        id: "neuro_st3_teaching",
-        name: "Teaching & Education",
-        maxScore: 4,
-        criteria: [
-          {
-            id: "neuro_st3_t1",
-            criterion: "Evidence of formal teaching or teaching qualification",
-            score: 0,
-            evidence: "Certificate or teaching portfolio evidence",
-            options: [
-              { label: "Formal teaching qualification (PgCert in Medical Education or equivalent)", score: 4 },
-              { label: "Sustained teaching programme with feedback (≥3 sessions)", score: 3 },
-              { label: "Some formal teaching with feedback (1–2 sessions)", score: 2 },
-              { label: "Informal teaching only", score: 1 },
-              { label: "None", score: 0 },
-            ],
-          },
-        ],
-      },
-      {
-        id: "neuro_st3_audit_qip",
-        name: "Audit & Quality Improvement",
-        maxScore: 4,
-        criteria: [
-          {
-            id: "neuro_st3_aud1",
-            criterion: "Completed clinical audit or QIP",
-            score: 0,
-            evidence: "Audit report or QI project documentation",
-            options: [
-              { label: "Completed full audit cycle or QIP with re-audit", score: 4 },
-              { label: "Completed audit or QIP (no re-audit)", score: 3 },
-              { label: "Participated in audit data collection", score: 1 },
-              { label: "None", score: 0 },
-            ],
-          },
-        ],
-      },
-      {
-        id: "neuro_st3_leadership",
-        name: "Leadership & Management",
-        maxScore: 3,
-        criteria: [
-          {
-            id: "neuro_st3_lead1",
-            criterion: "Leadership or management role",
-            score: 0,
-            evidence: "Letter or certificate confirming role",
-            options: [
-              { label: "National or regional leadership role (committee, society officer)", score: 3 },
-              { label: "Local leadership role (department lead, rota coordinator)", score: 2 },
-              { label: "Participated in leadership activity", score: 1 },
-              { label: "None", score: 0 },
-            ],
-          },
-        ],
-      },
-      {
-        id: "neuro_st3_clinical_exp",
-        name: "Neurology Clinical Experience",
-        maxScore: 3,
-        criteria: [
-          {
-            id: "neuro_st3_clin1",
-            criterion: "Relevant neurology clinical experience",
-            score: 0,
-            evidence: "Supervisor letter or job description",
-            options: [
-              { label: "≥6 months neurology post (SHO or above)", score: 3 },
-              { label: "Neurology taster week or elective (≥4 weeks)", score: 2 },
-              { label: "Attended neurology course or ABN conference", score: 1 },
-              { label: "None", score: 0 },
-            ],
-          },
-        ],
-      },
-    ],
+    description: "ST3 entry after IMT. Portfolio-based shortlisting. Strong academic output and neurology experience are key differentiators. Applications are scored by self-assessment on Oriel — 38 points across the domains plus 2 marks for evidence organisation — and then verified against uploaded evidence, which can raise or lower the score.",
+    interviewScoring: {
+      rawMaxScore: 0,
+      shortlistingScoreCarriesForward: true,
+      description: "Your verified self-assessment score carries into the final score used for ranking and offers. Some specialties also score commitment to specialty at shortlisting: two assessors mark it 10, 2 or 0 each, worth 20 marks and a third of the 60 available at that stage. That score does not carry forward — commitment is assessed again at interview for every specialty — but if either assessor marks you unappointable you are not shortlisted at all, however high your self-assessment score. Whether a specialty scores it at shortlisting is stated in its 'Planning your application' section.",
+      appointabilityCriteria: [
+              "Either assessor marking you unappointable on commitment to specialty stops you being shortlisted, regardless of your self-assessment score",
+              "Supplying no evidence, or no evidence for domains you scored yourself in, is likely to stop your application being shortlisted"
+      ],
+    },
+    evidenceGuidance: {
+      hardFails: [
+              "Supplying no evidence, or none for a domain you scored yourself in, is likely to mean your application is not shortlisted",
+              "Evidence organised poorly enough can stop an application being shortlisted regardless of score, and that judgement cannot be appealed"
+      ],
+      rules: [
+              "You are contacted after applications close to upload evidence — there is no need to supply anything at the time of applying, though you can prepare it.",
+              "Assessors award a further 2 marks for how well your evidence is organised. If presentation is sufficiently poor it can stop your application being shortlisted whatever else you scored, and this mark cannot be appealed.",
+              "Verification can move your score either way: where an achievement is unclear or hard to verify, assessors are told to award only what they can confidently confirm.",
+              "Five domains need an evidence pro forma from the PHST Document Library: postgraduate degrees and qualifications, presentations and posters, publications, teaching experience, and quality improvement.",
+              "You cannot amend a submitted application, but you may upload evidence for achievements gained between submission and the upload deadline, and may flag a mistake with a short explanatory document.",
+              "Anything not in English needs a certified, authenticated translation.",
+              "Every application is assessed independently with no cross-referencing, so the same achievement can score differently in another specialty or round. That alone is not grounds for appeal."
+      ],
+    },
+    domains: phstDomains("neuro"),
   },
 
   // ─── 16. Gastroenterology (ST3) ───────────────────────────────────────────
@@ -2409,152 +2227,35 @@ export const SAS_SPECIALTIES: SASSpecialty[] = [
     shortName: "Gastro",
     applicationRoute: "Specialty Training",
     msraRequired: false,
-    totalMaxScore: 32,
-    competitiveThreshold: 24,
+    totalMaxScore: 38,
+    competitiveThreshold: null,
     sourceUrl: "https://www.phstrecruitment.org.uk",
-    description: "ST3 entry after IMT. Portfolio-based shortlisting. Research output and endoscopy experience are highly valued.",
-    domains: [
-      {
-        id: "gastro_qualifications",
-        name: "Postgraduate Degrees & Qualifications",
-        maxScore: 4,
-        criteria: [
-          {
-            id: "gastro_q1",
-            criterion: "Highest postgraduate degree or qualification",
-            score: 0,
-            evidence: "Certificate/transcript of degree",
-            options: [
-              { label: "PhD or MD by research", score: 4 },
-              { label: "Masters degree (MSc, MRes, MA) – ≥8 months", score: 3 },
-              { label: "Postgraduate diploma (PgDip) – ≥4 months", score: 2 },
-              { label: "Postgraduate certificate (PgCert) – ≥2 months", score: 1 },
-              { label: "None of the above", score: 0 },
-            ],
-          },
-        ],
-      },
-      {
-        id: "gastro_publications",
-        name: "Publications",
-        maxScore: 8,
-        criteria: [
-          {
-            id: "gastro_pub1",
-            criterion: "Best publication level",
-            score: 0,
-            evidence: "PubMed/DOI link or journal citation",
-            options: [
-              { label: "First author paper in peer-reviewed journal (PubMed indexed)", score: 8 },
-              { label: "First author paper in peer-reviewed journal (not indexed)", score: 6 },
-              { label: "Co-author paper in peer-reviewed journal (PubMed indexed)", score: 5 },
-              { label: "Co-author paper in peer-reviewed journal (not indexed)", score: 3 },
-              { label: "Published case report or letter", score: 2 },
-              { label: "Published abstract only", score: 1 },
-              { label: "None", score: 0 },
-            ],
-          },
-        ],
-      },
-      {
-        id: "gastro_presentations",
-        name: "Presentations & Posters",
-        maxScore: 6,
-        criteria: [
-          {
-            id: "gastro_pres1",
-            criterion: "Best level of presentation at a medical meeting",
-            score: 0,
-            evidence: "Programme/certificate with your name and title",
-            options: [
-              { label: "Oral presentation at national or international meeting", score: 6 },
-              { label: "Oral presentation at regional meeting", score: 4 },
-              { label: "Poster at national or international meeting", score: 3 },
-              { label: "Poster at regional meeting", score: 2 },
-              { label: "Presentation at local (trust) meeting", score: 1 },
-              { label: "None", score: 0 },
-            ],
-          },
-        ],
-      },
-      {
-        id: "gastro_teaching",
-        name: "Teaching & Education",
-        maxScore: 4,
-        criteria: [
-          {
-            id: "gastro_t1",
-            criterion: "Evidence of formal teaching or teaching qualification",
-            score: 0,
-            evidence: "Certificate or teaching portfolio evidence",
-            options: [
-              { label: "Formal teaching qualification (PgCert in Medical Education or equivalent)", score: 4 },
-              { label: "Sustained teaching programme with feedback (≥3 sessions)", score: 3 },
-              { label: "Some formal teaching with feedback (1–2 sessions)", score: 2 },
-              { label: "Informal teaching only", score: 1 },
-              { label: "None", score: 0 },
-            ],
-          },
-        ],
-      },
-      {
-        id: "gastro_audit_qip",
-        name: "Audit & Quality Improvement",
-        maxScore: 4,
-        criteria: [
-          {
-            id: "gastro_aud1",
-            criterion: "Completed clinical audit or QIP",
-            score: 0,
-            evidence: "Audit report or QI project documentation",
-            options: [
-              { label: "Completed full audit cycle or QIP with re-audit", score: 4 },
-              { label: "Completed audit or QIP (no re-audit)", score: 3 },
-              { label: "Participated in audit data collection", score: 1 },
-              { label: "None", score: 0 },
-            ],
-          },
-        ],
-      },
-      {
-        id: "gastro_leadership",
-        name: "Leadership & Management",
-        maxScore: 3,
-        criteria: [
-          {
-            id: "gastro_lead1",
-            criterion: "Leadership or management role",
-            score: 0,
-            evidence: "Letter or certificate confirming role",
-            options: [
-              { label: "National or regional leadership role (committee, society officer)", score: 3 },
-              { label: "Local leadership role (department lead, rota coordinator)", score: 2 },
-              { label: "Participated in leadership activity", score: 1 },
-              { label: "None", score: 0 },
-            ],
-          },
-        ],
-      },
-      {
-        id: "gastro_clinical_exp",
-        name: "Gastroenterology Clinical Experience",
-        maxScore: 3,
-        criteria: [
-          {
-            id: "gastro_clin1",
-            criterion: "Relevant gastroenterology or endoscopy experience",
-            score: 0,
-            evidence: "Supervisor letter or job description",
-            options: [
-              { label: "≥6 months gastroenterology post (SHO or above) or endoscopy training", score: 3 },
-              { label: "Gastroenterology taster week or elective (≥4 weeks)", score: 2 },
-              { label: "Attended BSG course or gastroenterology conference", score: 1 },
-              { label: "None", score: 0 },
-            ],
-          },
-        ],
-      },
-    ],
+    description: "ST3 entry after IMT. Portfolio-based shortlisting. Research output and endoscopy experience are highly valued. Applications are scored by self-assessment on Oriel — 38 points across the domains plus 2 marks for evidence organisation — and then verified against uploaded evidence, which can raise or lower the score.",
+    interviewScoring: {
+      rawMaxScore: 0,
+      shortlistingScoreCarriesForward: true,
+      description: "Your verified self-assessment score carries into the final score used for ranking and offers. Some specialties also score commitment to specialty at shortlisting: two assessors mark it 10, 2 or 0 each, worth 20 marks and a third of the 60 available at that stage. That score does not carry forward — commitment is assessed again at interview for every specialty — but if either assessor marks you unappointable you are not shortlisted at all, however high your self-assessment score. Whether a specialty scores it at shortlisting is stated in its 'Planning your application' section.",
+      appointabilityCriteria: [
+              "Either assessor marking you unappointable on commitment to specialty stops you being shortlisted, regardless of your self-assessment score",
+              "Supplying no evidence, or no evidence for domains you scored yourself in, is likely to stop your application being shortlisted"
+      ],
+    },
+    evidenceGuidance: {
+      hardFails: [
+              "Supplying no evidence, or none for a domain you scored yourself in, is likely to mean your application is not shortlisted",
+              "Evidence organised poorly enough can stop an application being shortlisted regardless of score, and that judgement cannot be appealed"
+      ],
+      rules: [
+              "You are contacted after applications close to upload evidence — there is no need to supply anything at the time of applying, though you can prepare it.",
+              "Assessors award a further 2 marks for how well your evidence is organised. If presentation is sufficiently poor it can stop your application being shortlisted whatever else you scored, and this mark cannot be appealed.",
+              "Verification can move your score either way: where an achievement is unclear or hard to verify, assessors are told to award only what they can confidently confirm.",
+              "Five domains need an evidence pro forma from the PHST Document Library: postgraduate degrees and qualifications, presentations and posters, publications, teaching experience, and quality improvement.",
+              "You cannot amend a submitted application, but you may upload evidence for achievements gained between submission and the upload deadline, and may flag a mistake with a short explanatory document.",
+              "Anything not in English needs a certified, authenticated translation.",
+              "Every application is assessed independently with no cross-referencing, so the same achievement can score differently in another specialty or round. That alone is not grounds for appeal."
+      ],
+    },
+    domains: phstDomains("gastro"),
   },
 
   // ─── 17. Endocrinology & Diabetes (ST3) ───────────────────────────────────
@@ -2564,152 +2265,35 @@ export const SAS_SPECIALTIES: SASSpecialty[] = [
     shortName: "Endo",
     applicationRoute: "Specialty Training",
     msraRequired: false,
-    totalMaxScore: 32,
-    competitiveThreshold: 23,
+    totalMaxScore: 38,
+    competitiveThreshold: null,
     sourceUrl: "https://www.phstrecruitment.org.uk",
-    description: "ST3 entry after IMT. Portfolio-based shortlisting. Research in diabetes/endocrinology and clinical experience are key.",
-    domains: [
-      {
-        id: "endo_qualifications",
-        name: "Postgraduate Degrees & Qualifications",
-        maxScore: 4,
-        criteria: [
-          {
-            id: "endo_q1",
-            criterion: "Highest postgraduate degree or qualification",
-            score: 0,
-            evidence: "Certificate/transcript of degree",
-            options: [
-              { label: "PhD or MD by research", score: 4 },
-              { label: "Masters degree (MSc, MRes, MA) – ≥8 months", score: 3 },
-              { label: "Postgraduate diploma (PgDip) – ≥4 months", score: 2 },
-              { label: "Postgraduate certificate (PgCert) – ≥2 months", score: 1 },
-              { label: "None of the above", score: 0 },
-            ],
-          },
-        ],
-      },
-      {
-        id: "endo_publications",
-        name: "Publications",
-        maxScore: 8,
-        criteria: [
-          {
-            id: "endo_pub1",
-            criterion: "Best publication level",
-            score: 0,
-            evidence: "PubMed/DOI link or journal citation",
-            options: [
-              { label: "First author paper in peer-reviewed journal (PubMed indexed)", score: 8 },
-              { label: "First author paper in peer-reviewed journal (not indexed)", score: 6 },
-              { label: "Co-author paper in peer-reviewed journal (PubMed indexed)", score: 5 },
-              { label: "Co-author paper in peer-reviewed journal (not indexed)", score: 3 },
-              { label: "Published case report or letter", score: 2 },
-              { label: "Published abstract only", score: 1 },
-              { label: "None", score: 0 },
-            ],
-          },
-        ],
-      },
-      {
-        id: "endo_presentations",
-        name: "Presentations & Posters",
-        maxScore: 6,
-        criteria: [
-          {
-            id: "endo_pres1",
-            criterion: "Best level of presentation at a medical meeting",
-            score: 0,
-            evidence: "Programme/certificate with your name and title",
-            options: [
-              { label: "Oral presentation at national or international meeting", score: 6 },
-              { label: "Oral presentation at regional meeting", score: 4 },
-              { label: "Poster at national or international meeting", score: 3 },
-              { label: "Poster at regional meeting", score: 2 },
-              { label: "Presentation at local (trust) meeting", score: 1 },
-              { label: "None", score: 0 },
-            ],
-          },
-        ],
-      },
-      {
-        id: "endo_teaching",
-        name: "Teaching & Education",
-        maxScore: 4,
-        criteria: [
-          {
-            id: "endo_t1",
-            criterion: "Evidence of formal teaching or teaching qualification",
-            score: 0,
-            evidence: "Certificate or teaching portfolio evidence",
-            options: [
-              { label: "Formal teaching qualification (PgCert in Medical Education or equivalent)", score: 4 },
-              { label: "Sustained teaching programme with feedback (≥3 sessions)", score: 3 },
-              { label: "Some formal teaching with feedback (1–2 sessions)", score: 2 },
-              { label: "Informal teaching only", score: 1 },
-              { label: "None", score: 0 },
-            ],
-          },
-        ],
-      },
-      {
-        id: "endo_audit_qip",
-        name: "Audit & Quality Improvement",
-        maxScore: 4,
-        criteria: [
-          {
-            id: "endo_aud1",
-            criterion: "Completed clinical audit or QIP",
-            score: 0,
-            evidence: "Audit report or QI project documentation",
-            options: [
-              { label: "Completed full audit cycle or QIP with re-audit", score: 4 },
-              { label: "Completed audit or QIP (no re-audit)", score: 3 },
-              { label: "Participated in audit data collection", score: 1 },
-              { label: "None", score: 0 },
-            ],
-          },
-        ],
-      },
-      {
-        id: "endo_leadership",
-        name: "Leadership & Management",
-        maxScore: 3,
-        criteria: [
-          {
-            id: "endo_lead1",
-            criterion: "Leadership or management role",
-            score: 0,
-            evidence: "Letter or certificate confirming role",
-            options: [
-              { label: "National or regional leadership role (committee, society officer)", score: 3 },
-              { label: "Local leadership role (department lead, rota coordinator)", score: 2 },
-              { label: "Participated in leadership activity", score: 1 },
-              { label: "None", score: 0 },
-            ],
-          },
-        ],
-      },
-      {
-        id: "endo_clinical_exp",
-        name: "Endocrinology/Diabetes Clinical Experience",
-        maxScore: 3,
-        criteria: [
-          {
-            id: "endo_clin1",
-            criterion: "Relevant endocrinology or diabetes clinical experience",
-            score: 0,
-            evidence: "Supervisor letter or job description",
-            options: [
-              { label: "≥6 months endocrinology/diabetes post (SHO or above)", score: 3 },
-              { label: "Endocrinology taster week or elective (≥4 weeks)", score: 2 },
-              { label: "Attended SfE/ABCD course or conference", score: 1 },
-              { label: "None", score: 0 },
-            ],
-          },
-        ],
-      },
-    ],
+    description: "ST3 entry after IMT. Portfolio-based shortlisting. Research in diabetes/endocrinology and clinical experience are key. Applications are scored by self-assessment on Oriel — 38 points across the domains plus 2 marks for evidence organisation — and then verified against uploaded evidence, which can raise or lower the score.",
+    interviewScoring: {
+      rawMaxScore: 0,
+      shortlistingScoreCarriesForward: true,
+      description: "Your verified self-assessment score carries into the final score used for ranking and offers. Some specialties also score commitment to specialty at shortlisting: two assessors mark it 10, 2 or 0 each, worth 20 marks and a third of the 60 available at that stage. That score does not carry forward — commitment is assessed again at interview for every specialty — but if either assessor marks you unappointable you are not shortlisted at all, however high your self-assessment score. Whether a specialty scores it at shortlisting is stated in its 'Planning your application' section.",
+      appointabilityCriteria: [
+              "Either assessor marking you unappointable on commitment to specialty stops you being shortlisted, regardless of your self-assessment score",
+              "Supplying no evidence, or no evidence for domains you scored yourself in, is likely to stop your application being shortlisted"
+      ],
+    },
+    evidenceGuidance: {
+      hardFails: [
+              "Supplying no evidence, or none for a domain you scored yourself in, is likely to mean your application is not shortlisted",
+              "Evidence organised poorly enough can stop an application being shortlisted regardless of score, and that judgement cannot be appealed"
+      ],
+      rules: [
+              "You are contacted after applications close to upload evidence — there is no need to supply anything at the time of applying, though you can prepare it.",
+              "Assessors award a further 2 marks for how well your evidence is organised. If presentation is sufficiently poor it can stop your application being shortlisted whatever else you scored, and this mark cannot be appealed.",
+              "Verification can move your score either way: where an achievement is unclear or hard to verify, assessors are told to award only what they can confidently confirm.",
+              "Five domains need an evidence pro forma from the PHST Document Library: postgraduate degrees and qualifications, presentations and posters, publications, teaching experience, and quality improvement.",
+              "You cannot amend a submitted application, but you may upload evidence for achievements gained between submission and the upload deadline, and may flag a mistake with a short explanatory document.",
+              "Anything not in English needs a certified, authenticated translation.",
+              "Every application is assessed independently with no cross-referencing, so the same achievement can score differently in another specialty or round. That alone is not grounds for appeal."
+      ],
+    },
+    domains: phstDomains("endo"),
   },
 
   // ─── 18. Respiratory Medicine (ST3) ───────────────────────────────────────
@@ -2719,152 +2303,35 @@ export const SAS_SPECIALTIES: SASSpecialty[] = [
     shortName: "Resp",
     applicationRoute: "Specialty Training",
     msraRequired: false,
-    totalMaxScore: 32,
-    competitiveThreshold: 23,
+    totalMaxScore: 38,
+    competitiveThreshold: null,
     sourceUrl: "https://www.phstrecruitment.org.uk",
-    description: "ST3 entry after IMT. Portfolio-based shortlisting. Research output and respiratory clinical experience are key differentiators.",
-    domains: [
-      {
-        id: "resp_qualifications",
-        name: "Postgraduate Degrees & Qualifications",
-        maxScore: 4,
-        criteria: [
-          {
-            id: "resp_q1",
-            criterion: "Highest postgraduate degree or qualification",
-            score: 0,
-            evidence: "Certificate/transcript of degree",
-            options: [
-              { label: "PhD or MD by research", score: 4 },
-              { label: "Masters degree (MSc, MRes, MA) – ≥8 months", score: 3 },
-              { label: "Postgraduate diploma (PgDip) – ≥4 months", score: 2 },
-              { label: "Postgraduate certificate (PgCert) – ≥2 months", score: 1 },
-              { label: "None of the above", score: 0 },
-            ],
-          },
-        ],
-      },
-      {
-        id: "resp_publications",
-        name: "Publications",
-        maxScore: 8,
-        criteria: [
-          {
-            id: "resp_pub1",
-            criterion: "Best publication level",
-            score: 0,
-            evidence: "PubMed/DOI link or journal citation",
-            options: [
-              { label: "First author paper in peer-reviewed journal (PubMed indexed)", score: 8 },
-              { label: "First author paper in peer-reviewed journal (not indexed)", score: 6 },
-              { label: "Co-author paper in peer-reviewed journal (PubMed indexed)", score: 5 },
-              { label: "Co-author paper in peer-reviewed journal (not indexed)", score: 3 },
-              { label: "Published case report or letter", score: 2 },
-              { label: "Published abstract only", score: 1 },
-              { label: "None", score: 0 },
-            ],
-          },
-        ],
-      },
-      {
-        id: "resp_presentations",
-        name: "Presentations & Posters",
-        maxScore: 6,
-        criteria: [
-          {
-            id: "resp_pres1",
-            criterion: "Best level of presentation at a medical meeting",
-            score: 0,
-            evidence: "Programme/certificate with your name and title",
-            options: [
-              { label: "Oral presentation at national or international meeting", score: 6 },
-              { label: "Oral presentation at regional meeting", score: 4 },
-              { label: "Poster at national or international meeting", score: 3 },
-              { label: "Poster at regional meeting", score: 2 },
-              { label: "Presentation at local (trust) meeting", score: 1 },
-              { label: "None", score: 0 },
-            ],
-          },
-        ],
-      },
-      {
-        id: "resp_teaching",
-        name: "Teaching & Education",
-        maxScore: 4,
-        criteria: [
-          {
-            id: "resp_t1",
-            criterion: "Evidence of formal teaching or teaching qualification",
-            score: 0,
-            evidence: "Certificate or teaching portfolio evidence",
-            options: [
-              { label: "Formal teaching qualification (PgCert in Medical Education or equivalent)", score: 4 },
-              { label: "Sustained teaching programme with feedback (≥3 sessions)", score: 3 },
-              { label: "Some formal teaching with feedback (1–2 sessions)", score: 2 },
-              { label: "Informal teaching only", score: 1 },
-              { label: "None", score: 0 },
-            ],
-          },
-        ],
-      },
-      {
-        id: "resp_audit_qip",
-        name: "Audit & Quality Improvement",
-        maxScore: 4,
-        criteria: [
-          {
-            id: "resp_aud1",
-            criterion: "Completed clinical audit or QIP",
-            score: 0,
-            evidence: "Audit report or QI project documentation",
-            options: [
-              { label: "Completed full audit cycle or QIP with re-audit", score: 4 },
-              { label: "Completed audit or QIP (no re-audit)", score: 3 },
-              { label: "Participated in audit data collection", score: 1 },
-              { label: "None", score: 0 },
-            ],
-          },
-        ],
-      },
-      {
-        id: "resp_leadership",
-        name: "Leadership & Management",
-        maxScore: 3,
-        criteria: [
-          {
-            id: "resp_lead1",
-            criterion: "Leadership or management role",
-            score: 0,
-            evidence: "Letter or certificate confirming role",
-            options: [
-              { label: "National or regional leadership role (committee, society officer)", score: 3 },
-              { label: "Local leadership role (department lead, rota coordinator)", score: 2 },
-              { label: "Participated in leadership activity", score: 1 },
-              { label: "None", score: 0 },
-            ],
-          },
-        ],
-      },
-      {
-        id: "resp_clinical_exp",
-        name: "Respiratory Clinical Experience",
-        maxScore: 3,
-        criteria: [
-          {
-            id: "resp_clin1",
-            criterion: "Relevant respiratory clinical experience",
-            score: 0,
-            evidence: "Supervisor letter or job description",
-            options: [
-              { label: "≥6 months respiratory medicine post (SHO or above)", score: 3 },
-              { label: "Respiratory taster week or elective (≥4 weeks)", score: 2 },
-              { label: "Attended BTS course or respiratory conference", score: 1 },
-              { label: "None", score: 0 },
-            ],
-          },
-        ],
-      },
-    ],
+    description: "ST3 entry after IMT. Portfolio-based shortlisting. Research output and respiratory clinical experience are key differentiators. Applications are scored by self-assessment on Oriel — 38 points across the domains plus 2 marks for evidence organisation — and then verified against uploaded evidence, which can raise or lower the score.",
+    interviewScoring: {
+      rawMaxScore: 0,
+      shortlistingScoreCarriesForward: true,
+      description: "Your verified self-assessment score carries into the final score used for ranking and offers. Some specialties also score commitment to specialty at shortlisting: two assessors mark it 10, 2 or 0 each, worth 20 marks and a third of the 60 available at that stage. That score does not carry forward — commitment is assessed again at interview for every specialty — but if either assessor marks you unappointable you are not shortlisted at all, however high your self-assessment score. Whether a specialty scores it at shortlisting is stated in its 'Planning your application' section.",
+      appointabilityCriteria: [
+              "Either assessor marking you unappointable on commitment to specialty stops you being shortlisted, regardless of your self-assessment score",
+              "Supplying no evidence, or no evidence for domains you scored yourself in, is likely to stop your application being shortlisted"
+      ],
+    },
+    evidenceGuidance: {
+      hardFails: [
+              "Supplying no evidence, or none for a domain you scored yourself in, is likely to mean your application is not shortlisted",
+              "Evidence organised poorly enough can stop an application being shortlisted regardless of score, and that judgement cannot be appealed"
+      ],
+      rules: [
+              "You are contacted after applications close to upload evidence — there is no need to supply anything at the time of applying, though you can prepare it.",
+              "Assessors award a further 2 marks for how well your evidence is organised. If presentation is sufficiently poor it can stop your application being shortlisted whatever else you scored, and this mark cannot be appealed.",
+              "Verification can move your score either way: where an achievement is unclear or hard to verify, assessors are told to award only what they can confidently confirm.",
+              "Five domains need an evidence pro forma from the PHST Document Library: postgraduate degrees and qualifications, presentations and posters, publications, teaching experience, and quality improvement.",
+              "You cannot amend a submitted application, but you may upload evidence for achievements gained between submission and the upload deadline, and may flag a mistake with a short explanatory document.",
+              "Anything not in English needs a certified, authenticated translation.",
+              "Every application is assessed independently with no cross-referencing, so the same achievement can score differently in another specialty or round. That alone is not grounds for appeal."
+      ],
+    },
+    domains: phstDomains("resp"),
   },
 ];
 
@@ -3000,46 +2467,46 @@ export const SAS_VERIFICATION: Record<string, SASVerification> = {
   // matrices differ substantially between specialties, so this uniformity
   // indicates the figures were generated rather than sourced.
   dermatology: {
-    status: "unverified",
-    scoringModel: "unknown",
+    status: "verified",
+    scoringModel: "self-assessment",
     checkedOn: "2026-07-19",
-    cycle: null,
-    note: "Recruited through Physician Higher Specialty Training (PHST) at ST3, a shared national process for the higher medical specialties rather than a college-run one — the previous entry pointed at a specialist society page that was also a dead link. The PHST site blocks automated access, so the scoring matrix could not be read and remains unverified. The figures here are not credible in any case: this specialty was added in a batch of six that all carry an identical 32-point maximum differing only in threshold, which real recruitment matrices do not. Confirmed July 2026 that PHST runs a single national round covering all the higher medical specialties, so one scoring source should settle every specialty in this group at once.",
+    cycle: "2026",
+    note: "Verified against the PHST self-assessment and application scoring guidance. All higher medical specialties are recruited in one national round and share the same matrix: 38 points across seven domains, defined once in phstDomains(). Two things sit outside it — 2 marks for evidence organisation, and commitment to specialty worth 20 marks at shortlisting for the specialties that assess it, which does not carry into ranking but can block shortlisting outright. The 32-point maximum this specialty previously carried, shared with five others and differing only in threshold, corresponded to nothing. No competitive threshold is published, so none is claimed. Outstanding: whether this particular specialty scores commitment to specialty at shortlisting, which is stated per round on its own planning page.",
   },
   cardiology: {
-    status: "unverified",
-    scoringModel: "unknown",
+    status: "verified",
+    scoringModel: "self-assessment",
     checkedOn: "2026-07-19",
-    cycle: null,
-    note: "Recruited through Physician Higher Specialty Training (PHST) at ST3, a shared national process for the higher medical specialties rather than a college-run one — the previous entry pointed at a specialist society page that was also a dead link. The PHST site blocks automated access, so the scoring matrix could not be read and remains unverified. The figures here are not credible in any case: this specialty was added in a batch of six that all carry an identical 32-point maximum differing only in threshold, which real recruitment matrices do not. Confirmed July 2026 that PHST runs a single national round covering all the higher medical specialties, so one scoring source should settle every specialty in this group at once.",
+    cycle: "2026",
+    note: "Verified against the PHST self-assessment and application scoring guidance. All higher medical specialties are recruited in one national round and share the same matrix: 38 points across seven domains, defined once in phstDomains(). Two things sit outside it — 2 marks for evidence organisation, and commitment to specialty worth 20 marks at shortlisting for the specialties that assess it, which does not carry into ranking but can block shortlisting outright. The 32-point maximum this specialty previously carried, shared with five others and differing only in threshold, corresponded to nothing. No competitive threshold is published, so none is claimed. Outstanding: whether this particular specialty scores commitment to specialty at shortlisting, which is stated per round on its own planning page.",
   },
   neurology: {
-    status: "unverified",
-    scoringModel: "unknown",
+    status: "verified",
+    scoringModel: "self-assessment",
     checkedOn: "2026-07-19",
-    cycle: null,
-    note: "Recruited through Physician Higher Specialty Training (PHST) at ST3, a shared national process for the higher medical specialties rather than a college-run one — the previous entry pointed at a specialist society page that was also a dead link. The PHST site blocks automated access, so the scoring matrix could not be read and remains unverified. The figures here are not credible in any case: this specialty was added in a batch of six that all carry an identical 32-point maximum differing only in threshold, which real recruitment matrices do not. Confirmed July 2026 that PHST runs a single national round covering all the higher medical specialties, so one scoring source should settle every specialty in this group at once.",
+    cycle: "2026",
+    note: "Verified against the PHST self-assessment and application scoring guidance. All higher medical specialties are recruited in one national round and share the same matrix: 38 points across seven domains, defined once in phstDomains(). Two things sit outside it — 2 marks for evidence organisation, and commitment to specialty worth 20 marks at shortlisting for the specialties that assess it, which does not carry into ranking but can block shortlisting outright. The 32-point maximum this specialty previously carried, shared with five others and differing only in threshold, corresponded to nothing. No competitive threshold is published, so none is claimed. Outstanding: whether this particular specialty scores commitment to specialty at shortlisting, which is stated per round on its own planning page.",
   },
   gastroenterology: {
-    status: "unverified",
-    scoringModel: "unknown",
+    status: "verified",
+    scoringModel: "self-assessment",
     checkedOn: "2026-07-19",
-    cycle: null,
-    note: "Recruited through Physician Higher Specialty Training (PHST) at ST3, a shared national process for the higher medical specialties rather than a college-run one — the previous entry pointed at a specialist society page that was also a dead link. The PHST site blocks automated access, so the scoring matrix could not be read and remains unverified. The figures here are not credible in any case: this specialty was added in a batch of six that all carry an identical 32-point maximum differing only in threshold, which real recruitment matrices do not. Confirmed July 2026 that PHST runs a single national round covering all the higher medical specialties, so one scoring source should settle every specialty in this group at once.",
+    cycle: "2026",
+    note: "Verified against the PHST self-assessment and application scoring guidance. All higher medical specialties are recruited in one national round and share the same matrix: 38 points across seven domains, defined once in phstDomains(). Two things sit outside it — 2 marks for evidence organisation, and commitment to specialty worth 20 marks at shortlisting for the specialties that assess it, which does not carry into ranking but can block shortlisting outright. The 32-point maximum this specialty previously carried, shared with five others and differing only in threshold, corresponded to nothing. No competitive threshold is published, so none is claimed. Outstanding: whether this particular specialty scores commitment to specialty at shortlisting, which is stated per round on its own planning page.",
   },
   endocrinology: {
-    status: "unverified",
-    scoringModel: "unknown",
+    status: "verified",
+    scoringModel: "self-assessment",
     checkedOn: "2026-07-19",
-    cycle: null,
-    note: "Recruited through Physician Higher Specialty Training (PHST) at ST3, a shared national process for the higher medical specialties rather than a college-run one — the previous entry pointed at a specialist society page that was also a dead link. The PHST site blocks automated access, so the scoring matrix could not be read and remains unverified. The figures here are not credible in any case: this specialty was added in a batch of six that all carry an identical 32-point maximum differing only in threshold, which real recruitment matrices do not. Confirmed July 2026 that PHST runs a single national round covering all the higher medical specialties, so one scoring source should settle every specialty in this group at once.",
+    cycle: "2026",
+    note: "Verified against the PHST self-assessment and application scoring guidance. All higher medical specialties are recruited in one national round and share the same matrix: 38 points across seven domains, defined once in phstDomains(). Two things sit outside it — 2 marks for evidence organisation, and commitment to specialty worth 20 marks at shortlisting for the specialties that assess it, which does not carry into ranking but can block shortlisting outright. The 32-point maximum this specialty previously carried, shared with five others and differing only in threshold, corresponded to nothing. No competitive threshold is published, so none is claimed. Outstanding: whether this particular specialty scores commitment to specialty at shortlisting, which is stated per round on its own planning page.",
   },
   respiratory: {
-    status: "unverified",
-    scoringModel: "unknown",
+    status: "verified",
+    scoringModel: "self-assessment",
     checkedOn: "2026-07-19",
-    cycle: null,
-    note: "Recruited through Physician Higher Specialty Training (PHST) at ST3, a shared national process for the higher medical specialties rather than a college-run one — the previous entry pointed at a specialist society page that was also a dead link. The PHST site blocks automated access, so the scoring matrix could not be read and remains unverified. The figures here are not credible in any case: this specialty was added in a batch of six that all carry an identical 32-point maximum differing only in threshold, which real recruitment matrices do not. Confirmed July 2026 that PHST runs a single national round covering all the higher medical specialties, so one scoring source should settle every specialty in this group at once.",
+    cycle: "2026",
+    note: "Verified against the PHST self-assessment and application scoring guidance. All higher medical specialties are recruited in one national round and share the same matrix: 38 points across seven domains, defined once in phstDomains(). Two things sit outside it — 2 marks for evidence organisation, and commitment to specialty worth 20 marks at shortlisting for the specialties that assess it, which does not carry into ranking but can block shortlisting outright. The 32-point maximum this specialty previously carried, shared with five others and differing only in threshold, corresponded to nothing. No competitive threshold is published, so none is claimed. Outstanding: whether this particular specialty scores commitment to specialty at shortlisting, which is stated per round on its own planning page.",
   },
 };
 
