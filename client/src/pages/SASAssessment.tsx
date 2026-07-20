@@ -14,6 +14,7 @@ import {
   isVerified,
   type SASSpecialty,
   type SASDomain,
+  type SASScoringModel,
 } from "../../../shared/sas-data";
 import { courseForDomain } from "../../../shared/courses";
 import {
@@ -40,6 +41,14 @@ import { useState, useMemo } from "react";
 import { toast } from "sonner";
 
 type AnswerMap = Record<string, number>; // criterionId -> score
+
+// Card wording for specialties with nothing to self-score. The default covers
+// "msra-only", where the portfolio genuinely earns nothing; the entries here
+// are for specialties whose portfolio is scored, just not by the applicant.
+const NON_SCORABLE_CARD_LABEL: Partial<Record<SASScoringModel, string>> = {
+  "interview-portfolio": "Portfolio scored at interview — see details",
+  "application-assessed": "Scored from your application — see details",
+};
 
 function getCompetitiveLevel(
   percentage: number
@@ -153,9 +162,8 @@ function SpecialtySelector({ onSelect }: { onSelect: (s: SASSpecialty) => void }
             {!isScorable(specialty.id) ? (
               <div className="flex items-center gap-1.5 text-xs text-blue-300/90">
                 <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-                {getVerification(specialty.id).scoringModel === "interview-portfolio"
-                  ? "Portfolio scored at interview — see details"
-                  : "Not scored by portfolio — see details"}
+                {NON_SCORABLE_CARD_LABEL[getVerification(specialty.id).scoringModel] ??
+                  "Not scored by portfolio — see details"}
               </div>
             ) : isVerified(specialty.id) ? (
               <div className="flex items-center justify-between text-xs">
@@ -939,12 +947,29 @@ function NotPortfolioScored({
 }) {
   const { note, scoringModel } = getVerification(specialty.id);
 
-  // Two very different situations reach this screen, and conflating them would
-  // mislead badly. Under "interview-portfolio" the portfolio is worth real
-  // marks and is simply scored by a panel; under "msra-only" it earns nothing
-  // anywhere. Telling an O&G applicant their portfolio is not scored would
-  // send them away from 40 of the 150 marks available to them.
-  const panelScored = scoringModel === "interview-portfolio";
+  // Several distinct situations reach this screen and conflating them would
+  // mislead badly. Only under "msra-only" does the portfolio earn nothing;
+  // elsewhere it carries real marks and simply is not self-scored. Telling an
+  // O&G applicant their portfolio is not scored would send them away from 40 of
+  // the 150 marks available to them.
+  const COPY: Record<string, { heading: string; body: string; areasLabel: string }> = {
+    "interview-portfolio": {
+      heading: `${specialty.name} is scored at interview, not on the form`,
+      body: "Your portfolio still carries real marks here — a panel assesses it on the day rather than you declaring a score on your application, so no self-assessment can predict the result. What this can do is show you which areas are marked, so you arrive with evidence for each.",
+      areasLabel: "What the panel marks you on",
+    },
+    "application-assessed": {
+      heading: `${specialty.name} is scored from your application, not self-assessed`,
+      body: "Your portfolio carries real marks here, but assessors award them by reading your written answers rather than you selecting a category. There is no score to calculate in advance — what matters is having evidence in each scored area and describing it well in the words you are given.",
+      areasLabel: "What your application is scored on",
+    },
+    "msra-only": {
+      heading: `${specialty.name} is not scored by portfolio`,
+      body: "Because no portfolio is scored at any stage, a self-assessment cannot tell you anything useful here. Preparing for what is actually assessed is what moves your application.",
+      areasLabel: "What you are assessed on instead",
+    },
+  };
+  const copy = COPY[scoringModel] ?? COPY["msra-only"];
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-16">
@@ -952,28 +977,16 @@ function NotPortfolioScored({
         <div className="w-12 h-12 rounded-xl bg-amber-500/15 flex items-center justify-center mb-5">
           <AlertCircle className="w-6 h-6 text-amber-400" />
         </div>
-        <h1 className="text-2xl font-bold text-white mb-3">
-          {panelScored
-            ? `${specialty.name} is scored at interview, not on the form`
-            : `${specialty.name} is not scored by portfolio`}
-        </h1>
+        <h1 className="text-2xl font-bold text-white mb-3">{copy.heading}</h1>
         <p className="text-gray-300 leading-relaxed mb-4">{note}</p>
-        <p className="text-gray-400 text-sm leading-relaxed mb-6">
-          {panelScored
-            ? "Your portfolio still carries real marks here — it is assessed by the panel on the day rather than declared on your application, so no self-assessment can predict the score. What it can do is show you which areas the panel marks, so you arrive with evidence for each."
-            : "Because no portfolio is scored at any stage, a self-assessment cannot tell you anything useful here. Preparing for what is actually assessed is what moves your application."}
-        </p>
+        <p className="text-gray-400 text-sm leading-relaxed mb-6">{copy.body}</p>
 
         {/* Where the specialty ranks on an interview, showing what that
             interview marks is the closest thing to actionable guidance we can
             give in place of a score. */}
         {specialty.interviewScoring && (
           <div className="mb-6 rounded-xl border border-white/10 bg-white/3 p-4">
-            <p className="text-sm font-medium text-white mb-2">
-              {panelScored
-                ? "What the panel marks you on"
-                : "What you are assessed on instead"}
-            </p>
+            <p className="text-sm font-medium text-white mb-2">{copy.areasLabel}</p>
             <p className="text-xs text-gray-400 leading-relaxed">
               {specialty.interviewScoring.description}
             </p>

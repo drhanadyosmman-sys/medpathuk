@@ -19,6 +19,10 @@
  *                          matters a great deal here — it simply cannot be
  *                          self-scored in advance, so the tool shows what the
  *                          panel marks instead of producing a number.
+ *  - "application-assessed" Portfolio content is scored at shortlisting, but by
+ *                          assessors reading written answers on the form rather
+ *                          than by the applicant assigning their own category.
+ *                          Again scorable in principle, not self-scorable.
  *  - "msra-only"           No portfolio is scored at any stage; ranking comes
  *                          from the MSRA exam alone. Distinct from the case
  *                          above, and the difference changes what an applicant
@@ -28,6 +32,7 @@
 export type SASScoringModel =
   | "self-assessment"
   | "interview-portfolio"
+  | "application-assessed"
   | "msra-only"
   | "unknown";
 
@@ -38,7 +43,11 @@ export type SASScoringModel =
  * by a panel on the day. Offering a self-assessed total there would be
  * inventing a figure that does not exist in the process.
  */
-const NON_SCORABLE_MODELS: SASScoringModel[] = ["msra-only", "interview-portfolio"];
+const NON_SCORABLE_MODELS: SASScoringModel[] = [
+  "msra-only",
+  "interview-portfolio",
+  "application-assessed",
+];
 
 /**
  * How the interview stage is scored, where a specialty publishes it.
@@ -561,7 +570,7 @@ export const SAS_SPECIALTIES: SASSpecialty[] = [
     totalMaxScore: 100,
     competitiveThreshold: 60,
     sourceUrl: "https://gprecruitment.hee.nhs.uk/Recruitment",
-    description: "3-year GP training programme. Offers and location are decided by the MSRA alone — there is no interview and no portfolio scoring at any stage.",
+    description: "3-year GP training programme. Selection runs on the MSRA; no portfolio is scored at any stage, so there is nothing here to self-assess. Confirm the current round's process on the official site — recent cycles have changed how and whether candidates are assessed beyond the exam.",
     domains: [
       {
         id: "gp_msra",
@@ -788,12 +797,28 @@ export const SAS_SPECIALTIES: SASSpecialty[] = [
     id: "paediatrics",
     name: "Paediatrics and Child Health",
     shortName: "Paediatrics",
-    applicationRoute: "Core Training",
+    applicationRoute: "Run-through",
     msraRequired: false,
-    totalMaxScore: 25,
-    competitiveThreshold: 18,
-    sourceUrl: "https://medical.hee.nhs.uk/medical-training-recruitment/medical-specialty-training/paediatrics",
-    description: "Paediatric training from CT1 level. Portfolio-based scoring with interview. RCPCH oversees training.",
+    totalMaxScore: 0,
+    competitiveThreshold: null,
+    sourceUrl: "https://www.rcpch.ac.uk/education-careers/apply-paediatrics/ST1",
+    description: "Paediatric training from ST1, recruited by the RCPCH in National Round 1. There is no MSRA. Shortlisting is scored by assessors from written answers on the Oriel form — capped at 50 words per section — followed by a two-station online interview.",
+    interviewScoring: {
+      rawMaxScore: 0,
+      shortlistingScoreCarriesForward: true,
+      description:
+        "Shortlisting is scored from your written application across five areas, each answered in no more than 50 words. Shortlisted candidates then attend a two-station multi-scenario interview on the Qpercom platform, 20 minutes per station, covering communication, career motivation, clinical reasoning and reflective practice. Offers combine your score ranking with your programme preferences.",
+      appointabilityCriteria: [
+        "Appointability is determined from the interview scores, with a threshold of 55% or more",
+      ],
+      weightedAreas: [
+        { area: "Transferable clinical capabilities", weighting: "application, 50 words" },
+        { area: "Personal achievements and reflection", weighting: "application, 50 words" },
+        { area: "Quality Improvement Project / Audit", weighting: "application, 50 words" },
+        { area: "Academic achievements", weighting: "application, 50 words" },
+        { area: "Teaching", weighting: "application, 50 words" },
+      ],
+    },
     domains: [
       {
         id: "paed_qualifications",
@@ -1223,11 +1248,11 @@ export const SAS_SPECIALTIES: SASSpecialty[] = [
     name: "Emergency Medicine (EM)",
     shortName: "Emergency Medicine",
     applicationRoute: "Core Training",
-    msraRequired: false,
-    totalMaxScore: 56,
-    competitiveThreshold: 38,
-    sourceUrl: "https://www.rcem.ac.uk/Training-Exams/Specialty-Training/Recruitment",
-    description: "Emergency Medicine specialty training from CT1/ST1. Portfolio-based scoring. RCEM oversees training.",
+    msraRequired: true,
+    totalMaxScore: 0,
+    competitiveThreshold: null,
+    sourceUrl: "https://medical.hee.nhs.uk/medical-training-recruitment/medical-specialty-training/emergency-medicine/core-emergency-medicine/overview-of-core-training/applying-for-core-training",
+    description: "ACCS Emergency Medicine from CT1/ST1. All eligible applicants sit the MSRA, which is weighted 40% of the total score against 60% for the online interview. Where applications exceed interview capacity, the MSRA score decides who is invited. There is no self-assessment.",
     domains: [
       {
         id: "em_qualifications",
@@ -1921,7 +1946,7 @@ export const SAS_SPECIALTIES: SASSpecialty[] = [
     msraRequired: false,
     totalMaxScore: 32,
     competitiveThreshold: 24,
-    sourceUrl: "https://medical.hee.nhs.uk/medical-training-recruitment/medical-specialty-training/medicine",
+    sourceUrl: "https://www.phstrecruitment.org.uk",
     description: "ST3 entry specialty. Highly competitive with portfolio-based shortlisting via Oriel. Requires strong academic and clinical evidence.",
     domains: [
       {
@@ -2076,7 +2101,7 @@ export const SAS_SPECIALTIES: SASSpecialty[] = [
     msraRequired: false,
     totalMaxScore: 32,
     competitiveThreshold: 25,
-    sourceUrl: "https://www.bcs.com/education-and-research/training-and-accreditation/cardiology-training",
+    sourceUrl: "https://www.phstrecruitment.org.uk",
     description: "ST3 entry after IMT/ACCS. Highly competitive. Portfolio-based shortlisting with strong emphasis on research and academic output.",
     domains: [
       {
@@ -2231,7 +2256,7 @@ export const SAS_SPECIALTIES: SASSpecialty[] = [
     msraRequired: false,
     totalMaxScore: 32,
     competitiveThreshold: 24,
-    sourceUrl: "https://www.theabn.org/page/training",
+    sourceUrl: "https://www.phstrecruitment.org.uk",
     description: "ST3 entry after IMT. Portfolio-based shortlisting. Strong academic output and neurology experience are key differentiators.",
     domains: [
       {
@@ -2386,7 +2411,7 @@ export const SAS_SPECIALTIES: SASSpecialty[] = [
     msraRequired: false,
     totalMaxScore: 32,
     competitiveThreshold: 24,
-    sourceUrl: "https://medical.hee.nhs.uk/medical-training-recruitment/medical-specialty-training/medicine",
+    sourceUrl: "https://www.phstrecruitment.org.uk",
     description: "ST3 entry after IMT. Portfolio-based shortlisting. Research output and endoscopy experience are highly valued.",
     domains: [
       {
@@ -2541,7 +2566,7 @@ export const SAS_SPECIALTIES: SASSpecialty[] = [
     msraRequired: false,
     totalMaxScore: 32,
     competitiveThreshold: 23,
-    sourceUrl: "https://medical.hee.nhs.uk/medical-training-recruitment/medical-specialty-training/medicine",
+    sourceUrl: "https://www.phstrecruitment.org.uk",
     description: "ST3 entry after IMT. Portfolio-based shortlisting. Research in diabetes/endocrinology and clinical experience are key.",
     domains: [
       {
@@ -2696,7 +2721,7 @@ export const SAS_SPECIALTIES: SASSpecialty[] = [
     msraRequired: false,
     totalMaxScore: 32,
     competitiveThreshold: 23,
-    sourceUrl: "https://medical.hee.nhs.uk/medical-training-recruitment/medical-specialty-training/medicine",
+    sourceUrl: "https://www.phstrecruitment.org.uk",
     description: "ST3 entry after IMT. Portfolio-based shortlisting. Research output and respiratory clinical experience are key differentiators.",
     domains: [
       {
@@ -2905,21 +2930,21 @@ export const SAS_VERIFICATION: Record<string, SASVerification> = {
     scoringModel: "msra-only",
     checkedOn: null,
     cycle: null,
-    note: "GP has no portfolio scored at any stage — ranking and offers come from the MSRA alone. The 100-point scoring this tool previously showed does not correspond to anything in GP recruitment.",
+    note: "No portfolio is scored at any stage, so the 100-point assessment with a 60-point threshold this tool previously showed corresponds to nothing in GP recruitment. Left unverified because the selection mechanism itself could not be confirmed: NHS England's own page on changes to GP recruitment still describes the 2021 and 2022 rounds and a Selection Centre suspended for COVID, so whether candidates face anything beyond the MSRA in the current cycle is not established by official sources. The absence of portfolio scoring is well supported across them; the rest is not.",
   },
   psychiatry: {
-    status: "unverified",
+    status: "verified",
     scoringModel: "msra-only",
-    checkedOn: null,
-    cycle: null,
-    note: "Core Psychiatry selects on MSRA alone, with no interview and no portfolio. The 40-point scoring this tool previously showed does not correspond to anything in Psychiatry recruitment. Its sourceUrl was a dead link when checked in July 2026 and now points to the NHS England specialty hub rather than an invented deep link.",
+    checkedOn: "2026-07-19",
+    cycle: "2026",
+    note: "NHS England states directly that there are no face-to-face or online interviews for this round and that offers are based on MSRA scores only, with no portfolio component. The 40-point assessment with a 28-point threshold this tool previously showed corresponds to nothing in Psychiatry recruitment. Its sourceUrl was also a dead link when checked in July 2026 and now points to the NHS England specialty hub.",
   },
   paediatrics: {
-    status: "unverified",
-    scoringModel: "unknown",
-    checkedOn: null,
-    cycle: null,
-    note: "Matrix not checked against the official source. Its sourceUrl was a dead link when checked in July 2026 and now points to the NHS England specialty hub rather than an invented deep link.",
+    status: "verified",
+    scoringModel: "application-assessed",
+    checkedOn: "2026-07-19",
+    cycle: "2026",
+    note: "Shortlisting areas and the interview format come from the RCPCH ST1 applicant guidance. Nothing is self-scored: assessors mark written answers capped at 50 words per section, so the 25-point self-assessment with an 18-point threshold this tool previously offered had no counterpart in the process. RCPCH does not publish the marks behind each area, so none are claimed here. Entry is at ST1 rather than CT1 and there is no MSRA, both of which the previous entry had wrong. Outstanding: the marks available per shortlisting area.",
   },
   og: {
     status: "verified",
@@ -2938,9 +2963,9 @@ export const SAS_VERIFICATION: Record<string, SASVerification> = {
   em: {
     status: "unverified",
     scoringModel: "unknown",
-    checkedOn: null,
-    cycle: null,
-    note: "Matrix not checked against the official source.",
+    checkedOn: "2026-07-19",
+    cycle: "2026",
+    note: "Partly checked. Confirmed from NHS England: the MSRA is weighted 40% and the interview 60%, the MSRA decides shortlisting when applications exceed interview capacity, and there is no self-assessment — so the 56-point assessment with a 38-point threshold this tool previously offered had no counterpart, and the entry's claim that no MSRA was required was wrong. Left unverified because what the interview actually scores is not published on any accessible official page, so whether portfolio evidence carries marks here is unestablished and not guessed at.",
   },
   radiology: {
     status: "verified",
@@ -2977,44 +3002,44 @@ export const SAS_VERIFICATION: Record<string, SASVerification> = {
   dermatology: {
     status: "unverified",
     scoringModel: "unknown",
-    checkedOn: null,
+    checkedOn: "2026-07-19",
     cycle: null,
-    note: "Part of a batch of six specialties sharing an identical 32-point maximum, which real recruitment matrices do not. Its sourceUrl was a dead link when checked in July 2026 and now points to the NHS England specialty hub rather than an invented deep link.",
+    note: "Recruited through Physician Higher Specialty Training (PHST) at ST3, a shared national process for the higher medical specialties rather than a college-run one — the previous entry pointed at a specialist society page that was also a dead link. The PHST site blocks automated access, so the scoring matrix could not be read and remains unverified. The figures here are not credible in any case: this specialty was added in a batch of six that all carry an identical 32-point maximum differing only in threshold, which real recruitment matrices do not.",
   },
   cardiology: {
     status: "unverified",
     scoringModel: "unknown",
-    checkedOn: null,
+    checkedOn: "2026-07-19",
     cycle: null,
-    note: "Part of a batch of six specialties sharing an identical 32-point maximum, which real recruitment matrices do not.",
+    note: "Recruited through Physician Higher Specialty Training (PHST) at ST3, a shared national process for the higher medical specialties rather than a college-run one — the previous entry pointed at a specialist society page that was also a dead link. The PHST site blocks automated access, so the scoring matrix could not be read and remains unverified. The figures here are not credible in any case: this specialty was added in a batch of six that all carry an identical 32-point maximum differing only in threshold, which real recruitment matrices do not.",
   },
   neurology: {
     status: "unverified",
     scoringModel: "unknown",
-    checkedOn: null,
+    checkedOn: "2026-07-19",
     cycle: null,
-    note: "Part of a batch of six specialties sharing an identical 32-point maximum, which real recruitment matrices do not.",
+    note: "Recruited through Physician Higher Specialty Training (PHST) at ST3, a shared national process for the higher medical specialties rather than a college-run one — the previous entry pointed at a specialist society page that was also a dead link. The PHST site blocks automated access, so the scoring matrix could not be read and remains unverified. The figures here are not credible in any case: this specialty was added in a batch of six that all carry an identical 32-point maximum differing only in threshold, which real recruitment matrices do not.",
   },
   gastroenterology: {
     status: "unverified",
     scoringModel: "unknown",
-    checkedOn: null,
+    checkedOn: "2026-07-19",
     cycle: null,
-    note: "Part of a batch of six specialties sharing an identical 32-point maximum, which real recruitment matrices do not. Its sourceUrl was a dead link when checked in July 2026 and now points to the NHS England specialty hub rather than an invented deep link.",
+    note: "Recruited through Physician Higher Specialty Training (PHST) at ST3, a shared national process for the higher medical specialties rather than a college-run one — the previous entry pointed at a specialist society page that was also a dead link. The PHST site blocks automated access, so the scoring matrix could not be read and remains unverified. The figures here are not credible in any case: this specialty was added in a batch of six that all carry an identical 32-point maximum differing only in threshold, which real recruitment matrices do not.",
   },
   endocrinology: {
     status: "unverified",
     scoringModel: "unknown",
-    checkedOn: null,
+    checkedOn: "2026-07-19",
     cycle: null,
-    note: "Part of a batch of six specialties sharing an identical 32-point maximum, which real recruitment matrices do not. Its sourceUrl was a dead link when checked in July 2026 and now points to the NHS England specialty hub rather than an invented deep link.",
+    note: "Recruited through Physician Higher Specialty Training (PHST) at ST3, a shared national process for the higher medical specialties rather than a college-run one — the previous entry pointed at a specialist society page that was also a dead link. The PHST site blocks automated access, so the scoring matrix could not be read and remains unverified. The figures here are not credible in any case: this specialty was added in a batch of six that all carry an identical 32-point maximum differing only in threshold, which real recruitment matrices do not.",
   },
   respiratory: {
     status: "unverified",
     scoringModel: "unknown",
-    checkedOn: null,
+    checkedOn: "2026-07-19",
     cycle: null,
-    note: "Part of a batch of six specialties sharing an identical 32-point maximum, which real recruitment matrices do not. Its sourceUrl was a dead link when checked in July 2026 and now points to the NHS England specialty hub rather than an invented deep link.",
+    note: "Recruited through Physician Higher Specialty Training (PHST) at ST3, a shared national process for the higher medical specialties rather than a college-run one — the previous entry pointed at a specialist society page that was also a dead link. The PHST site blocks automated access, so the scoring matrix could not be read and remains unverified. The figures here are not credible in any case: this specialty was added in a batch of six that all carry an identical 32-point maximum differing only in threshold, which real recruitment matrices do not.",
   },
 };
 
