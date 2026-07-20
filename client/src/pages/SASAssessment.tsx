@@ -968,8 +968,13 @@ function NotPortfolioScored({
       body: "Because no portfolio is scored at any stage, a self-assessment cannot tell you anything useful here. Preparing for what is actually assessed is what moves your application.",
       areasLabel: "What you are assessed on instead",
     },
+    unknown: {
+      heading: `${specialty.name} — scoring still being checked`,
+      body: "There is no self-assessment to complete for this specialty, so no score is offered. Exactly how the rest of the process is scored has not been established against an official source, and is set out below only as far as it has been confirmed. Check the current guidance for the round you are applying to.",
+      areasLabel: "What has been confirmed so far",
+    },
   };
-  const copy = COPY[scoringModel] ?? COPY["msra-only"];
+  const copy = COPY[scoringModel] ?? COPY.unknown;
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-16">

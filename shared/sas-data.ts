@@ -355,6 +355,116 @@ function phstDomains(prefix: string): SASDomain[] {
   ];
 }
 
+/**
+ * Every specialty recruited through Physician Higher Specialty Training.
+ *
+ * PHST runs one national round at ST3 across all of them, scored on the shared
+ * 38-point self-assessment in phstDomains(). What differs between specialties
+ * is the interview: how many areas are scored (four, five or six), how those
+ * areas are weighted, and whether commitment to specialty is also scored at
+ * shortlisting. Those sit on each specialty's own page and are recorded as
+ * outstanding rather than assumed here.
+ *
+ * Source: https://phstrecruitment.org.uk, verified July 2026.
+ */
+const PHST_SPECIALTY_LIST: { id: string; prefix: string; name: string; shortName: string }[] = [
+  { id: "acute_internal_medicine", prefix: "aim", name: "Acute Internal Medicine", shortName: "Acute Med" },
+  { id: "allergy", prefix: "allergy", name: "Allergy", shortName: "Allergy" },
+  { id: "audiovestibular", prefix: "audio", name: "Audiovestibular Medicine", shortName: "Audiovestibular" },
+  { id: "cardiology", prefix: "cardio", name: "Cardiology", shortName: "Cardio" },
+  { id: "clinical_genetics", prefix: "genetics", name: "Clinical Genetics", shortName: "Clin Genetics" },
+  { id: "clinical_neurophysiology", prefix: "neurophys", name: "Clinical Neurophysiology", shortName: "Neurophysiology" },
+  { id: "clinical_oncology", prefix: "clinonc", name: "Clinical Oncology", shortName: "Clin Oncology" },
+  { id: "clinical_pharmacology", prefix: "clinpharm", name: "Clinical Pharmacology & Therapeutics", shortName: "Clin Pharm" },
+  { id: "combined_infection", prefix: "infection", name: "Combined Infection Training", shortName: "Infection" },
+  { id: "dermatology", prefix: "derm", name: "Dermatology", shortName: "Derm" },
+  { id: "endocrinology", prefix: "endo", name: "Endocrinology & Diabetes Mellitus", shortName: "Endo" },
+  { id: "gastroenterology", prefix: "gastro", name: "Gastroenterology", shortName: "Gastro" },
+  { id: "gim", prefix: "gim", name: "General Internal Medicine", shortName: "GIM" },
+  { id: "genitourinary", prefix: "gum", name: "Genitourinary Medicine", shortName: "GUM" },
+  { id: "geriatric_medicine", prefix: "geriatrics", name: "Geriatric Medicine", shortName: "Geriatrics" },
+  { id: "haematology", prefix: "haem", name: "Haematology", shortName: "Haematology" },
+  { id: "immunology", prefix: "immuno", name: "Immunology", shortName: "Immunology" },
+  { id: "intensive_care", prefix: "icm", name: "Intensive Care Medicine", shortName: "ICM" },
+  { id: "medical_microbiology", prefix: "micro", name: "Medical Microbiology", shortName: "Microbiology" },
+  { id: "medical_oncology", prefix: "medonc", name: "Medical Oncology", shortName: "Med Oncology" },
+  { id: "medical_ophthalmology", prefix: "medophth", name: "Medical Ophthalmology", shortName: "Med Ophth" },
+  { id: "medical_virology", prefix: "virology", name: "Medical Virology", shortName: "Virology" },
+  { id: "neurology", prefix: "neuro", name: "Neurology", shortName: "Neuro" },
+  { id: "nuclear_medicine", prefix: "nuclear", name: "Nuclear Medicine", shortName: "Nuclear Med" },
+  { id: "paediatric_cardiology", prefix: "paedcardio", name: "Paediatric Cardiology", shortName: "Paed Cardio" },
+  { id: "palliative_medicine", prefix: "palliative", name: "Palliative Medicine", shortName: "Palliative" },
+  { id: "pharmaceutical_medicine", prefix: "pharmmed", name: "Pharmaceutical Medicine", shortName: "Pharm Med" },
+  { id: "rehabilitation_medicine", prefix: "rehab", name: "Rehabilitation Medicine", shortName: "Rehab Med" },
+  { id: "renal_medicine", prefix: "renal", name: "Renal Medicine", shortName: "Renal" },
+  { id: "respiratory", prefix: "resp", name: "Respiratory Medicine", shortName: "Resp" },
+  { id: "rheumatology", prefix: "rheum", name: "Rheumatology", shortName: "Rheumatology" },
+  { id: "sport_exercise_medicine", prefix: "sem", name: "Sport & Exercise Medicine", shortName: "Sport & Exercise" },
+  { id: "stroke_medicine", prefix: "stroke", name: "Stroke Medicine / GIM", shortName: "Stroke" },
+  { id: "tropical_medicine", prefix: "tropical", name: "Tropical Medicine", shortName: "Tropical Med" },
+];
+
+const PHST_SOURCE_URL = "https://phstrecruitment.org.uk";
+
+const PHST_INTERVIEW_DESCRIPTION =
+  "Two independent interviewers score each area from 1 to 5, against the standard expected of a UK core trainee one level below the post — CT3 for group 1 specialties, CT2 for group 2. A 3 is satisfactory and marks a candidate suitable for higher specialty training; 4 is above average and 5 highly performing. Specialties score four, five or six areas, giving a raw interview score out of 40, 50 or 60 respectively, and each weights its areas differently. Your weighted interview score is combined with your weighted application score to produce the ranking used for offers, so unlike some specialties the self-assessment above does carry forward.";
+
+const PHST_APPOINTABILITY = [
+  "None of your interview scores may be 1/5",
+  "No more than two of your interview scores may be 2/5",
+  "Your raw interview score must reach 60% of the maximum — 24 of 40 where four areas are scored, 30 of 50 for five, or 36 of 60 for six",
+  "Either assessor marking you unappointable on commitment to specialty stops you being shortlisted, regardless of your self-assessment score",
+];
+
+const PHST_EVIDENCE_HARD_FAILS = [
+  "Supplying no evidence, or none for a domain you scored yourself in, is likely to mean your application is not shortlisted",
+  "Evidence organised poorly enough can stop an application being shortlisted regardless of score, and that judgement cannot be appealed",
+];
+
+const PHST_EVIDENCE_RULES = [
+  "You are contacted after applications close to upload evidence — there is no need to supply anything at the time of applying, though you can prepare it.",
+  "Assessors award a further 2 marks for how well your evidence is organised, on top of the 38 above.",
+  "Verification can move your score either way: where an achievement is unclear or hard to verify, assessors are told to award only what they can confidently confirm.",
+  "Five domains need an evidence pro forma from the PHST Document Library: postgraduate degrees and qualifications, presentations and posters, publications, teaching experience, and quality improvement.",
+  "You cannot amend a submitted application, but you may upload evidence for achievements gained between submission and the upload deadline, and may flag a mistake with a short explanatory document.",
+  "Anything not in English needs a certified, authenticated translation.",
+  "Every application is assessed independently with no cross-referencing, so the same achievement can score differently in another specialty or round. That alone is not grounds for appeal.",
+];
+
+/** Builds a specialty from the shared PHST process. */
+function phstSpecialty(s: {
+  id: string;
+  prefix: string;
+  name: string;
+  shortName: string;
+}): SASSpecialty {
+  return {
+    id: s.id,
+    name: s.name,
+    shortName: s.shortName,
+    applicationRoute: "Specialty Training",
+    msraRequired: false,
+    totalMaxScore: 38,
+    competitiveThreshold: null,
+    sourceUrl: PHST_SOURCE_URL,
+    description: `${s.name} at ST3, recruited through Physician Higher Specialty Training. Applications are scored by self-assessment on Oriel — 38 points across seven domains, shared by every PHST specialty — then verified against your uploaded evidence, which can raise or lower the score.`,
+    interviewScoring: {
+      rawMaxScore: 0,
+      shortlistingScoreCarriesForward: true,
+      description: PHST_INTERVIEW_DESCRIPTION,
+      appointabilityCriteria: PHST_APPOINTABILITY,
+    },
+    evidenceGuidance: {
+      hardFails: PHST_EVIDENCE_HARD_FAILS,
+      rules: PHST_EVIDENCE_RULES,
+    },
+    domains: phstDomains(s.prefix),
+  };
+}
+
+const PHST_VERIFICATION_NOTE =
+  "Verified against the PHST self-assessment and application scoring guidance. All higher medical specialties are recruited in one national round and share the same 38-point matrix, defined once in phstDomains(). Two things sit outside it: 2 marks for evidence organisation, and commitment to specialty worth 20 marks at shortlisting where a specialty assesses it, which does not carry into ranking but can block shortlisting outright. No competitive threshold is published, so none is claimed. Outstanding for this specialty: how many interview areas it scores, how they are weighted, and whether it assesses commitment to specialty at shortlisting — all stated per round on its own page.";
+
 export const SAS_SPECIALTIES: SASSpecialty[] = [
   // ─── 1. Internal Medicine Training (IMT) ─────────────────────────────────
   // VERIFIED against the official IMT 2026 application scoring guidance.
@@ -2106,233 +2216,14 @@ export const SAS_SPECIALTIES: SASSpecialty[] = [
     ],
   },
 
-  // ─── 13. Dermatology ─────────────────────────────────────────────────────────
-  {
-    id: "dermatology",
-    name: "Dermatology",
-    shortName: "Derm",
-    applicationRoute: "Specialty Training",
-    msraRequired: false,
-    totalMaxScore: 38,
-    competitiveThreshold: null,
-    sourceUrl: "https://www.phstrecruitment.org.uk",
-    description: "ST3 entry specialty. Highly competitive with portfolio-based shortlisting via Oriel. Requires strong academic and clinical evidence. Applications are scored by self-assessment on Oriel — 38 points across the domains plus 2 marks for evidence organisation — and then verified against uploaded evidence, which can raise or lower the score.",
-    interviewScoring: {
-      rawMaxScore: 0,
-      shortlistingScoreCarriesForward: true,
-      description: "Your verified self-assessment score carries into the final score used for ranking and offers. Some specialties also score commitment to specialty at shortlisting: two assessors mark it 10, 2 or 0 each, worth 20 marks and a third of the 60 available at that stage. That score does not carry forward — commitment is assessed again at interview for every specialty — but if either assessor marks you unappointable you are not shortlisted at all, however high your self-assessment score. Whether a specialty scores it at shortlisting is stated in its 'Planning your application' section.",
-      appointabilityCriteria: [
-              "Either assessor marking you unappointable on commitment to specialty stops you being shortlisted, regardless of your self-assessment score",
-              "Supplying no evidence, or no evidence for domains you scored yourself in, is likely to stop your application being shortlisted"
-      ],
-    },
-    evidenceGuidance: {
-      hardFails: [
-              "Supplying no evidence, or none for a domain you scored yourself in, is likely to mean your application is not shortlisted",
-              "Evidence organised poorly enough can stop an application being shortlisted regardless of score, and that judgement cannot be appealed"
-      ],
-      rules: [
-              "You are contacted after applications close to upload evidence — there is no need to supply anything at the time of applying, though you can prepare it.",
-              "Assessors award a further 2 marks for how well your evidence is organised. If presentation is sufficiently poor it can stop your application being shortlisted whatever else you scored, and this mark cannot be appealed.",
-              "Verification can move your score either way: where an achievement is unclear or hard to verify, assessors are told to award only what they can confidently confirm.",
-              "Five domains need an evidence pro forma from the PHST Document Library: postgraduate degrees and qualifications, presentations and posters, publications, teaching experience, and quality improvement.",
-              "You cannot amend a submitted application, but you may upload evidence for achievements gained between submission and the upload deadline, and may flag a mistake with a short explanatory document.",
-              "Anything not in English needs a certified, authenticated translation.",
-              "Every application is assessed independently with no cross-referencing, so the same achievement can score differently in another specialty or round. That alone is not grounds for appeal."
-      ],
-    },
-    domains: phstDomains("derm"),
-  },
 
-  // ─── 14. Cardiology (ST3) ─────────────────────────────────────────────────
-  {
-    id: "cardiology",
-    name: "Cardiology",
-    shortName: "Cardio",
-    applicationRoute: "Specialty Training",
-    msraRequired: false,
-    totalMaxScore: 38,
-    competitiveThreshold: null,
-    sourceUrl: "https://www.phstrecruitment.org.uk",
-    description: "ST3 entry after IMT/ACCS. Highly competitive. Portfolio-based shortlisting with strong emphasis on research and academic output. Applications are scored by self-assessment on Oriel — 38 points across the domains plus 2 marks for evidence organisation — and then verified against uploaded evidence, which can raise or lower the score.",
-    interviewScoring: {
-      rawMaxScore: 0,
-      shortlistingScoreCarriesForward: true,
-      description: "Your verified self-assessment score carries into the final score used for ranking and offers. Some specialties also score commitment to specialty at shortlisting: two assessors mark it 10, 2 or 0 each, worth 20 marks and a third of the 60 available at that stage. That score does not carry forward — commitment is assessed again at interview for every specialty — but if either assessor marks you unappointable you are not shortlisted at all, however high your self-assessment score. Whether a specialty scores it at shortlisting is stated in its 'Planning your application' section.",
-      appointabilityCriteria: [
-              "Either assessor marking you unappointable on commitment to specialty stops you being shortlisted, regardless of your self-assessment score",
-              "Supplying no evidence, or no evidence for domains you scored yourself in, is likely to stop your application being shortlisted"
-      ],
-    },
-    evidenceGuidance: {
-      hardFails: [
-              "Supplying no evidence, or none for a domain you scored yourself in, is likely to mean your application is not shortlisted",
-              "Evidence organised poorly enough can stop an application being shortlisted regardless of score, and that judgement cannot be appealed"
-      ],
-      rules: [
-              "You are contacted after applications close to upload evidence — there is no need to supply anything at the time of applying, though you can prepare it.",
-              "Assessors award a further 2 marks for how well your evidence is organised. If presentation is sufficiently poor it can stop your application being shortlisted whatever else you scored, and this mark cannot be appealed.",
-              "Verification can move your score either way: where an achievement is unclear or hard to verify, assessors are told to award only what they can confidently confirm.",
-              "Five domains need an evidence pro forma from the PHST Document Library: postgraduate degrees and qualifications, presentations and posters, publications, teaching experience, and quality improvement.",
-              "You cannot amend a submitted application, but you may upload evidence for achievements gained between submission and the upload deadline, and may flag a mistake with a short explanatory document.",
-              "Anything not in English needs a certified, authenticated translation.",
-              "Every application is assessed independently with no cross-referencing, so the same achievement can score differently in another specialty or round. That alone is not grounds for appeal."
-      ],
-    },
-    domains: phstDomains("cardio"),
-  },
 
-  // ─── 15. Neurology (ST3) ──────────────────────────────────────────────────
-  {
-    id: "neurology",
-    name: "Neurology",
-    shortName: "Neuro",
-    applicationRoute: "Specialty Training",
-    msraRequired: false,
-    totalMaxScore: 38,
-    competitiveThreshold: null,
-    sourceUrl: "https://www.phstrecruitment.org.uk",
-    description: "ST3 entry after IMT. Portfolio-based shortlisting. Strong academic output and neurology experience are key differentiators. Applications are scored by self-assessment on Oriel — 38 points across the domains plus 2 marks for evidence organisation — and then verified against uploaded evidence, which can raise or lower the score.",
-    interviewScoring: {
-      rawMaxScore: 0,
-      shortlistingScoreCarriesForward: true,
-      description: "Your verified self-assessment score carries into the final score used for ranking and offers. Some specialties also score commitment to specialty at shortlisting: two assessors mark it 10, 2 or 0 each, worth 20 marks and a third of the 60 available at that stage. That score does not carry forward — commitment is assessed again at interview for every specialty — but if either assessor marks you unappointable you are not shortlisted at all, however high your self-assessment score. Whether a specialty scores it at shortlisting is stated in its 'Planning your application' section.",
-      appointabilityCriteria: [
-              "Either assessor marking you unappointable on commitment to specialty stops you being shortlisted, regardless of your self-assessment score",
-              "Supplying no evidence, or no evidence for domains you scored yourself in, is likely to stop your application being shortlisted"
-      ],
-    },
-    evidenceGuidance: {
-      hardFails: [
-              "Supplying no evidence, or none for a domain you scored yourself in, is likely to mean your application is not shortlisted",
-              "Evidence organised poorly enough can stop an application being shortlisted regardless of score, and that judgement cannot be appealed"
-      ],
-      rules: [
-              "You are contacted after applications close to upload evidence — there is no need to supply anything at the time of applying, though you can prepare it.",
-              "Assessors award a further 2 marks for how well your evidence is organised. If presentation is sufficiently poor it can stop your application being shortlisted whatever else you scored, and this mark cannot be appealed.",
-              "Verification can move your score either way: where an achievement is unclear or hard to verify, assessors are told to award only what they can confidently confirm.",
-              "Five domains need an evidence pro forma from the PHST Document Library: postgraduate degrees and qualifications, presentations and posters, publications, teaching experience, and quality improvement.",
-              "You cannot amend a submitted application, but you may upload evidence for achievements gained between submission and the upload deadline, and may flag a mistake with a short explanatory document.",
-              "Anything not in English needs a certified, authenticated translation.",
-              "Every application is assessed independently with no cross-referencing, so the same achievement can score differently in another specialty or round. That alone is not grounds for appeal."
-      ],
-    },
-    domains: phstDomains("neuro"),
-  },
 
-  // ─── 16. Gastroenterology (ST3) ───────────────────────────────────────────
-  {
-    id: "gastroenterology",
-    name: "Gastroenterology",
-    shortName: "Gastro",
-    applicationRoute: "Specialty Training",
-    msraRequired: false,
-    totalMaxScore: 38,
-    competitiveThreshold: null,
-    sourceUrl: "https://www.phstrecruitment.org.uk",
-    description: "ST3 entry after IMT. Portfolio-based shortlisting. Research output and endoscopy experience are highly valued. Applications are scored by self-assessment on Oriel — 38 points across the domains plus 2 marks for evidence organisation — and then verified against uploaded evidence, which can raise or lower the score.",
-    interviewScoring: {
-      rawMaxScore: 0,
-      shortlistingScoreCarriesForward: true,
-      description: "Your verified self-assessment score carries into the final score used for ranking and offers. Some specialties also score commitment to specialty at shortlisting: two assessors mark it 10, 2 or 0 each, worth 20 marks and a third of the 60 available at that stage. That score does not carry forward — commitment is assessed again at interview for every specialty — but if either assessor marks you unappointable you are not shortlisted at all, however high your self-assessment score. Whether a specialty scores it at shortlisting is stated in its 'Planning your application' section.",
-      appointabilityCriteria: [
-              "Either assessor marking you unappointable on commitment to specialty stops you being shortlisted, regardless of your self-assessment score",
-              "Supplying no evidence, or no evidence for domains you scored yourself in, is likely to stop your application being shortlisted"
-      ],
-    },
-    evidenceGuidance: {
-      hardFails: [
-              "Supplying no evidence, or none for a domain you scored yourself in, is likely to mean your application is not shortlisted",
-              "Evidence organised poorly enough can stop an application being shortlisted regardless of score, and that judgement cannot be appealed"
-      ],
-      rules: [
-              "You are contacted after applications close to upload evidence — there is no need to supply anything at the time of applying, though you can prepare it.",
-              "Assessors award a further 2 marks for how well your evidence is organised. If presentation is sufficiently poor it can stop your application being shortlisted whatever else you scored, and this mark cannot be appealed.",
-              "Verification can move your score either way: where an achievement is unclear or hard to verify, assessors are told to award only what they can confidently confirm.",
-              "Five domains need an evidence pro forma from the PHST Document Library: postgraduate degrees and qualifications, presentations and posters, publications, teaching experience, and quality improvement.",
-              "You cannot amend a submitted application, but you may upload evidence for achievements gained between submission and the upload deadline, and may flag a mistake with a short explanatory document.",
-              "Anything not in English needs a certified, authenticated translation.",
-              "Every application is assessed independently with no cross-referencing, so the same achievement can score differently in another specialty or round. That alone is not grounds for appeal."
-      ],
-    },
-    domains: phstDomains("gastro"),
-  },
 
-  // ─── 17. Endocrinology & Diabetes (ST3) ───────────────────────────────────
-  {
-    id: "endocrinology",
-    name: "Endocrinology & Diabetes",
-    shortName: "Endo",
-    applicationRoute: "Specialty Training",
-    msraRequired: false,
-    totalMaxScore: 38,
-    competitiveThreshold: null,
-    sourceUrl: "https://www.phstrecruitment.org.uk",
-    description: "ST3 entry after IMT. Portfolio-based shortlisting. Research in diabetes/endocrinology and clinical experience are key. Applications are scored by self-assessment on Oriel — 38 points across the domains plus 2 marks for evidence organisation — and then verified against uploaded evidence, which can raise or lower the score.",
-    interviewScoring: {
-      rawMaxScore: 0,
-      shortlistingScoreCarriesForward: true,
-      description: "Your verified self-assessment score carries into the final score used for ranking and offers. Some specialties also score commitment to specialty at shortlisting: two assessors mark it 10, 2 or 0 each, worth 20 marks and a third of the 60 available at that stage. That score does not carry forward — commitment is assessed again at interview for every specialty — but if either assessor marks you unappointable you are not shortlisted at all, however high your self-assessment score. Whether a specialty scores it at shortlisting is stated in its 'Planning your application' section.",
-      appointabilityCriteria: [
-              "Either assessor marking you unappointable on commitment to specialty stops you being shortlisted, regardless of your self-assessment score",
-              "Supplying no evidence, or no evidence for domains you scored yourself in, is likely to stop your application being shortlisted"
-      ],
-    },
-    evidenceGuidance: {
-      hardFails: [
-              "Supplying no evidence, or none for a domain you scored yourself in, is likely to mean your application is not shortlisted",
-              "Evidence organised poorly enough can stop an application being shortlisted regardless of score, and that judgement cannot be appealed"
-      ],
-      rules: [
-              "You are contacted after applications close to upload evidence — there is no need to supply anything at the time of applying, though you can prepare it.",
-              "Assessors award a further 2 marks for how well your evidence is organised. If presentation is sufficiently poor it can stop your application being shortlisted whatever else you scored, and this mark cannot be appealed.",
-              "Verification can move your score either way: where an achievement is unclear or hard to verify, assessors are told to award only what they can confidently confirm.",
-              "Five domains need an evidence pro forma from the PHST Document Library: postgraduate degrees and qualifications, presentations and posters, publications, teaching experience, and quality improvement.",
-              "You cannot amend a submitted application, but you may upload evidence for achievements gained between submission and the upload deadline, and may flag a mistake with a short explanatory document.",
-              "Anything not in English needs a certified, authenticated translation.",
-              "Every application is assessed independently with no cross-referencing, so the same achievement can score differently in another specialty or round. That alone is not grounds for appeal."
-      ],
-    },
-    domains: phstDomains("endo"),
-  },
 
-  // ─── 18. Respiratory Medicine (ST3) ───────────────────────────────────────
-  {
-    id: "respiratory",
-    name: "Respiratory Medicine",
-    shortName: "Resp",
-    applicationRoute: "Specialty Training",
-    msraRequired: false,
-    totalMaxScore: 38,
-    competitiveThreshold: null,
-    sourceUrl: "https://www.phstrecruitment.org.uk",
-    description: "ST3 entry after IMT. Portfolio-based shortlisting. Research output and respiratory clinical experience are key differentiators. Applications are scored by self-assessment on Oriel — 38 points across the domains plus 2 marks for evidence organisation — and then verified against uploaded evidence, which can raise or lower the score.",
-    interviewScoring: {
-      rawMaxScore: 0,
-      shortlistingScoreCarriesForward: true,
-      description: "Your verified self-assessment score carries into the final score used for ranking and offers. Some specialties also score commitment to specialty at shortlisting: two assessors mark it 10, 2 or 0 each, worth 20 marks and a third of the 60 available at that stage. That score does not carry forward — commitment is assessed again at interview for every specialty — but if either assessor marks you unappointable you are not shortlisted at all, however high your self-assessment score. Whether a specialty scores it at shortlisting is stated in its 'Planning your application' section.",
-      appointabilityCriteria: [
-              "Either assessor marking you unappointable on commitment to specialty stops you being shortlisted, regardless of your self-assessment score",
-              "Supplying no evidence, or no evidence for domains you scored yourself in, is likely to stop your application being shortlisted"
-      ],
-    },
-    evidenceGuidance: {
-      hardFails: [
-              "Supplying no evidence, or none for a domain you scored yourself in, is likely to mean your application is not shortlisted",
-              "Evidence organised poorly enough can stop an application being shortlisted regardless of score, and that judgement cannot be appealed"
-      ],
-      rules: [
-              "You are contacted after applications close to upload evidence — there is no need to supply anything at the time of applying, though you can prepare it.",
-              "Assessors award a further 2 marks for how well your evidence is organised. If presentation is sufficiently poor it can stop your application being shortlisted whatever else you scored, and this mark cannot be appealed.",
-              "Verification can move your score either way: where an achievement is unclear or hard to verify, assessors are told to award only what they can confidently confirm.",
-              "Five domains need an evidence pro forma from the PHST Document Library: postgraduate degrees and qualifications, presentations and posters, publications, teaching experience, and quality improvement.",
-              "You cannot amend a submitted application, but you may upload evidence for achievements gained between submission and the upload deadline, and may flag a mistake with a short explanatory document.",
-              "Anything not in English needs a certified, authenticated translation.",
-              "Every application is assessed independently with no cross-referencing, so the same achievement can score differently in another specialty or round. That alone is not grounds for appeal."
-      ],
-    },
-    domains: phstDomains("resp"),
-  },
+
+  // Every PHST specialty, built from the shared process above.
+  ...PHST_SPECIALTY_LIST.map(phstSpecialty),
 ];
 
 export function getSpecialtyById(id: string): SASSpecialty | undefined {
@@ -2378,6 +2269,20 @@ export function calculateSASScore(
 // year the matrix belongs to.
 
 export const SAS_VERIFICATION: Record<string, SASVerification> = {
+  // One entry per PHST specialty, generated from the shared process. Kept in
+  // step with the specialty list by construction rather than by hand.
+  ...Object.fromEntries(
+    PHST_SPECIALTY_LIST.map((s) => [
+      s.id,
+      {
+        status: "verified" as const,
+        scoringModel: "self-assessment" as const,
+        checkedOn: "2026-07-19",
+        cycle: "2026",
+        note: PHST_VERIFICATION_NOTE,
+      },
+    ])
+  ),
   imt: {
     status: "verified",
     scoringModel: "self-assessment",
@@ -2466,48 +2371,6 @@ export const SAS_VERIFICATION: Record<string, SASVerification> = {
   // identical 32-point maximum, differing only in threshold. Real recruitment
   // matrices differ substantially between specialties, so this uniformity
   // indicates the figures were generated rather than sourced.
-  dermatology: {
-    status: "verified",
-    scoringModel: "self-assessment",
-    checkedOn: "2026-07-19",
-    cycle: "2026",
-    note: "Verified against the PHST self-assessment and application scoring guidance. All higher medical specialties are recruited in one national round and share the same matrix: 38 points across seven domains, defined once in phstDomains(). Two things sit outside it — 2 marks for evidence organisation, and commitment to specialty worth 20 marks at shortlisting for the specialties that assess it, which does not carry into ranking but can block shortlisting outright. The 32-point maximum this specialty previously carried, shared with five others and differing only in threshold, corresponded to nothing. No competitive threshold is published, so none is claimed. Outstanding: whether this particular specialty scores commitment to specialty at shortlisting, which is stated per round on its own planning page.",
-  },
-  cardiology: {
-    status: "verified",
-    scoringModel: "self-assessment",
-    checkedOn: "2026-07-19",
-    cycle: "2026",
-    note: "Verified against the PHST self-assessment and application scoring guidance. All higher medical specialties are recruited in one national round and share the same matrix: 38 points across seven domains, defined once in phstDomains(). Two things sit outside it — 2 marks for evidence organisation, and commitment to specialty worth 20 marks at shortlisting for the specialties that assess it, which does not carry into ranking but can block shortlisting outright. The 32-point maximum this specialty previously carried, shared with five others and differing only in threshold, corresponded to nothing. No competitive threshold is published, so none is claimed. Outstanding: whether this particular specialty scores commitment to specialty at shortlisting, which is stated per round on its own planning page.",
-  },
-  neurology: {
-    status: "verified",
-    scoringModel: "self-assessment",
-    checkedOn: "2026-07-19",
-    cycle: "2026",
-    note: "Verified against the PHST self-assessment and application scoring guidance. All higher medical specialties are recruited in one national round and share the same matrix: 38 points across seven domains, defined once in phstDomains(). Two things sit outside it — 2 marks for evidence organisation, and commitment to specialty worth 20 marks at shortlisting for the specialties that assess it, which does not carry into ranking but can block shortlisting outright. The 32-point maximum this specialty previously carried, shared with five others and differing only in threshold, corresponded to nothing. No competitive threshold is published, so none is claimed. Outstanding: whether this particular specialty scores commitment to specialty at shortlisting, which is stated per round on its own planning page.",
-  },
-  gastroenterology: {
-    status: "verified",
-    scoringModel: "self-assessment",
-    checkedOn: "2026-07-19",
-    cycle: "2026",
-    note: "Verified against the PHST self-assessment and application scoring guidance. All higher medical specialties are recruited in one national round and share the same matrix: 38 points across seven domains, defined once in phstDomains(). Two things sit outside it — 2 marks for evidence organisation, and commitment to specialty worth 20 marks at shortlisting for the specialties that assess it, which does not carry into ranking but can block shortlisting outright. The 32-point maximum this specialty previously carried, shared with five others and differing only in threshold, corresponded to nothing. No competitive threshold is published, so none is claimed. Outstanding: whether this particular specialty scores commitment to specialty at shortlisting, which is stated per round on its own planning page.",
-  },
-  endocrinology: {
-    status: "verified",
-    scoringModel: "self-assessment",
-    checkedOn: "2026-07-19",
-    cycle: "2026",
-    note: "Verified against the PHST self-assessment and application scoring guidance. All higher medical specialties are recruited in one national round and share the same matrix: 38 points across seven domains, defined once in phstDomains(). Two things sit outside it — 2 marks for evidence organisation, and commitment to specialty worth 20 marks at shortlisting for the specialties that assess it, which does not carry into ranking but can block shortlisting outright. The 32-point maximum this specialty previously carried, shared with five others and differing only in threshold, corresponded to nothing. No competitive threshold is published, so none is claimed. Outstanding: whether this particular specialty scores commitment to specialty at shortlisting, which is stated per round on its own planning page.",
-  },
-  respiratory: {
-    status: "verified",
-    scoringModel: "self-assessment",
-    checkedOn: "2026-07-19",
-    cycle: "2026",
-    note: "Verified against the PHST self-assessment and application scoring guidance. All higher medical specialties are recruited in one national round and share the same matrix: 38 points across seven domains, defined once in phstDomains(). Two things sit outside it — 2 marks for evidence organisation, and commitment to specialty worth 20 marks at shortlisting for the specialties that assess it, which does not carry into ranking but can block shortlisting outright. The 32-point maximum this specialty previously carried, shared with five others and differing only in threshold, corresponded to nothing. No competitive threshold is published, so none is claimed. Outstanding: whether this particular specialty scores commitment to specialty at shortlisting, which is stated per round on its own planning page.",
-  },
 };
 
 /**
@@ -2532,7 +2395,18 @@ export function isVerified(specialtyId: string): boolean {
   return getVerification(specialtyId).status === "verified";
 }
 
-/** True when the specialty has a portfolio the applicant can score themselves. */
+/**
+ * True when the specialty has a portfolio the applicant can score themselves.
+ *
+ * Also false where no maximum is published, whatever the model says. A
+ * specialty whose points are unknown cannot produce a meaningful total, and
+ * scoring one out of zero would render as a broken percentage rather than as
+ * the honest answer, which is that the figures are not established.
+ */
 export function isScorable(specialtyId: string): boolean {
-  return !NON_SCORABLE_MODELS.includes(getVerification(specialtyId).scoringModel);
+  if (NON_SCORABLE_MODELS.includes(getVerification(specialtyId).scoringModel)) {
+    return false;
+  }
+  const specialty = getSpecialtyById(specialtyId);
+  return !!specialty && specialty.totalMaxScore > 0;
 }
