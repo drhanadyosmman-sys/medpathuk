@@ -1803,10 +1803,10 @@ export const SAS_SPECIALTIES: SASSpecialty[] = [
     shortName: "Ophthalmology",
     applicationRoute: "Run-through",
     msraRequired: true,
-    totalMaxScore: 45,
-    competitiveThreshold: 32,
-    sourceUrl: "https://www.rcophth.ac.uk/training/ophthalmology-specialty-training/",
-    description: "7-year run-through ophthalmology training from ST1. MSRA used for shortlisting. RCOphth oversees training.",
+    totalMaxScore: 0,
+    competitiveThreshold: null,
+    sourceUrl: "https://medical.hee.nhs.uk/medical-training-recruitment/medical-specialty-training/ophthalmology",
+    description: "7-year run-through ophthalmology training from ST1, with the MSRA used for shortlisting. Recruitment is run by the Ophthalmology National Recruitment Office rather than advertised centrally.",
     domains: [
       {
         id: "oph_qualifications",
@@ -2204,10 +2204,10 @@ export const SAS_SPECIALTIES: SASSpecialty[] = [
     shortName: "Neurosurgery",
     applicationRoute: "Run-through",
     msraRequired: true,
-    totalMaxScore: 36,
-    competitiveThreshold: 26,
-    sourceUrl: "https://medical.hee.nhs.uk/medical-training-recruitment/medical-specialty-training/surgery",
-    description: "8-year run-through neurosurgery training from ST1. MSRA used for shortlisting. SBNS oversees training. Highly competitive.",
+    totalMaxScore: 0,
+    competitiveThreshold: null,
+    sourceUrl: "https://www.yorksandhumberdeanery.nhs.uk/recruitment/national_recruitment/national_neurosurgery_st1__st3_recruitment",
+    description: "8-year run-through neurosurgery training from ST1 and ST2, recruited nationally through Yorkshire and Humber for England, Scotland, Wales and Northern Ireland. All applicants sit the MSRA, which carries 40% of the shortlisting score; the rest comes from a published shortlisting matrix.",
     domains: [
       {
         id: "neuro_qualifications",
@@ -2463,9 +2463,9 @@ export const SAS_VERIFICATION: Record<string, SASVerification> = {
   ophthalmology: {
     status: "unverified",
     scoringModel: "unknown",
-    checkedOn: null,
+    checkedOn: "2026-07-19",
     cycle: null,
-    note: "Matrix not checked against the official source.",
+    note: "Not checked. Recruitment is run by the Ophthalmology National Recruitment Office and is not advertised on the NHS England hub, which directs applicants to the recruitment office directly; no accessible official page sets out the scoring. The 45-point assessment with a 32-point threshold this tool previously offered has no source and is removed rather than shown with a warning, since it came from the same batch as figures elsewhere in this file that proved to be invented. Outstanding: the whole scoring process.",
   },
   orthopaedics: {
     status: "verified",
@@ -2477,9 +2477,9 @@ export const SAS_VERIFICATION: Record<string, SASVerification> = {
   neurosurgery: {
     status: "unverified",
     scoringModel: "unknown",
-    checkedOn: null,
+    checkedOn: "2026-07-19",
     cycle: null,
-    note: "Matrix not checked against the official source. Its sourceUrl was a dead link when checked in July 2026 and now points to the NHS England specialty hub rather than an invented deep link.",
+    note: "Partly checked. Confirmed: recruitment is national, run through Yorkshire and Humber, covering ST1 and ST2 across all four UK nations, and the MSRA carries 40% of the shortlisting score. The remaining 60% comes from a published shortlisting matrix which could not be read — the deanery site serves a bot-detection page to automated requests, and the applicant handbook PDF returns HTML rather than the document. The 36-point assessment with a 26-point threshold this tool previously offered has no source, and is removed rather than shown with a warning: it came from the same batch as figures elsewhere in this file that proved to be invented. Outstanding: the shortlisting matrix.",
   },
   // The six specialties below were added in one batch and all carry an
   // identical 32-point maximum, differing only in threshold. Real recruitment

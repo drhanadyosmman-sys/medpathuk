@@ -112,10 +112,10 @@ function SpecialtySelector({ onSelect }: { onSelect: (s: SASSpecialty) => void }
             notice disappears on its own once every matrix is verified. */}
         {unverifiedCount > 0 && (
           <p className="text-amber-300/80 max-w-2xl mx-auto text-sm mt-3">
-            {unverifiedCount} of {SAS_SPECIALTIES.length} specialties are still
-            being re-checked against official recruitment sources and are marked
-            below. For those, treat the result as a reflection exercise rather
-            than a prediction of how competitive you are.
+            Every score here comes from that specialty's official recruitment
+            criteria. {unverifiedCount} of {SAS_SPECIALTIES.length} specialties
+            are still being checked and offer no score until they are — open one
+            to see what has been established so far.
           </p>
         )}
       </div>
