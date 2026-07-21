@@ -1,7 +1,9 @@
 import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 import { TRPCError } from "@trpc/server";
 import bcrypt from "bcryptjs";
+import { nanoid } from "nanoid";
 import { z } from "zod";
+import { sendWelcomeEmail, sendPasswordResetEmail } from "./email";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { invokeLLM } from "./_core/llm";
 import { sdk } from "./_core/sdk";
@@ -33,6 +35,10 @@ import {
   validateAndUseAccessCode,
   saveSasResult,
   getSasResults,
+  createPasswordResetToken,
+  getPasswordResetToken,
+  markPasswordResetTokenUsed,
+  updateUserPassword,
 } from "./db";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -86,6 +92,8 @@ export const appRouter = router({
         const sessionToken = await sdk.createSessionToken(user.openId, { name: user.name || "", expiresInMs: ONE_YEAR_MS });
         const cookieOptions = getSessionCookieOptions(ctx.req);
         ctx.res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
+        // Send welcome email (non-blocking)
+        sendWelcomeEmail(user.email!, user.name || "Doctor").catch(console.error);
         return { success: true, user: { id: user.id, name: user.name, email: user.email } };
       }),
     login: publicProcedure
@@ -106,6 +114,42 @@ export const appRouter = router({
         const cookieOptions = getSessionCookieOptions(ctx.req);
         ctx.res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
         return { success: true, user: { id: user.id, name: user.name, email: user.email } };
+      }),
+    forgotPassword: publicProcedure
+      .input(z.object({
+        email: z.string().email("Invalid email address"),
+        origin: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const user = await getUserByEmail(input.email);
+        // Always return success to prevent email enumeration
+        if (!user) return { success: true };
+        const token = nanoid(48);
+        await createPasswordResetToken(user.id, token);
+        const origin = input.origin || "https://medpathuk.hcqsai.uk";
+        sendPasswordResetEmail(user.email!, user.name || "Doctor", token, origin).catch(console.error);
+        return { success: true };
+      }),
+    resetPassword: publicProcedure
+      .input(z.object({
+        token: z.string().min(1),
+        password: z.string().min(8, "Password must be at least 8 characters"),
+      }))
+      .mutation(async ({ input }) => {
+        const resetToken = await getPasswordResetToken(input.token);
+        if (!resetToken) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Invalid or expired reset link." });
+        }
+        if (resetToken.usedAt) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "This reset link has already been used." });
+        }
+        if (new Date() > resetToken.expiresAt) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "This reset link has expired. Please request a new one." });
+        }
+        const passwordHash = await bcrypt.hash(input.password, 12);
+        await updateUserPassword(resetToken.userId, passwordHash);
+        await markPasswordResetTokenUsed(input.token);
+        return { success: true };
       }),
   }),
 

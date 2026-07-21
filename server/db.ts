@@ -14,6 +14,7 @@ import {
   users,
   sasResults,
   InsertSasResult,
+  passwordResetTokens,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
@@ -411,4 +412,40 @@ export async function getLatestSasResult(userId: number, specialty: string) {
     .orderBy(desc(sasResults.createdAt))
     .limit(1);
   return results[0] ?? null;
+}
+
+// ─── Password Reset Tokens ────────────────────────────────────────────────────
+export async function createPasswordResetToken(userId: number, token: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+  // Invalidate any existing tokens for this user
+  await db.delete(passwordResetTokens).where(eq(passwordResetTokens.userId, userId));
+  await db.insert(passwordResetTokens).values({ userId, token, expiresAt });
+}
+
+export async function getPasswordResetToken(token: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db
+    .select()
+    .from(passwordResetTokens)
+    .where(eq(passwordResetTokens.token, token))
+    .limit(1);
+  return result[0] ?? null;
+}
+
+export async function markPasswordResetTokenUsed(token: string) {
+  const db = await getDb();
+  if (!db) return;
+  await db
+    .update(passwordResetTokens)
+    .set({ usedAt: new Date() })
+    .where(eq(passwordResetTokens.token, token));
+}
+
+export async function updateUserPassword(userId: number, passwordHash: string) {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(users).set({ passwordHash }).where(eq(users.id, userId));
 }
