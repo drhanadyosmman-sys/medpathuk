@@ -121,3 +121,17 @@
 - [x] Remove Manus OAuth dependency from auth flow
 - [x] Run tests and fix any errors
 - [x] Save checkpoint to enable publishing
+<<<<<<< HEAD
+=======
+
+## Resend Email Integration
+- [x] Install Resend SDK
+- [x] Add RESEND_API_KEY secret
+- [x] Build email service (server/email.ts)
+- [x] Send welcome email on registration
+- [x] Add password reset table to DB schema
+- [x] Add forgotPassword and resetPassword tRPC procedures
+- [x] Build ForgotPassword page (/forgot-password)
+- [x] Build ResetPassword page (/reset-password)
+- [x] Add links to login page
+- [ ] Push to GitHub

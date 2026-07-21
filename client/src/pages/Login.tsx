@@ -177,6 +177,9 @@ export default function Login() {
                 </button>
               </div>
               {errors.password && <p className="text-destructive text-sm">{errors.password}</p>}
+              <div className="text-right">
+                <a href="/forgot-password" className="text-sm text-primary hover:underline">Forgot password?</a>
+              </div>
             </div>
 
             <Button
