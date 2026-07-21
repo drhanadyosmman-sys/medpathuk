@@ -118,6 +118,29 @@ function SpecialtySelector({ onSelect }: { onSelect: (s: SASSpecialty) => void }
             to see what has been established so far.
           </p>
         )}
+
+        {/* A portfolio score is not the whole picture any more. Someone about to
+            plan two years around this number needs the prioritisation rules in
+            front of them now, not after they have built the evidence. */}
+        <div className="max-w-2xl mx-auto mt-5 rounded-xl border border-blue-500/25 bg-blue-500/8 px-4 py-3 text-left">
+          <p className="text-xs text-blue-200/90 leading-relaxed">
+            <span className="font-semibold">Before you plan around a score:</span>{" "}
+            the Medical Training (Prioritisation) Act gives UK graduates and
+            certain other groups — including British citizens and holders of
+            indefinite leave to remain — priority for training posts. In 2026
+            this applies at the offer stage; from 2027 it applies at shortlisting
+            too, before your portfolio is scored. Check where you stand with the{" "}
+            <a
+              href="https://www.bma.org.uk/advice-and-support/career-progression/training/what-we-know-so-far-about-uk-graduate-prioritisation"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-white"
+            >
+              BMA guidance
+            </a>
+            .
+          </p>
+        </div>
       </div>
 
       {/* Search */}

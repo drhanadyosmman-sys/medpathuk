@@ -362,6 +362,81 @@ export default function Home() {
         </div>
       </section>
 
+      {/* UK graduate prioritisation — stated plainly, because a doctor deciding
+          where to spend the next two years needs it before they decide, not
+          after. Omitting it would make everything else on this page misleading. */}
+      <section className="py-24 bg-background border-y border-border">
+        <div className="container">
+          <div className="max-w-3xl">
+            <Badge variant="secondary" className="mb-4">Something you should know first</Badge>
+            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-6">
+              UK graduates now get priority for training posts
+            </h2>
+
+            <div className="space-y-5 text-muted-foreground leading-relaxed">
+              <p className="text-lg">
+                The Medical Training (Prioritisation) Act became law on 5 March 2026. It gives priority
+                for specialty and foundation training to UK graduates and to several other defined
+                groups. If you are not in one of those groups, this changes your odds — and you should
+                know that before you plan around anything on this page.
+              </p>
+
+              <div className="p-6 rounded-2xl bg-card border border-border">
+                <h3 className="font-semibold text-foreground mb-3">Prioritised for specialty training</h3>
+                <ul className="space-y-2 text-sm">
+                  {[
+                    "Graduates of UK and Republic of Ireland medical schools",
+                    "Graduates of medical schools in Iceland, Liechtenstein, Norway and Switzerland",
+                    "Doctors who have completed, or are completing, relevant UK training",
+                    "British and Irish citizens; Commonwealth citizens with right of abode",
+                    "Holders of indefinite leave to remain, or EU Settlement Scheme status",
+                  ].map((group) => (
+                    <li key={group} className="flex gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                      {group}
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-sm mt-4 pt-4 border-t border-border">
+                  Note the second half of that list: an international graduate who holds British
+                  citizenship or indefinite leave to remain <span className="text-foreground font-medium">is</span>{" "}
+                  prioritised for specialty training. Where you qualified is not the only thing that counts.
+                </p>
+              </div>
+
+              <div className="p-6 rounded-2xl bg-card border border-border">
+                <h3 className="font-semibold text-foreground mb-3">When it applies</h3>
+                <ul className="space-y-2 text-sm">
+                  <li><span className="text-foreground font-medium">2026 recruitment</span> — priority is applied at the offer stage, because shortlisting had already begun.</li>
+                  <li><span className="text-foreground font-medium">2027 onwards</span> — priority applies at both shortlisting and offer.</li>
+                </ul>
+              </div>
+
+              <p>
+                We are not going to tell you this makes no difference. For a doctor outside the
+                prioritised groups it is a real barrier, and from 2027 it applies before your portfolio
+                is even scored. What a strong portfolio still does is put you at the front of everyone
+                you are compared against — and it remains what the criteria reward once you are in
+                contention.
+              </p>
+
+              <p className="text-sm">
+                Check your own position against the official guidance before making plans:{" "}
+                <a
+                  href="https://www.bma.org.uk/advice-and-support/career-progression/training/what-we-know-so-far-about-uk-graduate-prioritisation"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  BMA — UK graduate prioritisation
+                </a>
+                . Eligibility is decided by the recruiting bodies, not by us.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Pricing */}
       <section className="py-24 bg-secondary/30">
         <div className="container">

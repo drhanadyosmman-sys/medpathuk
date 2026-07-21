@@ -92,7 +92,7 @@ export default function Login() {
           </div>
         </div>
         <p className="text-muted-foreground text-sm">
-          © 2025 MedPath UK. Helping IMGs succeed in British medicine.
+          © 2026 Healthcare Quality School. Planning support — not a guarantee of a training post.
         </p>
       </div>
 

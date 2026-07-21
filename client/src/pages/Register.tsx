@@ -106,14 +106,14 @@ export default function Register() {
             Your UK Medical Career Starts Here
           </h1>
           <p className="text-muted-foreground text-lg leading-relaxed">
-            Built for international medical graduates navigating their path to UK training. Get AI-powered guidance, self-assessment against official recruitment criteria, and a personalised roadmap.
+            Measure your portfolio against the published recruitment criteria for your specialty, see where the marks are, and get a plan for what to do next.
           </p>
           <div className="space-y-3">
             {[
-              "SAS scoring for 18 UK specialties",
-              "AI-generated personalised roadmaps",
-              "Official NHS resources & links",
-              "Track your progress to training",
+              "Self-assessment across 46 UK specialties",
+              "Criteria traced to official recruitment sources",
+              "A roadmap built from your weakest domains",
+              "Support for research, QI, audit and interviews",
             ].map((feature) => (
               <div key={feature} className="flex items-center gap-3">
                 <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
@@ -125,7 +125,7 @@ export default function Register() {
           </div>
         </div>
         <p className="text-muted-foreground text-sm">
-          © 2025 MedPath UK. Helping IMGs succeed in British medicine.
+          © 2026 Healthcare Quality School. Planning support — not a guarantee of a training post.
         </p>
       </div>
 
