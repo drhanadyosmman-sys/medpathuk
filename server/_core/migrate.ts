@@ -11,6 +11,30 @@ import { migrate } from "drizzle-orm/mysql2/migrator";
 
 const MIGRATIONS_FOLDER = "./drizzle";
 
+/**
+ * A database is often still starting when the app is. Retry a few times before
+ * giving up, so a slow neighbour does not take the site down — but do give up,
+ * rather than restart-looping forever against a genuinely wrong configuration.
+ */
+const MAX_ATTEMPTS = 5;
+const RETRY_DELAY_MS = 3000;
+
+const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+async function attemptMigration(url: string): Promise<void> {
+  const db = drizzle(url);
+  try {
+    await migrate(db, { migrationsFolder: MIGRATIONS_FOLDER });
+  } finally {
+    // The migrator opens its own pool; leaving it open holds the process alive.
+    try {
+      await db.$client.end();
+    } catch {
+      /* already closed, or never opened */
+    }
+  }
+}
+
 export async function runMigrations(): Promise<void> {
   const url = process.env.DATABASE_URL;
 
@@ -21,23 +45,23 @@ export async function runMigrations(): Promise<void> {
     return;
   }
 
-  const db = drizzle(url);
-
-  try {
-    await migrate(db, { migrationsFolder: MIGRATIONS_FOLDER });
-    console.log("[Migrations] Database schema is up to date");
-  } catch (error) {
-    // Starting with a half-built schema produces confusing failures later —
-    // every query against a missing table looks like a separate bug. Fail here
-    // instead, where the cause is legible.
-    console.error("[Migrations] Failed to apply migrations:", error);
-    throw error;
-  } finally {
-    // The migrator opens its own pool; leaving it open holds the process alive.
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     try {
-      await db.$client.end();
-    } catch {
-      /* already closed, or never opened */
+      await attemptMigration(url);
+      console.log("[Migrations] Database schema is up to date");
+      return;
+    } catch (error) {
+      const lastAttempt = attempt === MAX_ATTEMPTS;
+      console.error(
+        `[Migrations] Attempt ${attempt}/${MAX_ATTEMPTS} failed:`,
+        error instanceof Error ? error.message : error
+      );
+
+      // Serving on a half-built schema produces confusing failures later —
+      // every query against a missing table looks like a separate bug. Stop
+      // here, where the cause is legible.
+      if (lastAttempt) throw error;
+      await wait(RETRY_DELAY_MS);
     }
   }
 }
