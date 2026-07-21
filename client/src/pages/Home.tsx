@@ -1,82 +1,145 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { getLoginUrl } from "@/const";
 import {
   ArrowRight,
   BookOpen,
   Brain,
   CheckCircle2,
-  ChevronRight,
   ClipboardList,
+  Clock,
+  Compass,
   FileText,
+  FileWarning,
   GraduationCap,
-  Heart,
-  Lock,
   MessageSquare,
   Microscope,
+  Search,
   Shield,
-  Sparkles,
   Star,
   Stethoscope,
   Target,
   TrendingUp,
-  Users,
-  Zap,
 } from "lucide-react";
 import { Link } from "wouter";
 
+// ─── Pain points ──────────────────────────────────────────────────────────────
+// Every figure below comes from the official recruitment criteria the assessment
+// tool is built on. They are specific because vague reassurance is what
+// applicants already get everywhere else.
+const PAIN_POINTS = [
+  {
+    icon: Target,
+    problem: "You build a portfolio, then find it was never scored",
+    detail:
+      "GP and Core Psychiatry rank applicants on the MSRA alone — no portfolio is scored at any stage. A year spent collecting evidence for either earns nothing.",
+  },
+  {
+    icon: TrendingUp,
+    problem: "More experience can score you lower, not higher",
+    detail:
+      "Trauma & Orthopaedics scores 10 to 42 months in the specialty at 8 points, and 60 months or more at 1. Years accumulated in non-training posts move you down the list.",
+  },
+  {
+    icon: Clock,
+    problem: "Eligibility rules out strong applicants before scoring begins",
+    detail:
+      "IMT changed for 2026: full GMC registration must be in place when you submit, not when you start. A CREST certificate needs a supervisor's sign-off and takes months to arrange.",
+  },
+  {
+    icon: FileWarning,
+    problem: "Evidence you cannot organise is evidence that does not count",
+    detail:
+      "Higher medical specialties award 2 marks for how well documents are presented, and that judgement cannot be appealed. Submitting nothing for three or more scored domains stops an application outright.",
+  },
+  {
+    icon: Search,
+    problem: "The real criteria are scattered, and some change every year",
+    detail:
+      "Each specialty publishes its own matrix across deanery sites, college pages and PDFs. Several are revised annually, and guidance that has quietly gone stale looks identical to guidance that has not.",
+  },
+  {
+    icon: Compass,
+    problem: "Nobody tells you when to stop building and start preparing",
+    detail:
+      "For IMT the self-assessment score decides who is interviewed, then stops counting — offers are ranked on the interview alone. Past a point, more evidence changes nothing.",
+  },
+];
+
+// ─── What the platform does about each ────────────────────────────────────────
+const ANSWERS = [
+  {
+    icon: ClipboardList,
+    title: "Score yourself against the real criteria",
+    body: "Work through the actual scoring domains for your target specialty — the same options assessors use — and see where your evidence is thin. Specialties that score no portfolio say so, instead of inventing a number.",
+  },
+  {
+    icon: Shield,
+    title: "Every figure traced to its official source",
+    body: "Each specialty records which recruitment source its criteria came from and when it was last checked. Anything not yet verified shows no score at all rather than a plausible guess.",
+  },
+  {
+    icon: Brain,
+    title: "A plan built around what moves your application",
+    body: "Your weakest scoring domains become a sequenced plan with deadlines — weighted by what the criteria reward, not by what is easiest to collect.",
+  },
+  {
+    icon: MessageSquare,
+    title: "Specialist support for each piece of evidence",
+    body: "Separate workspaces for research and publication, quality improvement, clinical audit, teaching, CV and portfolio, interviews, OET, and the UK pathway itself.",
+  },
+];
+
+// ─── How it works ─────────────────────────────────────────────────────────────
+const STEPS = [
+  { number: "01", title: "Tell us where you are", body: "Your stage, your target specialty, and how much time you have. Two minutes." },
+  { number: "02", title: "See your score and your gaps", body: "Your portfolio measured against your specialty's published criteria, domain by domain." },
+  { number: "03", title: "Get a plan in priority order", body: "What to do next, sequenced by what earns most and what takes longest to arrange." },
+  { number: "04", title: "Work through it with support", body: "Specialist guidance for each piece of evidence, plus the official sources behind every requirement." },
+];
+
 const WORKSPACES = [
-  { icon: Microscope, title: "Research Workspace", desc: "Journal selection, manuscript writing, authorship planning following ICMJE guidelines", color: "from-purple-500 to-purple-700" },
-  { icon: TrendingUp, title: "QI Project Workspace", desc: "PDSA cycles, baseline measurement, NHS improvement methodology", color: "from-blue-500 to-blue-700" },
-  { icon: ClipboardList, title: "Clinical Audit Workspace", desc: "Audit design, standard setting, gap analysis, re-audit planning", color: "from-indigo-500 to-indigo-700" },
-  { icon: GraduationCap, title: "Teaching Workspace", desc: "Session planning, learning objectives, teaching portfolios", color: "from-violet-500 to-violet-700" },
-  { icon: Star, title: "Presentations & Conferences", desc: "Abstract writing, poster design, oral presentation coaching", color: "from-orange-500 to-orange-600" },
-  { icon: MessageSquare, title: "Interview Preparation", desc: "NHS interview coaching, STAR method, mock sessions", color: "from-amber-500 to-amber-600" },
-  { icon: BookOpen, title: "OET Preparation", desc: "All sub-tests, writing review, speaking practice, official resources", color: "from-green-500 to-green-700" },
-  { icon: FileText, title: "CV & Portfolio Workspace", desc: "Medical CV structure, portfolio mapping, role-targeted versions", color: "from-teal-500 to-teal-700" },
-  { icon: Target, title: "UK Pathway Center", desc: "PLAB, Royal College exams, Oriel applications, NHS Jobs", color: "from-rose-500 to-rose-700" },
-  { icon: Brain, title: "AI Career Advisor", desc: "Personalised guidance, roadmap generation, career planning", color: "from-pink-500 to-pink-700" },
+  { icon: Microscope, title: "Research & Publication", desc: "Journal selection, manuscript writing, authorship under ICMJE guidance" },
+  { icon: TrendingUp, title: "Quality Improvement", desc: "PDSA cycles, baseline measurement, NHS improvement methodology" },
+  { icon: ClipboardList, title: "Clinical Audit", desc: "Audit design, standard setting, gap analysis, closing the loop" },
+  { icon: GraduationCap, title: "Teaching", desc: "Session planning, learning objectives, evidencing a teaching portfolio" },
+  { icon: Star, title: "Presentations & Conferences", desc: "Abstract writing, poster design, oral presentation coaching" },
+  { icon: MessageSquare, title: "Interview Preparation", desc: "NHS interview coaching, structured answers, mock sessions" },
+  { icon: BookOpen, title: "OET Preparation", desc: "All sub-tests, writing review, speaking practice, official resources" },
+  { icon: FileText, title: "CV & Portfolio", desc: "Medical CV structure, portfolio mapping, role-targeted versions" },
+  { icon: Target, title: "UK Pathway Centre", desc: "PLAB, Royal College exams, Oriel applications, NHS Jobs, GMC" },
+  { icon: Brain, title: "Career Advisor", desc: "Personalised guidance, roadmap generation, long-term planning" },
 ];
 
 const PLANS = [
   {
     name: "Starter",
-    price: "Access Code",
-    desc: "Begin your UK career journey",
-    features: ["Onboarding assessment", "Personal career roadmap", "AI workspace access", "Official resources center", "Progress tracking"],
-    cta: "Get Started",
+    price: "Free",
+    desc: "See where you stand",
+    features: ["Onboarding assessment", "Self-assessment for your specialty", "Personal career roadmap", "Official resources centre", "Progress tracking"],
+    cta: "Create Free Account",
     highlight: false,
   },
   {
     name: "Professional",
     price: "£29.99/mo",
-    desc: "Comprehensive career support",
+    desc: "Build the evidence",
     features: ["Everything in Starter", "Full AI workspace access", "File upload & analysis", "Interview mock sessions", "CV review & feedback", "Priority support"],
-    cta: "Upgrade Now",
+    cta: "Upgrade",
     highlight: true,
   },
   {
     name: "Premium",
     price: "£79.99/mo",
-    desc: "1-to-1 mentoring & full support",
+    desc: "One-to-one support",
     features: ["Everything in Professional", "1-to-1 mentoring sessions", "Personalised journal finder", "Unlimited AI interactions", "Dedicated career advisor", "Guaranteed response time"],
     cta: "Go Premium",
     highlight: false,
   },
 ];
 
-// Only claims that can be checked against the product itself. A "500+ doctors
-// supported" and "95% success rate" previously sat here; both were invented,
-// and outcome claims of that kind cannot be made on a paid service without
-// evidence to support them.
-const STATS = [
-  { value: "10", label: "AI Workspaces" },
-  { value: "24/7", label: "AI Availability" },
-];
-
 export default function Home() {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   return (
     <div className="min-h-screen bg-background">
@@ -88,62 +151,56 @@ export default function Home() {
               <Stethoscope className="w-4 h-4 text-white" />
             </div>
             <span className="font-bold text-lg text-foreground">MedPath UK</span>
-            <Badge variant="secondary" className="text-xs hidden sm:flex">by Health Care Quality School</Badge>
+            <Badge variant="secondary" className="text-xs hidden sm:flex">by Healthcare Quality School</Badge>
           </div>
           <div className="flex items-center gap-3">
-            {!loading && (
-              isAuthenticated ? (
-                <Link href="/dashboard">
-                  <Button size="sm" className="gradient-purple text-white border-0">
-                    Dashboard <ArrowRight className="w-4 h-4 ml-1" />
-                  </Button>
-                </Link>
-              ) : (
-                <>
-                  <a href="/login">
-                    <Button variant="ghost" size="sm">Sign In</Button>
-                  </a>
-                  <a href="/register">
-                    <Button size="sm" className="gradient-purple text-white border-0">
-                      Get Started
-                    </Button>
-                  </a>
-                </>
-              )
+            {isAuthenticated ? (
+              <Link href="/dashboard">
+                <Button size="sm" className="gradient-orange text-white border-0">Dashboard</Button>
+              </Link>
+            ) : (
+              <>
+                <a href="/login" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Sign In</a>
+                <a href="/register">
+                  <Button size="sm" className="gradient-orange text-white border-0">Get Started</Button>
+                </a>
+              </>
             )}
           </div>
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="gradient-hero min-h-screen flex items-center pt-16 relative overflow-hidden">
-        {/* Background decoration */}
+      {/* Hero */}
+      <section className="gradient-hero flex items-center pt-16 relative overflow-hidden">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-purple-500/10 blur-3xl" />
           <div className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full bg-orange-500/10 blur-3xl" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-purple-600/5 blur-3xl" />
         </div>
 
-        <div className="container relative z-10 py-20">
-          <div className="max-w-4xl mx-auto text-center">
+        <div className="container relative z-10 py-24 lg:py-32">
+          <div className="max-w-3xl">
             <Badge className="mb-6 px-4 py-1.5 text-sm bg-white/10 text-white border-white/20 hover:bg-white/15">
-              <Sparkles className="w-3.5 h-3.5 mr-1.5" />
-              Premium UK Medical Career Platform
+              For international doctors applying to UK training
             </Badge>
 
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-              Your UK Medical
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+              Know exactly what your
               <span className="block text-transparent bg-clip-text" style={{ backgroundImage: "linear-gradient(135deg, oklch(0.70 0.19 52), oklch(0.80 0.15 70))" }}>
-                Career, Mastered.
+                application actually scores.
               </span>
             </h1>
 
-            <p className="text-xl text-white/70 mb-8 max-w-2xl mx-auto leading-relaxed">
-              A premium, access-code protected platform for healthcare professionals preparing for UK careers.
-              Powered by specialised AI workspaces, official resources, and expert guidance.
+            <p className="text-lg sm:text-xl text-white/75 mb-4 leading-relaxed">
+              Most doctors build a portfolio on guesswork — advice from colleagues, forum posts, whatever
+              turns up in a search. Meanwhile the recruitment criteria are published, specific, and
+              different for every specialty.
+            </p>
+            <p className="text-lg sm:text-xl text-white/75 mb-10 leading-relaxed">
+              MedPath UK measures your portfolio against those criteria, shows you where the marks are,
+              and tells you what to do next.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+            <div className="flex flex-col sm:flex-row gap-4 mb-8">
               {isAuthenticated ? (
                 <Link href="/dashboard">
                   <Button size="lg" className="gradient-orange text-white border-0 px-8 py-6 text-base font-semibold shadow-lg">
@@ -154,7 +211,7 @@ export default function Home() {
                 <>
                   <a href="/register">
                     <Button size="lg" className="gradient-orange text-white border-0 px-8 py-6 text-base font-semibold shadow-lg">
-                      Create Free Account <ArrowRight className="w-5 h-5 ml-2" />
+                      Check my specialty free <ArrowRight className="w-5 h-5 ml-2" />
                     </Button>
                   </a>
                   <a href="/login">
@@ -166,127 +223,140 @@ export default function Home() {
               )}
             </div>
 
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white/60 text-sm">
-              <Lock className="w-3.5 h-3.5" />
-              Free to join — no invitation code required
-            </div>
-          </div>
-
-          {/* Stats */}
-          <div className="grid grid-cols-2 gap-6 mt-20 max-w-md mx-auto">
-            {STATS.map((stat) => (
-              <div key={stat.label} className="text-center glass rounded-xl p-4">
-                <div className="text-3xl font-bold text-white mb-1">{stat.value}</div>
-                <div className="text-sm text-white/60">{stat.label}</div>
-              </div>
-            ))}
+            <p className="text-sm text-white/50">
+              Free to start. No access code needed.
+            </p>
           </div>
         </div>
       </section>
 
-      {/* How It Works */}
+      {/* The problem */}
       <section className="py-24 bg-background">
         <div className="container">
-          <div className="text-center mb-16">
-            <Badge variant="secondary" className="mb-4">How It Works</Badge>
-            <h2 className="text-4xl font-bold text-foreground mb-4">Your Journey to UK Practice</h2>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              A structured, assessment-driven pathway designed specifically for international medical graduates.
+          <div className="max-w-3xl mb-16">
+            <Badge variant="secondary" className="mb-4">The problem</Badge>
+            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
+              Effort is not the same as points
+            </h2>
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              UK specialty recruitment publishes what it rewards. The difficulty is that it rewards
+              different things in every specialty, states them across dozens of separate sources, and
+              revises them without announcement. These are real examples from the 2026 criteria.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-4 gap-8 max-w-5xl mx-auto">
-            {[
-              { step: "01", icon: Lock, title: "Activate Access", desc: "Enter your unique invitation code and authorised email to unlock the platform." },
-              { step: "02", icon: ClipboardList, title: "Complete Assessment", desc: "A comprehensive onboarding assessment evaluates your current portfolio and goals." },
-              { step: "03", icon: Target, title: "Get Your Roadmap", desc: "AI generates a personalised career roadmap with milestones and deadlines." },
-              { step: "04", icon: Zap, title: "Work in AI Spaces", desc: "Use specialised AI workspaces to build every component of your portfolio." },
-            ].map((item) => (
-              <div key={item.step} className="relative text-center">
-                <div className="w-14 h-14 rounded-2xl gradient-purple flex items-center justify-center mx-auto mb-4 shadow-lg">
-                  <item.icon className="w-6 h-6 text-white" />
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {PAIN_POINTS.map((point) => (
+              <div key={point.problem} className="p-6 rounded-2xl bg-card border border-border">
+                <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center mb-4">
+                  <point.icon className="w-5 h-5 text-orange-500" />
                 </div>
-                <div className="text-xs font-bold text-primary/40 mb-2">{item.step}</div>
-                <h3 className="font-semibold text-foreground mb-2">{item.title}</h3>
-                <p className="text-sm text-muted-foreground">{item.desc}</p>
+                <h3 className="font-semibold text-foreground mb-2 leading-snug">{point.problem}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{point.detail}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* AI Workspaces */}
+      {/* The answer */}
       <section className="py-24 bg-secondary/30">
         <div className="container">
-          <div className="text-center mb-16">
-            <Badge variant="secondary" className="mb-4">AI Workspaces</Badge>
-            <h2 className="text-4xl font-bold text-foreground mb-4">10 Specialised AI Workspaces</h2>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Each workspace is a professional studio powered by AI, designed for a specific aspect of your UK career preparation.
+          <div className="max-w-3xl mb-16">
+            <Badge variant="secondary" className="mb-4">What we do</Badge>
+            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
+              The criteria, applied to you
+            </h2>
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              We read the official recruitment guidance for each specialty, transcribe it exactly, and
+              record where every figure came from. Then we measure your portfolio against it.
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-            {WORKSPACES.map((ws) => (
-              <div key={ws.title} className="workspace-card group">
-                <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${ws.color} flex items-center justify-center mb-3 shadow-md`}>
-                  <ws.icon className="w-5 h-5 text-white" />
+          <div className="grid md:grid-cols-2 gap-6">
+            {ANSWERS.map((answer) => (
+              <div key={answer.title} className="flex gap-4 p-6 rounded-2xl bg-card border border-border">
+                <div className="w-11 h-11 rounded-xl gradient-purple flex items-center justify-center shrink-0">
+                  <answer.icon className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="font-semibold text-sm text-foreground mb-1">{ws.title}</h3>
-                <p className="text-xs text-muted-foreground leading-relaxed">{ws.desc}</p>
+                <div>
+                  <h3 className="font-semibold text-foreground mb-2">{answer.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{answer.body}</p>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Official Resources */}
+      {/* How it works */}
       <section className="py-24 bg-background">
         <div className="container">
-          <div className="grid lg:grid-cols-2 gap-16 items-center max-w-5xl mx-auto">
-            <div>
-              <Badge variant="secondary" className="mb-4">Official Resources</Badge>
-              <h2 className="text-4xl font-bold text-foreground mb-6">Built on Trusted Sources</h2>
-              <p className="text-muted-foreground text-lg mb-8">
-                Every piece of guidance is anchored to official UK medical organisations and internationally recognised standards.
-              </p>
-              <div className="space-y-3">
-                {[
-                  "GMC — General Medical Council",
-                  "NHS Jobs & Oriel Applications Portal",
-                  "OET Official — Occupational English Test",
-                  "Think. Check. Submit. — Journal Integrity",
-                  "ICMJE — Authorship Standards",
-                  "UKRIO — Research Integrity Office",
-                  "Royal Colleges — MRCP, MRCS, MRCGP",
-                ].map((item) => (
-                  <div key={item} className="flex items-center gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0" />
-                    <span className="text-foreground">{item}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="relative">
-              <div className="gradient-hero rounded-2xl p-8 text-white">
-                <Shield className="w-12 h-12 mb-4 text-orange-400" />
-                <h3 className="text-2xl font-bold mb-3">Compliance First</h3>
-                <p className="text-white/70 mb-6">
-                  Every section touching official processes includes trust-oriented guidance reminding users to verify current requirements with official sources.
-                </p>
-                <div className="space-y-2">
-                  {[
-                    "Evidence-based guidance only",
-                    "Official links always provided",
-                    "AI supports — doesn't replace — official requirements",
-                  ].map((item) => (
-                    <div key={item} className="flex items-center gap-2 text-sm text-white/80">
-                      <ChevronRight className="w-4 h-4 text-orange-400" />
-                      {item}
-                    </div>
-                  ))}
+          <div className="max-w-3xl mb-16">
+            <Badge variant="secondary" className="mb-4">How it works</Badge>
+            <h2 className="text-3xl sm:text-4xl font-bold text-foreground">From where you are to what to do next</h2>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {STEPS.map((step) => (
+              <div key={step.number}>
+                <div className="text-4xl font-bold text-transparent bg-clip-text mb-4" style={{ backgroundImage: "linear-gradient(135deg, oklch(0.70 0.19 52), oklch(0.80 0.15 70))" }}>
+                  {step.number}
                 </div>
+                <h3 className="font-semibold text-foreground mb-2">{step.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{step.body}</p>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Workspaces */}
+      <section className="py-24 bg-secondary/30">
+        <div className="container">
+          <div className="max-w-3xl mb-16">
+            <Badge variant="secondary" className="mb-4">Support</Badge>
+            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">Help with each piece of evidence</h2>
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              Knowing a domain is weak is the easy part. These workspaces help you actually build the
+              evidence — each one specialised rather than a general assistant.
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {WORKSPACES.map((workspace) => (
+              <div key={workspace.title} className="p-5 rounded-xl bg-card border border-border hover:border-primary/40 transition-colors">
+                <div className="flex items-center gap-3 mb-2">
+                  <workspace.icon className="w-5 h-5 text-primary shrink-0" />
+                  <h3 className="font-medium text-foreground text-sm">{workspace.title}</h3>
+                </div>
+                <p className="text-xs text-muted-foreground leading-relaxed">{workspace.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Sources */}
+      <section className="py-24 bg-background">
+        <div className="container">
+          <div className="max-w-3xl mx-auto text-center">
+            <Badge variant="secondary" className="mb-4">Where the criteria come from</Badge>
+            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-6">
+              Official sources, and a record of which
+            </h2>
+            <p className="text-lg text-muted-foreground leading-relaxed mb-10">
+              Scoring criteria are transcribed from NHS England specialty recruitment pages, the national
+              recruitment offices that run each round, and the royal colleges. Every specialty carries the
+              source it came from and the date it was checked — so you can confirm it yourself, and so
+              anything that has gone out of date is visible rather than assumed.
+            </p>
+            <div className="flex flex-wrap justify-center gap-3">
+              {["NHS England", "Oriel", "GMC", "Royal Colleges", "Deanery recruitment offices", "NICE"].map((source) => (
+                <span key={source} className="px-4 py-2 rounded-full bg-secondary text-sm text-secondary-foreground">
+                  {source}
+                </span>
+              ))}
             </div>
           </div>
         </div>
@@ -297,37 +367,35 @@ export default function Home() {
         <div className="container">
           <div className="text-center mb-16">
             <Badge variant="secondary" className="mb-4">Pricing</Badge>
-            <h2 className="text-4xl font-bold text-foreground mb-4">Choose Your Level</h2>
-            <p className="text-muted-foreground text-lg">All plans require an access code. Upgrade anytime.</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">Start free, upgrade when you need more</h2>
+            <p className="text-lg text-muted-foreground">
+              The self-assessment and your roadmap are free. Paid plans add the workspaces and one-to-one support.
+            </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {PLANS.map((plan) => (
               <div
                 key={plan.name}
-                className={`rounded-2xl p-8 border ${plan.highlight ? "gradient-purple text-white border-transparent shadow-2xl scale-105" : "bg-card border-border"}`}
+                className={`p-8 rounded-2xl border ${plan.highlight ? "border-primary bg-card shadow-lg scale-[1.02]" : "border-border bg-card"}`}
               >
-                <div className="mb-6">
-                  <h3 className={`text-xl font-bold mb-1 ${plan.highlight ? "text-white" : "text-foreground"}`}>{plan.name}</h3>
-                  <div className={`text-3xl font-bold mb-1 ${plan.highlight ? "text-white" : "text-foreground"}`}>{plan.price}</div>
-                  <p className={`text-sm ${plan.highlight ? "text-white/70" : "text-muted-foreground"}`}>{plan.desc}</p>
-                </div>
+                {plan.highlight && <Badge className="mb-4 gradient-orange text-white border-0">Most popular</Badge>}
+                <h3 className="text-xl font-bold text-foreground mb-1">{plan.name}</h3>
+                <p className="text-sm text-muted-foreground mb-4">{plan.desc}</p>
+                <div className="text-3xl font-bold text-foreground mb-6">{plan.price}</div>
                 <ul className="space-y-3 mb-8">
-                  {plan.features.map((f) => (
-                    <li key={f} className="flex items-center gap-2 text-sm">
-                      <CheckCircle2 className={`w-4 h-4 flex-shrink-0 ${plan.highlight ? "text-orange-300" : "text-primary"}`} />
-                      <span className={plan.highlight ? "text-white/90" : "text-foreground"}>{f}</span>
+                  {plan.features.map((feature) => (
+                    <li key={feature} className="flex items-start gap-2 text-sm text-muted-foreground">
+                      <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                      {feature}
                     </li>
                   ))}
                 </ul>
-                <Link href="/activate">
-                  <Button
-                    className={`w-full ${plan.highlight ? "bg-white text-purple-700 hover:bg-white/90" : "gradient-purple text-white border-0"}`}
-                    variant={plan.highlight ? "outline" : "default"}
-                  >
+                <a href="/register" className="block">
+                  <Button className={`w-full ${plan.highlight ? "gradient-orange text-white border-0" : ""}`} variant={plan.highlight ? "default" : "outline"}>
                     {plan.cta}
                   </Button>
-                </Link>
+                </a>
               </div>
             ))}
           </div>
@@ -341,37 +409,75 @@ export default function Home() {
           <div className="absolute top-1/2 right-1/4 w-64 h-64 rounded-full bg-orange-500/10 blur-3xl" />
         </div>
         <div className="container relative z-10 text-center">
-          <h2 className="text-4xl font-bold text-white mb-4">Ready to Begin Your UK Journey?</h2>
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Find out where you actually stand</h2>
           <p className="text-white/70 text-lg mb-8 max-w-xl mx-auto">
-            Assess your portfolio against official recruitment criteria, and build a plan around what actually moves your application.
+            Pick your specialty, work through its scoring domains, and see the gaps. It takes about ten
+            minutes and costs nothing.
           </p>
-          <Link href="/activate">
+          <a href="/register">
             <Button size="lg" className="gradient-orange text-white border-0 px-10 py-6 text-base font-semibold shadow-xl">
-              Activate Your Access Code <ArrowRight className="w-5 h-5 ml-2" />
+              Start my self-assessment <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
-          </Link>
-          <p className="text-white/40 text-sm mt-4">Access code required. Contact your programme coordinator to obtain one.</p>
+          </a>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-foreground/5 border-t border-border py-12">
+      <footer className="bg-foreground/5 border-t border-border py-14">
         <div className="container">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg gradient-purple flex items-center justify-center">
-                <Stethoscope className="w-3.5 h-3.5 text-white" />
+          <div className="grid md:grid-cols-3 gap-10 mb-10">
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-7 h-7 rounded-lg gradient-purple flex items-center justify-center">
+                  <Stethoscope className="w-3.5 h-3.5 text-white" />
+                </div>
+                <span className="font-bold text-foreground">MedPath UK</span>
               </div>
-              <span className="font-bold text-foreground">MedPath UK</span>
-              <span className="text-muted-foreground text-sm">by Health Care Quality School</span>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                A platform by Healthcare Quality School, helping international doctors plan and evidence a
+                career in UK medicine.
+              </p>
             </div>
-            <div className="flex items-center gap-6 text-sm text-muted-foreground">
-              <Link href="/resources">Official Resources</Link>
-              <Link href="/pricing">Pricing</Link>
-              <Link href="/activate">Activate</Link>
+
+            <div>
+              <h3 className="font-semibold text-foreground text-sm mb-3">Platform</h3>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><Link href="/sas" className="hover:text-foreground transition-colors">Self-assessment</Link></li>
+                <li><Link href="/resources" className="hover:text-foreground transition-colors">Resources</Link></li>
+                <li><Link href="/links" className="hover:text-foreground transition-colors">Official links</Link></li>
+                <li><Link href="/pricing" className="hover:text-foreground transition-colors">Pricing</Link></li>
+              </ul>
             </div>
+
+            {/* Company identity and statutory registrations. These are
+                registrations, not accreditations or endorsements — an ICO entry
+                is a data-protection requirement and a UKPRN is a provider
+                identifier. Described as what they are. */}
+            <div>
+              <h3 className="font-semibold text-foreground text-sm mb-3">Healthcare Quality School</h3>
+              <div className="space-y-3 text-sm text-muted-foreground">
+                <p className="leading-relaxed">
+                  A United States company based in Boulder, Colorado, with a branch in the United Kingdom.
+                </p>
+                <p className="leading-relaxed">
+                  71–75 Shelton Street, Covent Garden<br />
+                  London WC2H 9JQ, United Kingdom
+                </p>
+                <p className="leading-relaxed text-xs">
+                  Registered with the Information Commissioner's Office, reference <span className="text-foreground">ZC149125</span>.<br />
+                  Listed on the UK Register of Learning Providers, UKPRN <span className="text-foreground">10101333</span>.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="pt-8 border-t border-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <p className="text-xs text-muted-foreground">
-              © 2025 MedPath UK. This platform supports planning and preparation but does not replace official regulatory requirements.
+              © 2026 Healthcare Quality School. All rights reserved.
+            </p>
+            <p className="text-xs text-muted-foreground max-w-xl sm:text-right">
+              MedPath UK supports planning and preparation. It does not replace official regulatory
+              requirements — always confirm current criteria with the recruiting body before you apply.
             </p>
           </div>
         </div>
