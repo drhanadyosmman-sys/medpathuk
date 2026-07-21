@@ -121,8 +121,6 @@
 - [x] Remove Manus OAuth dependency from auth flow
 - [x] Run tests and fix any errors
 - [x] Save checkpoint to enable publishing
-<<<<<<< HEAD
-=======
 
 ## Resend Email Integration
 - [x] Install Resend SDK
