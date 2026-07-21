@@ -3,7 +3,7 @@ import { TRPCError } from "@trpc/server";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { getSessionCookieOptions } from "./_core/cookies";
-import { invokeLLM } from "./_core/llm";
+import { invokeLLM, invokeLLMJson } from "./_core/llm";
 import { sdk } from "./_core/sdk";
 import { systemRouter } from "./_core/systemRouter";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
@@ -265,49 +265,44 @@ Return ONLY valid JSON in this exact format:
   ]
 }`;
 
-        const response = await invokeLLM({
-          messages: [{ role: "user", content: prompt }],
-          response_format: {
-            type: "json_schema",
-            json_schema: {
-              name: "roadmap",
-              strict: true,
-              schema: {
-                type: "object",
-                properties: {
-                  title: { type: "string" },
-                  summary: { type: "string" },
-                  totalDurationMonths: { type: "integer" },
-                  milestones: {
-                    type: "array",
-                    items: {
-                      type: "object",
-                      properties: {
-                        title: { type: "string" },
-                        description: { type: "string" },
-                        category: { type: "string" },
-                        dueMonths: { type: "integer" },
-                        orderIndex: { type: "integer" },
-                        priority: { type: "string" },
-                        resources: { type: "array", items: { type: "object", properties: { title: { type: "string" }, url: { type: "string" } }, required: ["title", "url"], additionalProperties: false } },
-                      },
-                      required: ["title", "description", "category", "dueMonths", "orderIndex", "priority", "resources"],
-                      additionalProperties: false,
+        let roadmapData: { title: string; summary: string; totalDurationMonths: number; milestones: any[] };
+        try {
+          roadmapData = await invokeLLMJson({
+            messages: [{ role: "user", content: prompt }],
+            schema: {
+              type: "object",
+              properties: {
+                title: { type: "string" },
+                summary: { type: "string" },
+                totalDurationMonths: { type: "integer" },
+                milestones: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      title: { type: "string" },
+                      description: { type: "string" },
+                      category: { type: "string" },
+                      dueMonths: { type: "integer" },
+                      orderIndex: { type: "integer" },
+                      priority: { type: "string" },
+                      resources: { type: "array", items: { type: "object", properties: { title: { type: "string" }, url: { type: "string" } }, required: ["title", "url"], additionalProperties: false } },
                     },
+                    required: ["title", "description", "category", "dueMonths", "orderIndex", "priority", "resources"],
+                    additionalProperties: false,
                   },
                 },
-                required: ["title", "summary", "totalDurationMonths", "milestones"],
-                additionalProperties: false,
               },
+              required: ["title", "summary", "totalDurationMonths", "milestones"],
+              additionalProperties: false,
             },
-          },
-        });
-
-        const rawContent = response.choices[0]?.message?.content;
-        const content = typeof rawContent === "string" ? rawContent : null;
-        if (!content) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to generate roadmap" });
-
-        const roadmapData = JSON.parse(content) as { title: string; summary: string; totalDurationMonths: number; milestones: any[] };
+          });
+        } catch (error) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: error instanceof Error ? error.message : "Failed to generate roadmap",
+          });
+        }
 
         // Deactivate old roadmaps
         const { getDb } = await import("./db");
@@ -467,16 +462,23 @@ ${tier === "premium" ? "Provide comprehensive, detailed, personalised guidance w
 
 IMPORTANT: Always respond in English. Be professional, supportive, and evidence-based. If you reference official sources, provide the correct website URLs. Always add: "Please verify current requirements with the official source before taking action."`;
 
-        const response = await invokeLLM({
-          messages: [
-            { role: "system", content: systemPrompt },
-            ...messages,
-            { role: "user" as const, content: input.message },
-          ],
-        });
-
-        const rawMsg = response.choices[0]?.message?.content;
-        const assistantMessage = typeof rawMsg === "string" ? rawMsg : "I apologise, an error occurred. Please try again.";
+        let assistantMessage: string;
+        try {
+          assistantMessage = await invokeLLM({
+            messages: [
+              { role: "system", content: systemPrompt },
+              ...messages,
+              { role: "user" as const, content: input.message },
+            ],
+          });
+        } catch (error) {
+          // Surface the reason rather than a generic apology — an unset API key
+          // and a declined request need very different responses from the user.
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: error instanceof Error ? error.message : "The assistant is unavailable",
+          });
+        }
 
         await saveChatMessage({ sessionId: session.id, userId: ctx.user.id, role: "assistant", content: assistantMessage });
 
@@ -691,17 +693,15 @@ Return a JSON object with this exact structure:
   ]
 }`;
 
-        const response = await invokeLLM({
+        // The schema is enforced by the API, so the prompt no longer has to ask
+        // for "valid JSON only, no markdown" — that instruction existed to work
+        // around a model that could return prose around the payload.
+        return await invokeLLMJson({
           messages: [
-            { role: "system", content: "You are an expert UK medical career advisor. Always respond with valid JSON only, no markdown code blocks." },
+            { role: "system", content: "You are an expert UK medical career advisor." },
             { role: "user", content: prompt },
           ],
-          response_format: {
-            type: "json_schema",
-            json_schema: {
-              name: "sas_roadmap_suggestions",
-              strict: true,
-              schema: {
+          schema: {
                 type: "object",
                 properties: {
                   summary: { type: "string" },
@@ -737,18 +737,10 @@ Return a JSON object with this exact structure:
                     },
                   },
                 },
-                required: ["summary", "overallAdvice", "milestones"],
-                additionalProperties: false,
-              },
-            },
+            required: ["summary", "overallAdvice", "milestones"],
+            additionalProperties: false,
           },
-        });
-
-        const rawContent = response.choices[0]?.message?.content;
-        if (!rawContent) throw new Error("No response from AI");
-
-        const parsed = typeof rawContent === "string" ? JSON.parse(rawContent) : rawContent;
-        return parsed as {
+        }) as {
           summary: string;
           overallAdvice: string;
           milestones: Array<{

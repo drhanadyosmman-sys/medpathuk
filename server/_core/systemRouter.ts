@@ -1,7 +1,10 @@
 import { z } from "zod";
-import { notifyOwner } from "./notification";
-import { adminProcedure, publicProcedure, router } from "./trpc";
+import { publicProcedure, router } from "./trpc";
 
+// A `notifyOwner` procedure used to live here, delivering owner alerts through
+// the Manus Notification Service. It could not work off that platform and
+// nothing in the app called it. If owner notifications are wanted again, send
+// them by email rather than reintroducing a platform-specific service.
 export const systemRouter = router({
   health: publicProcedure
     .input(
@@ -12,18 +15,4 @@ export const systemRouter = router({
     .query(() => ({
       ok: true,
     })),
-
-  notifyOwner: adminProcedure
-    .input(
-      z.object({
-        title: z.string().min(1, "title is required"),
-        content: z.string().min(1, "content is required"),
-      })
-    )
-    .mutation(async ({ input }) => {
-      const delivered = await notifyOwner(input);
-      return {
-        success: delivered,
-      } as const;
-    }),
 });
