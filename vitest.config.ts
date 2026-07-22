@@ -15,5 +15,10 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["server/**/*.test.ts", "server/**/*.spec.ts"],
+    env: {
+      // Signing needs a key of non-zero length. Production supplies the real
+      // one; tests only need the round trip to be exercisable.
+      JWT_SECRET: "test-secret-not-used-anywhere-real",
+    },
   },
 });

@@ -156,6 +156,14 @@ class SDKServer {
 
   private getSessionSecret() {
     const secret = ENV.cookieSecret;
+    if (!secret) {
+      // Without this the failure surfaces from deep inside the JWT library as
+      // "Zero-length key is not supported", which says nothing about the
+      // missing variable that actually caused it.
+      throw new Error(
+        "JWT_SECRET is not configured — sessions cannot be signed or verified"
+      );
+    }
     return new TextEncoder().encode(secret);
   }
 
@@ -212,17 +220,19 @@ class SDKServer {
       });
       const { openId, appId, name } = payload as Record<string, unknown>;
 
-      if (
-        !isNonEmptyString(openId) ||
-        !isNonEmptyString(appId)
-      ) {
-        console.warn("[Auth] Session payload missing required fields");
+      // Only openId identifies the session. appId used to name the Manus app a
+      // token belonged to; nothing routes on it now that the platform runs on
+      // its own. Requiring it here rejected every otherwise-valid session,
+      // because the variable it came from was never set outside Manus — the
+      // signature is what makes a token trustworthy, not this field.
+      if (!isNonEmptyString(openId)) {
+        console.warn("[Auth] Session payload missing openId");
         return null;
       }
 
       return {
         openId,
-        appId,
+        appId: isNonEmptyString(appId) ? appId : "",
         name: isNonEmptyString(name) ? name : "",
       };
     } catch (error) {

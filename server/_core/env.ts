@@ -1,5 +1,10 @@
 export const ENV = {
-  appId: process.env.VITE_APP_ID ?? "",
+  /**
+   * Identifies this application inside session tokens. It was a Manus app id;
+   * off Manus there is one application, so it falls back to a fixed name rather
+   * than an empty string, which is what silently invalidated every session.
+   */
+  appId: process.env.VITE_APP_ID || "medpath-uk",
   cookieSecret: process.env.JWT_SECRET ?? "",
   databaseUrl: process.env.DATABASE_URL ?? "",
   oAuthServerUrl: process.env.OAUTH_SERVER_URL ?? "",
