@@ -131,7 +131,7 @@ export default function Login() {
                 Email Address
               </Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Mail className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   id="email"
                   type="email"
@@ -141,7 +141,7 @@ export default function Login() {
                     setForm(p => ({ ...p, email: e.target.value }));
                     setErrors(p => ({ ...p, email: "", general: "" }));
                   }}
-                  className={`pl-10 bg-card border-border text-foreground placeholder:text-muted-foreground ${errors.email ? "border-destructive" : ""}`}
+                  className={`ps-10 bg-card border-border text-foreground placeholder:text-muted-foreground ${errors.email ? "border-destructive" : ""}`}
                   autoComplete="email"
                   autoFocus
                 />
@@ -155,7 +155,7 @@ export default function Login() {
                 Password
               </Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Lock className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
@@ -165,19 +165,19 @@ export default function Login() {
                     setForm(p => ({ ...p, password: e.target.value }));
                     setErrors(p => ({ ...p, password: "", general: "" }));
                   }}
-                  className={`pl-10 pr-10 bg-card border-border text-foreground placeholder:text-muted-foreground ${errors.password ? "border-destructive" : ""}`}
+                  className={`ps-10 pe-10 bg-card border-border text-foreground placeholder:text-muted-foreground ${errors.password ? "border-destructive" : ""}`}
                   autoComplete="current-password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(p => !p)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  className="absolute end-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
               {errors.password && <p className="text-destructive text-sm">{errors.password}</p>}
-              <div className="text-right">
+              <div className="text-end">
                 <a href="/forgot-password" className="text-sm text-primary hover:underline">Forgot password?</a>
               </div>
             </div>

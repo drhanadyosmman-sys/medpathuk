@@ -8,6 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { Eye, EyeOff, Stethoscope, ArrowRight, User, Mail, Lock, Phone, Globe } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { useT } from "@/contexts/LanguageContext";
+import LanguageToggle from "@/components/LanguageToggle";
 import { useEffect } from "react";
 
 // Common graduation countries for UK IMG doctors
@@ -23,6 +25,7 @@ const GRADUATION_COUNTRIES = [
 export default function Register() {
   const [, navigate] = useLocation();
   const { isAuthenticated, loading } = useAuth();
+  const t = useT();
   const utils = trpc.useUtils();
 
   const [showPassword, setShowPassword] = useState(false);
@@ -44,14 +47,14 @@ export default function Register() {
   const registerMutation = trpc.auth.register.useMutation({
     onSuccess: async () => {
       await utils.auth.me.invalidate();
-      toast.success("Account created successfully! Welcome to MedPath UK.");
+      toast.success(t("auth.register.success"));
       navigate("/dashboard");
     },
     onError: (err) => {
       if (err.message.includes("already exists")) {
-        setErrors({ email: "An account with this email already exists." });
+        setErrors({ email: t("auth.register.errors.exists") });
       } else {
-        toast.error(err.message || "Registration failed. Please try again.");
+        toast.error(err.message || t("auth.register.errors.failed"));
       }
     },
   });
@@ -59,13 +62,13 @@ export default function Register() {
   const validate = () => {
     const newErrors: Record<string, string> = {};
     if (!form.name.trim() || form.name.trim().length < 2) {
-      newErrors.name = "Full name must be at least 2 characters.";
+      newErrors.name = t("auth.register.errors.name");
     }
     if (!form.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-      newErrors.email = "Please enter a valid email address.";
+      newErrors.email = t("auth.register.errors.email");
     }
     if (!form.password || form.password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters.";
+      newErrors.password = t("auth.register.errors.password");
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -103,10 +106,10 @@ export default function Register() {
         </div>
         <div className="space-y-6">
           <h1 className="text-4xl font-bold text-foreground leading-tight">
-            Your UK Medical Career Starts Here
+            {t("auth.register.heroTitle")}
           </h1>
           <p className="text-muted-foreground text-lg leading-relaxed">
-            Measure your portfolio against the published recruitment criteria for your specialty, see where the marks are, and get a plan for what to do next.
+            {t("auth.register.heroBody")}
           </p>
           <div className="space-y-3">
             {[
@@ -125,7 +128,7 @@ export default function Register() {
           </div>
         </div>
         <p className="text-muted-foreground text-sm">
-          © 2026 Healthcare Quality School. Planning support — not a guarantee of a training post.
+          {t("common.footer.rights")}
         </p>
       </div>
 
@@ -140,12 +143,16 @@ export default function Register() {
             <span className="text-xl font-bold text-foreground">MedPath UK</span>
           </div>
 
+          <div className="flex justify-end">
+            <LanguageToggle />
+          </div>
+
           <div>
-            <h2 className="text-3xl font-bold text-foreground">Create your account</h2>
+            <h2 className="text-3xl font-bold text-foreground">{t("auth.register.title")}</h2>
             <p className="mt-2 text-muted-foreground">
-              Already have an account?{" "}
+              {t("auth.register.haveAccount")}{" "}
               <a href="/login" className="text-primary hover:underline font-medium">
-                Sign in
+                {t("auth.register.signIn")}
               </a>
             </p>
           </div>
@@ -154,17 +161,17 @@ export default function Register() {
             {/* Full Name */}
             <div className="space-y-1.5">
               <Label htmlFor="name" className="text-foreground font-medium">
-                Full Name <span className="text-destructive">*</span>
+                {t("auth.register.name")} <span className="text-destructive">*</span>
               </Label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <User className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   id="name"
                   type="text"
-                  placeholder="Dr. Ahmed Al-Rashid"
+                  placeholder={t("auth.register.namePlaceholder")}
                   value={form.name}
                   onChange={(e) => setForm(p => ({ ...p, name: e.target.value }))}
-                  className={`pl-10 bg-card border-border text-foreground placeholder:text-muted-foreground ${errors.name ? "border-destructive" : ""}`}
+                  className={`ps-10 bg-card border-border text-foreground placeholder:text-muted-foreground ${errors.name ? "border-destructive" : ""}`}
                   autoComplete="name"
                 />
               </div>
@@ -174,17 +181,17 @@ export default function Register() {
             {/* Email */}
             <div className="space-y-1.5">
               <Label htmlFor="email" className="text-foreground font-medium">
-                Email Address <span className="text-destructive">*</span>
+                {t("auth.register.email")} <span className="text-destructive">*</span>
               </Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Mail className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   id="email"
                   type="email"
-                  placeholder="doctor@example.com"
+                  placeholder={t("auth.register.emailPlaceholder")}
                   value={form.email}
                   onChange={(e) => setForm(p => ({ ...p, email: e.target.value }))}
-                  className={`pl-10 bg-card border-border text-foreground placeholder:text-muted-foreground ${errors.email ? "border-destructive" : ""}`}
+                  className={`ps-10 bg-card border-border text-foreground placeholder:text-muted-foreground ${errors.email ? "border-destructive" : ""}`}
                   autoComplete="email"
                 />
               </div>
@@ -194,23 +201,23 @@ export default function Register() {
             {/* Password */}
             <div className="space-y-1.5">
               <Label htmlFor="password" className="text-foreground font-medium">
-                Password <span className="text-destructive">*</span>
+                {t("auth.register.password")} <span className="text-destructive">*</span>
               </Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Lock className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Minimum 8 characters"
+                  placeholder={t("auth.register.passwordPlaceholder")}
                   value={form.password}
                   onChange={(e) => setForm(p => ({ ...p, password: e.target.value }))}
-                  className={`pl-10 pr-10 bg-card border-border text-foreground placeholder:text-muted-foreground ${errors.password ? "border-destructive" : ""}`}
+                  className={`ps-10 pe-10 bg-card border-border text-foreground placeholder:text-muted-foreground ${errors.password ? "border-destructive" : ""}`}
                   autoComplete="new-password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(p => !p)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  className="absolute end-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -221,16 +228,16 @@ export default function Register() {
             {/* Graduation Country */}
             <div className="space-y-1.5">
               <Label htmlFor="graduationCountry" className="text-foreground font-medium">
-                Country of Graduation
+                {t("auth.register.country")}
               </Label>
               <div className="relative">
-                <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground z-10 pointer-events-none" />
+                <Globe className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground z-10 pointer-events-none" />
                 <Select
                   value={form.graduationCountry}
                   onValueChange={(val) => setForm(p => ({ ...p, graduationCountry: val }))}
                 >
-                  <SelectTrigger className="pl-10 bg-card border-border text-foreground">
-                    <SelectValue placeholder="Select your graduation country" />
+                  <SelectTrigger className="w-full ps-10 bg-card border-border text-foreground">
+                    <SelectValue placeholder={t("auth.register.countryPlaceholder")} />
                   </SelectTrigger>
                   <SelectContent className="bg-card border-border">
                     {GRADUATION_COUNTRIES.map((country) => (
@@ -246,21 +253,21 @@ export default function Register() {
             {/* WhatsApp Number */}
             <div className="space-y-1.5">
               <Label htmlFor="whatsapp" className="text-foreground font-medium">
-                WhatsApp Number
+                {t("auth.register.whatsapp")}
               </Label>
               <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Phone className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   id="whatsapp"
                   type="tel"
                   placeholder="+44 7700 000000"
                   value={form.whatsappNumber}
                   onChange={(e) => setForm(p => ({ ...p, whatsappNumber: e.target.value }))}
-                  className="pl-10 bg-card border-border text-foreground placeholder:text-muted-foreground"
+                  className="ps-10 bg-card border-border text-foreground placeholder:text-muted-foreground"
                   autoComplete="tel"
                 />
               </div>
-              <p className="text-muted-foreground text-xs">Optional — for future notifications</p>
+              <p className="text-muted-foreground text-xs">{t("auth.register.whatsappHint")}</p>
             </div>
 
             <Button
@@ -271,11 +278,11 @@ export default function Register() {
               {registerMutation.isPending ? (
                 <span className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
-                  Creating account...
+                  {t("auth.register.creating")}
                 </span>
               ) : (
                 <span className="flex items-center gap-2">
-                  Create Account
+                  {t("auth.register.submit")}
                   <ArrowRight className="w-4 h-4" />
                 </span>
               )}
@@ -283,7 +290,7 @@ export default function Register() {
           </form>
 
           <p className="text-center text-muted-foreground text-xs">
-            By creating an account, you agree to our terms of service and privacy policy.
+            {t("auth.register.terms")}
           </p>
         </div>
       </div>

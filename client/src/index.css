@@ -124,6 +124,48 @@
   html {
     scroll-behavior: smooth;
   }
+
+  /* Arabic sets its own face. Inter has no Arabic coverage, so without this the
+     browser falls back to whatever it has and the page changes character
+     mid-sentence. Cairo is already loaded for both scripts. */
+  html.lang-ar body {
+    font-family: "Cairo", system-ui, sans-serif;
+  }
+
+  /* Arabic runs taller than Latin at the same size and needs the extra leading
+     to stay readable. */
+  html.lang-ar {
+    line-height: 1.85;
+  }
+
+  /* Numerals, dates and scores stay in Western digits — they have to match what
+     the doctor will type into Oriel and read on official criteria. */
+  html.lang-ar [dir="ltr"],
+  html.lang-ar .force-ltr {
+    direction: ltr;
+    text-align: start;
+  }
+
+  /* An arrow meaning "onward" points the way the reader is going, so in Arabic
+     it points left. Mirroring by icon name rather than replacing every one of
+     them keeps the markup identical in both languages.
+
+     Only arrows that express direction of travel. Anything marked
+     .no-flip — external-link marks, brand glyphs, play buttons — keeps its
+     orientation, because those point at a thing rather than along a path. */
+  html.lang-ar
+    :is(
+      .lucide-arrow-right,
+      .lucide-arrow-left,
+      .lucide-chevron-right,
+      .lucide-chevron-left,
+      .lucide-move-right,
+      .lucide-move-left,
+      .lucide-arrow-up-right,
+      .lucide-trending-up
+    ):not(.no-flip) {
+    transform: scaleX(-1);
+  }
   button:not(:disabled),
   [role="button"]:not([aria-disabled="true"]),
   [type="button"]:not(:disabled),

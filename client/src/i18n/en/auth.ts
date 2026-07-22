@@ -1,0 +1,82 @@
+export const auth = {
+  login: {
+    welcome: "Welcome Back, Doctor",
+    intro:
+      "Continue your journey towards UK medical training. Your personalised roadmap and progress are waiting for you.",
+    waitingHeading: "What's waiting for you:",
+    waiting: {
+      roadmap: "Your personalised career roadmap",
+      history: "Self-assessment history & trends",
+      workspaces: "AI workspace conversations",
+      progress: "Progress tracking & milestones",
+    },
+    title: "Sign in to your account",
+    noAccount: "Don't have an account?",
+    createOne: "Create one free",
+    email: "Email Address",
+    password: "Password",
+    forgot: "Forgot password?",
+    submit: "Sign In",
+    backHome: "← Back to home",
+    signingIn: "Signing in…",
+    success: "Welcome back.",
+    failed: "Sign in failed. Please try again.",
+    gateTitle: "Sign In to Access Dashboard",
+    gateBody: "Your personalised career dashboard awaits.",
+  },
+
+  register: {
+    title: "Create your account",
+    haveAccount: "Already have an account?",
+    signIn: "Sign in",
+    heroTitle: "Your UK Medical Career Starts Here",
+    heroBody:
+      "Measure your portfolio against the published recruitment criteria for your specialty, see where the marks are, and get a plan for what to do next.",
+    features: {
+      specialties: "Self-assessment across 46 UK specialties",
+      sources: "Criteria traced to official recruitment sources",
+      roadmap: "A roadmap built from your weakest domains",
+      support: "Support for research, QI, audit and interviews",
+    },
+    name: "Full Name",
+    namePlaceholder: "Dr. Ahmed Al-Rashid",
+    email: "Email Address",
+    emailPlaceholder: "doctor@example.com",
+    password: "Password",
+    passwordPlaceholder: "Minimum 8 characters",
+    country: "Country of Graduation",
+    countryPlaceholder: "Select your graduation country",
+    whatsapp: "WhatsApp Number",
+    whatsappHint: "Optional — for future notifications",
+    submit: "Create Account",
+    creating: "Creating account…",
+    success: "Account created successfully! Welcome to MedPath UK.",
+    terms:
+      "By creating an account, you agree to our terms of service and privacy policy.",
+    errors: {
+      name: "Full name must be at least 2 characters.",
+      email: "Please enter a valid email address.",
+      password: "Password must be at least 8 characters.",
+      exists: "An account with this email already exists.",
+      failed: "Registration failed. Please try again.",
+    },
+  },
+
+  forgot: {
+    title: "Reset your password",
+    body: "Enter your email and we will send you a link to set a new password.",
+    submit: "Send reset link",
+    sent: "If that email is registered, a reset link is on its way.",
+    backToLogin: "← Back to sign in",
+  },
+
+  reset: {
+    title: "Choose a new password",
+    password: "New password",
+    confirm: "Confirm new password",
+    submit: "Update password",
+    mismatch: "The two passwords do not match.",
+    success: "Password updated. You can sign in now.",
+    invalid: "This reset link is invalid or has expired.",
+  },
+} as const;
