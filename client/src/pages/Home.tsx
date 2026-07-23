@@ -53,7 +53,9 @@ export default function Home() {
             <Badge variant="secondary" className="text-xs hidden sm:flex">{h.nav.by}</Badge>
           </div>
           <div className="flex items-center gap-3">
-            <LanguageToggle className="hidden sm:inline-flex" />
+            {/* Visible on every size: someone who reads only Arabic landing on
+                an English page needs the switch in front of them, phone or not. */}
+            <LanguageToggle />
             {isAuthenticated ? (
               <Link href="/dashboard">
                 <Button size="sm" className="gradient-orange text-white border-0">{h.nav.dashboard}</Button>
