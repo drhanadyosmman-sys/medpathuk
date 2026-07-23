@@ -1,5 +1,6 @@
 import { auth } from "./en/auth";
 import { common } from "./en/common";
+import { home } from "./en/home";
 
 /**
  * English is the fallback dictionary. Every key that exists anywhere must exist
@@ -12,6 +13,7 @@ import { common } from "./en/common";
 export const en = {
   auth,
   common,
+  home,
 } as const;
 
 export type Dictionary = typeof en;

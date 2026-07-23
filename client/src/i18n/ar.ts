@@ -1,5 +1,6 @@
 import { auth } from "./ar/auth";
 import { common } from "./ar/common";
+import { home } from "./ar/home";
 
 /**
  * Arabic. Structure mirrors the English dictionary; anything absent here falls
@@ -8,4 +9,5 @@ import { common } from "./ar/common";
 export const ar = {
   auth,
   common,
+  home,
 } as const;

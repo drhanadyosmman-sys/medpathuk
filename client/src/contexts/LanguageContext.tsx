@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { ar } from "@/i18n/ar";
-import { en } from "@/i18n/en";
+import { en, type Dictionary } from "@/i18n/en";
 
 export type Language = "en" | "ar";
 
@@ -12,6 +12,13 @@ interface LanguageContextType {
   language: Language;
   setLanguage: (language: Language) => void;
   isRTL: boolean;
+  /**
+   * The whole dictionary for the current language, for components that map over
+   * structured lists (feature grids, pricing tiers) rather than looking up one
+   * string at a time. Typed against the English shape; Arabic mirrors it, so
+   * any key present here resolves in both.
+   */
+  dict: Dictionary;
   /**
    * Look up a translated string by dotted key.
    *
@@ -83,8 +90,13 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
+  // Arabic is structurally the same shape but its `as const` literals differ,
+  // so it does not assign to Dictionary directly. The runtime object is
+  // correct; the cast is only to satisfy the type.
+  const dict = DICTIONARIES[language] as unknown as Dictionary;
+
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, isRTL, t }}>
+    <LanguageContext.Provider value={{ language, setLanguage, isRTL, dict, t }}>
       {children}
     </LanguageContext.Provider>
   );
