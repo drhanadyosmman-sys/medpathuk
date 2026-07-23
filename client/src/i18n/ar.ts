@@ -11,6 +11,7 @@ import { pricing } from "./ar/pricing";
 import { questionnaire } from "./ar/questionnaire";
 import { resources } from "./ar/resources";
 import { roadmap } from "./ar/roadmap";
+import { sas } from "./ar/sas";
 import { sasHistory } from "./ar/sasHistory";
 
 /**
@@ -31,5 +32,6 @@ export const ar = {
   questionnaire,
   resources,
   roadmap,
+  sas,
   sasHistory,
 } as const;

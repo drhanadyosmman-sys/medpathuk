@@ -11,6 +11,7 @@ import { pricing } from "./en/pricing";
 import { questionnaire } from "./en/questionnaire";
 import { resources } from "./en/resources";
 import { roadmap } from "./en/roadmap";
+import { sas } from "./en/sas";
 import { sasHistory } from "./en/sasHistory";
 
 /**
@@ -35,6 +36,7 @@ export const en = {
   questionnaire,
   resources,
   roadmap,
+  sas,
   sasHistory,
 } as const;
 

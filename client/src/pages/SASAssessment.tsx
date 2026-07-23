@@ -18,6 +18,8 @@ import {
 } from "../../../shared/sas-data";
 import { courseForDomain } from "../../../shared/courses";
 import { useLanguage } from "@/contexts/LanguageContext";
+import LanguageToggle from "@/components/LanguageToggle";
+import { sasAr } from "../../../shared/sas-i18n-ar";
 import {
   AlertCircle,
   Award,
@@ -43,13 +45,42 @@ import { toast } from "sonner";
 
 type AnswerMap = Record<string, number>; // criterionId -> score
 
-// Card wording for specialties with nothing to self-score. The default covers
-// "msra-only", where the portfolio genuinely earns nothing; the entries here
-// are for specialties whose portfolio is scored, just not by the applicant.
-const NON_SCORABLE_CARD_LABEL: Partial<Record<SASScoringModel, string>> = {
-  "interview-portfolio": "Portfolio scored at interview — see details",
-  "application-assessed": "Scored from your application — see details",
-};
+// Arabic-above-English display for one scoring-data field. When the reader has
+// chosen Arabic AND a translation exists for this id/field, the Arabic takes the
+// prominent line (inheriting the surrounding element's size/weight) and the
+// original authoritative English sits beneath it in a smaller muted line. When
+// there is no Arabic, or the language is English, the English renders exactly as
+// before — no extra line, no layout change. The English is never hidden.
+function BiText({
+  ar,
+  en,
+  enClassName = "block text-xs text-gray-500 font-normal mt-0.5",
+}: {
+  ar?: string;
+  en: string;
+  enClassName?: string;
+}) {
+  const { language } = useLanguage();
+  if (language === "ar" && ar) {
+    return (
+      <>
+        {ar}
+        <span className={enClassName}>{en}</span>
+      </>
+    );
+  }
+  return <>{en}</>;
+}
+
+// Which chrome key describes the card of a specialty with nothing to self-score.
+// The default covers "msra-only", where the portfolio genuinely earns nothing;
+// the named entries are for specialties whose portfolio is scored, just not by
+// the applicant.
+function nonScorableCardKey(model: SASScoringModel): string {
+  if (model === "interview-portfolio") return "sas.nonScorableCard.interviewPortfolio";
+  if (model === "application-assessed") return "sas.nonScorableCard.applicationAssessed";
+  return "sas.nonScorableCard.default";
+}
 
 function getCompetitiveLevel(
   percentage: number
@@ -60,17 +91,20 @@ function getCompetitiveLevel(
   return "needs_improvement";
 }
 
+// Returns the colour classes and the i18n key for the level label; the words
+// themselves live in the sas dictionary and are looked up at the call site.
 function competitiveLevelLabel(level: string) {
   switch (level) {
-    case "excellent": return { label: "Excellent", color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/30" };
-    case "competitive": return { label: "Competitive", color: "text-blue-400", bg: "bg-blue-500/10 border-blue-500/30" };
-    case "borderline": return { label: "Borderline", color: "text-amber-400", bg: "bg-amber-500/10 border-amber-500/30" };
-    default: return { label: "Needs Improvement", color: "text-red-400", bg: "bg-red-500/10 border-red-500/30" };
+    case "excellent": return { labelKey: "sas.levels.excellent", color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/30" };
+    case "competitive": return { labelKey: "sas.levels.competitive", color: "text-blue-400", bg: "bg-blue-500/10 border-blue-500/30" };
+    case "borderline": return { labelKey: "sas.levels.borderline", color: "text-amber-400", bg: "bg-amber-500/10 border-amber-500/30" };
+    default: return { labelKey: "sas.levels.needs_improvement", color: "text-red-400", bg: "bg-red-500/10 border-red-500/30" };
   }
 }
 
 // ─── Specialty Selection ──────────────────────────────────────────────────────
 function SpecialtySelector({ onSelect }: { onSelect: (s: SASSpecialty) => void }) {
+  const { t } = useLanguage();
   const [search, setSearch] = useState("");
   const unverifiedCount = SAS_SPECIALTIES.filter((s) => !isVerified(s.id)).length;
   const filtered = SAS_SPECIALTIES.filter(
@@ -91,32 +125,34 @@ function SpecialtySelector({ onSelect }: { onSelect: (s: SASSpecialty) => void }
       <div className="text-center mb-10">
         <div className="flex items-center justify-between mb-4">
           <a href="/dashboard" className="text-xs text-gray-500 hover:text-gray-300 flex items-center gap-1 transition-colors">
-            <ChevronLeft className="w-3 h-3" /> Dashboard
+            <ChevronLeft className="w-3 h-3" /> {t("sas.selector.backToDashboard")}
           </a>
-          <a href="/sas/history" className="text-xs text-purple-400 hover:text-purple-300 flex items-center gap-1 transition-colors">
-            <HistoryIcon className="w-3 h-3" /> View History
-          </a>
+          <div className="flex items-center gap-3">
+            <LanguageToggle />
+            <a href="/sas/history" className="text-xs text-purple-400 hover:text-purple-300 flex items-center gap-1 transition-colors">
+              <HistoryIcon className="w-3 h-3" /> {t("sas.selector.viewHistory")}
+            </a>
+          </div>
         </div>
         <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 rounded-full px-4 py-2 mb-4">
           <ClipboardList className="w-4 h-4 text-purple-400" />
-          <span className="text-sm text-purple-300 font-medium">UK Specialty Self-Assessment</span>
+          <span className="text-sm text-purple-300 font-medium">{t("sas.selector.badge")}</span>
         </div>
         <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
-          Self Assessment Score Tool
+          {t("sas.selector.title")}
         </h1>
         <p className="text-gray-400 max-w-2xl mx-auto text-base">
-          Work through the portfolio domains for your target specialty to see
-          where your evidence is strong and where it is thin.
+          {t("sas.selector.subtitle")}
         </p>
         {/* Stated up front rather than buried: a doctor deciding what to work
             on next needs to know which specialties are still mid-review. The
             notice disappears on its own once every matrix is verified. */}
         {unverifiedCount > 0 && (
           <p className="text-amber-300/80 max-w-2xl mx-auto text-sm mt-3">
-            Every score here comes from that specialty's official recruitment
-            criteria. {unverifiedCount} of {SAS_SPECIALTIES.length} specialties
-            are still being checked and offer no score until they are — open one
-            to see what has been established so far.
+            {t("sas.selector.unverifiedNotice", {
+              count: unverifiedCount,
+              total: SAS_SPECIALTIES.length,
+            })}
           </p>
         )}
 
@@ -125,19 +161,15 @@ function SpecialtySelector({ onSelect }: { onSelect: (s: SASSpecialty) => void }
             front of them now, not after they have built the evidence. */}
         <div className="max-w-2xl mx-auto mt-5 rounded-xl border border-blue-500/25 bg-blue-500/8 px-4 py-3 text-start">
           <p className="text-xs text-blue-200/90 leading-relaxed">
-            <span className="font-semibold">Before you plan around a score:</span>{" "}
-            the Medical Training (Prioritisation) Act gives UK graduates and
-            certain other groups — including British citizens and holders of
-            indefinite leave to remain — priority for training posts. In 2026
-            this applies at the offer stage; from 2027 it applies at shortlisting
-            too, before your portfolio is scored. Check where you stand with the{" "}
+            <span className="font-semibold">{t("sas.selector.priorityLabel")}</span>{" "}
+            {t("sas.selector.priorityBody")}{" "}
             <a
               href="https://www.bma.org.uk/advice-and-support/career-progression/training/what-we-know-so-far-about-uk-graduate-prioritisation"
               target="_blank"
               rel="noopener noreferrer"
               className="underline hover:text-white"
             >
-              BMA guidance
+              {t("sas.selector.priorityLink")}
             </a>
             .
           </p>
@@ -148,7 +180,7 @@ function SpecialtySelector({ onSelect }: { onSelect: (s: SASSpecialty) => void }
       <div className="relative mb-6">
         <input
           type="text"
-          placeholder="Search specialty..."
+          placeholder={t("sas.selector.searchPlaceholder")}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50 focus:bg-white/8 transition-all"
@@ -176,9 +208,11 @@ function SpecialtySelector({ onSelect }: { onSelect: (s: SASSpecialty) => void }
               </span>
             </div>
             <h3 className="font-semibold text-white text-sm mb-1 leading-snug">
-              {specialty.name}
+              <BiText ar={sasAr(specialty.id)?.name} en={specialty.name} />
             </h3>
-            <p className="text-xs text-gray-500 mb-3 line-clamp-2">{specialty.description}</p>
+            <p className="text-xs text-gray-500 mb-3 line-clamp-2">
+              <BiText ar={sasAr(specialty.id)?.description} en={specialty.description} />
+            </p>
             {/* Three states. A specialty with no self-scorable portfolio says so
                 whether or not it is verified — a max score would be meaningless
                 there. Otherwise figures appear only once the matrix behind them
@@ -186,26 +220,25 @@ function SpecialtySelector({ onSelect }: { onSelect: (s: SASSpecialty) => void }
             {!isScorable(specialty.id) ? (
               <div className="flex items-center gap-1.5 text-xs text-blue-300/90">
                 <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-                {NON_SCORABLE_CARD_LABEL[getVerification(specialty.id).scoringModel] ??
-                  "Not scored by portfolio — see details"}
+                {t(nonScorableCardKey(getVerification(specialty.id).scoringModel))}
               </div>
             ) : isVerified(specialty.id) ? (
               <div className="flex items-center justify-between text-xs">
-                <span className="text-gray-500">Max score: <span className="text-purple-400 font-semibold">{specialty.totalMaxScore}</span></span>
+                <span className="text-gray-500">{t("sas.selector.maxScore")} <span className="text-purple-400 font-semibold">{specialty.totalMaxScore}</span></span>
                 {specialty.competitiveThreshold && (
-                  <span className="text-gray-500">Threshold: <span className="text-orange-400 font-semibold">{specialty.competitiveThreshold}</span></span>
+                  <span className="text-gray-500">{t("sas.selector.threshold")} <span className="text-orange-400 font-semibold">{specialty.competitiveThreshold}</span></span>
                 )}
               </div>
             ) : (
               <div className="flex items-center gap-1.5 text-xs text-amber-400/90">
                 <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-                Scoring under review — figures not yet confirmed
+                {t("sas.selector.underReview")}
               </div>
             )}
             {specialty.msraRequired && (
               <div className="mt-2 flex items-center gap-1 text-xs text-gray-500">
                 <AlertCircle className="w-3 h-3" />
-                MSRA required
+                {t("sas.selector.msraRequired")}
               </div>
             )}
           </button>
@@ -215,7 +248,7 @@ function SpecialtySelector({ onSelect }: { onSelect: (s: SASSpecialty) => void }
       {filtered.length === 0 && (
         <div className="text-center py-16 text-gray-500">
           <Stethoscope className="w-12 h-12 mx-auto mb-3 opacity-30" />
-          <p>No specialties found matching "{search}"</p>
+          <p>{t("sas.selector.noResults", { search })}</p>
         </div>
       )}
     </div>
@@ -232,6 +265,8 @@ function DomainCard({
   answers: AnswerMap;
   onAnswer: (criterionId: string, score: number) => void;
 }) {
+  const { t } = useLanguage();
+  const arDomain = sasAr(domain.id);
   const domainScore = domain.criteria.reduce(
     (sum, c) => sum + (answers[c.id] ?? 0),
     0
@@ -243,7 +278,7 @@ function DomainCard({
     <Card className="bg-white/3 border-white/8 mb-4">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-base text-white font-semibold">{domain.name}</CardTitle>
+          <CardTitle className="text-base text-white font-semibold"><BiText ar={arDomain?.name} en={domain.name} /></CardTitle>
           <div className="flex items-center gap-2">
             <span className="text-sm text-gray-400">
               <span className="text-white font-semibold">{domainScore}</span>/{domainMax}
@@ -255,7 +290,9 @@ function DomainCard({
         </div>
       </CardHeader>
       <CardContent className="space-y-5">
-        {domain.criteria.map((criterion) => (
+        {domain.criteria.map((criterion) => {
+          const arCrit = sasAr(criterion.id);
+          return (
           <div key={criterion.id} className="space-y-2">
             <div className="flex items-start gap-2">
               <div className="mt-0.5">
@@ -266,9 +303,10 @@ function DomainCard({
                 )}
               </div>
               <div className="flex-1">
-                <p className="text-sm text-gray-200 font-medium mb-1">{criterion.criterion}</p>
+                <p className="text-sm text-gray-200 font-medium mb-1"><BiText ar={arCrit?.criterion} en={criterion.criterion} /></p>
                 <p className="text-xs text-gray-500 mb-3">
-                  <span className="text-purple-400">Evidence required:</span> {criterion.evidence}
+                  <span className="text-purple-400">{t("sas.domain.evidenceRequired")}</span>{" "}
+                  <BiText ar={arCrit?.evidence} en={criterion.evidence} enClassName="block text-gray-600 mt-0.5" />
                 </p>
                 {criterion.options ? (
                   <RadioGroup
@@ -288,10 +326,10 @@ function DomainCard({
                       >
                         <RadioGroupItem value={opt.score.toString()} id={`${criterion.id}_${idx}`} className="shrink-0" />
                         <Label htmlFor={`${criterion.id}_${idx}`} className="flex-1 cursor-pointer text-sm text-gray-300">
-                          {opt.label}
+                          <BiText ar={arCrit?.options?.[idx]} en={opt.label} />
                         </Label>
                         <span className={`text-xs font-bold shrink-0 ${opt.score > 0 ? "text-purple-400" : "text-gray-600"}`}>
-                          {opt.score} pts
+                          {t("sas.domain.points", { score: opt.score })}
                         </span>
                       </div>
                     ))}
@@ -313,7 +351,7 @@ function DomainCard({
                     >
                       <RadioGroupItem value={criterion.score.toString()} id={`${criterion.id}_yes`} />
                       <Label htmlFor={`${criterion.id}_yes`} className="cursor-pointer text-sm text-gray-300">
-                        Yes — {criterion.score} pts
+                        {t("sas.domain.yes", { score: criterion.score })}
                       </Label>
                     </div>
                     <div
@@ -326,7 +364,7 @@ function DomainCard({
                     >
                       <RadioGroupItem value="0" id={`${criterion.id}_no`} />
                       <Label htmlFor={`${criterion.id}_no`} className="cursor-pointer text-sm text-gray-300">
-                        No — 0 pts
+                        {t("sas.domain.no")}
                       </Label>
                     </div>
                   </RadioGroup>
@@ -334,7 +372,8 @@ function DomainCard({
               </div>
             </div>
           </div>
-        ))}
+          );
+        })}
       </CardContent>
     </Card>
   );
@@ -353,7 +392,7 @@ function ResultsView({
   onRetake: () => void;
 }) {
   const { isAuthenticated } = useAuth();
-  const { language } = useLanguage();
+  const { t, language } = useLanguage();
   const saveResult = trpc.sas.saveResult.useMutation();
   const generateSuggestions = trpc.sas.generateRoadmapSuggestions.useMutation();
   const saveMilestonesToRoadmap = trpc.sas.saveMilestonesToRoadmap.useMutation();
@@ -393,7 +432,7 @@ function ResultsView({
 
   const handleSave = async () => {
     if (!isAuthenticated) {
-      toast.error("Please sign in to save your results");
+      toast.error(t("sas.toast.signInToSave"));
       return;
     }
     try {
@@ -407,15 +446,15 @@ function ResultsView({
         sectionScores: JSON.stringify(sectionScores),
         competitiveLevel: level,
       });
-      toast.success("Results saved to your profile!");
+      toast.success(t("sas.toast.saved"));
     } catch {
-      toast.error("Failed to save results");
+      toast.error(t("sas.toast.saveFailed"));
     }
   };
 
   const handleGenerateSuggestions = async () => {
     if (!isAuthenticated) {
-      toast.error("Please sign in to generate your personalised roadmap");
+      toast.error(t("sas.toast.signInToGenerate"));
       return;
     }
     setSuggestionsRequested(true);
@@ -431,7 +470,7 @@ function ResultsView({
       });
       setSuggestions(result);
     } catch {
-      toast.error("Failed to generate suggestions. Please try again.");
+      toast.error(t("sas.toast.generateFailed"));
       setSuggestionsRequested(false);
     }
   };
@@ -452,28 +491,31 @@ function ResultsView({
         })),
       });
       setSavedToRoadmap(true);
-      toast.success(`${result.count} milestones saved to your Roadmap!`);
+      toast.success(t("sas.toast.milestonesSaved", { count: result.count }));
     } catch {
-      toast.error("Failed to save milestones to Roadmap. Please try again.");
+      toast.error(t("sas.toast.milestonesFailed"));
     }
   };
 
   const priorityConfig = {
-    high: { color: "text-red-400", bg: "bg-red-500/10 border-red-500/30", label: "High Priority" },
-    medium: { color: "text-amber-400", bg: "bg-amber-500/10 border-amber-500/30", label: "Medium Priority" },
-    low: { color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/30", label: "Low Priority" },
+    high: { color: "text-red-400", bg: "bg-red-500/10 border-red-500/30", labelKey: "sas.results.priority.high" },
+    medium: { color: "text-amber-400", bg: "bg-amber-500/10 border-amber-500/30", labelKey: "sas.results.priority.medium" },
+    low: { color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/30", labelKey: "sas.results.priority.low" },
   };
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10">
+      <div className="flex justify-end mb-4">
+        <LanguageToggle />
+      </div>
       {/* Score Card */}
       <div className="text-center mb-8">
         <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 rounded-full px-4 py-2 mb-4">
           <Award className="w-4 h-4 text-purple-400" />
-          <span className="text-sm text-purple-300 font-medium">Assessment Complete</span>
+          <span className="text-sm text-purple-300 font-medium">{t("sas.results.badge")}</span>
         </div>
-        <h2 className="text-2xl font-bold text-white mb-1">{specialty.name}</h2>
-        <p className="text-gray-400 text-sm">Self Assessment Score Results</p>
+        <h2 className="text-2xl font-bold text-white mb-1"><BiText ar={sasAr(specialty.id)?.name} en={specialty.name} /></h2>
+        <p className="text-gray-400 text-sm">{t("sas.results.subtitle")}</p>
       </div>
 
       {/* Main Score */}
@@ -485,7 +527,7 @@ function ResultsView({
         <div className="text-2xl font-bold text-purple-400 mb-4">{percentage}%</div>
         <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-semibold ${levelInfo.bg} ${levelInfo.color}`}>
           <TrendingUp className="w-4 h-4" />
-          {levelInfo.label}
+          {t(levelInfo.labelKey)}
         </div>
         {/* Three cases. A threshold comparison is only shown when the matrix is
             verified AND the specialty publishes a threshold — several rank
@@ -493,30 +535,23 @@ function ResultsView({
             clear and claiming one would be inventing a number. */}
         {isVerified(specialty.id) && specialty.competitiveThreshold ? (
           <p className="text-sm text-gray-400 mt-4">
-            Competitive threshold for {specialty.shortName}:{" "}
+            {t("sas.results.thresholdLine", { specialty: specialty.shortName })}{" "}
             <span className="text-orange-400 font-semibold">{specialty.competitiveThreshold}/{maxScore}</span>
             {totalScore >= specialty.competitiveThreshold ? (
-              <span className="text-emerald-400 ms-2">✓ You meet this threshold</span>
+              <span className="text-emerald-400 ms-2">{t("sas.results.meetThreshold")}</span>
             ) : (
               <span className="text-red-400 ms-2">
-                You need {specialty.competitiveThreshold - totalScore} more points
+                {t("sas.results.needMore", { points: specialty.competitiveThreshold - totalScore })}
               </span>
             )}
           </p>
         ) : isVerified(specialty.id) ? (
           <p className="text-sm text-gray-400 mt-4 max-w-lg mx-auto">
-            {specialty.shortName} does not publish a pass mark. Applicants are
-            invited to interview in order of score until capacity is filled, so
-            the score needed changes each year. Use this to see where your
-            evidence is thin, not as a cut-off.
+            {t("sas.results.noThreshold", { specialty: specialty.shortName })}
           </p>
         ) : (
           <p className="text-sm text-amber-300/90 mt-4 max-w-lg mx-auto">
-            This score is a self-reflection exercise only. The scoring criteria
-            for {specialty.shortName} have not yet been confirmed against the
-            official recruitment source, so it does not tell you whether you
-            would be competitive. Check the official criteria before you plan
-            around it.
+            {t("sas.results.unverified", { specialty: specialty.shortName })}
           </p>
         )}
       </div>
@@ -529,7 +564,7 @@ function ResultsView({
           <CardHeader>
             <CardTitle className="text-base text-white flex items-center gap-2">
               <ClipboardList className="w-4 h-4 text-blue-400" />
-              After shortlisting: the interview
+              {t("sas.results.interviewHeading")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -541,24 +576,17 @@ function ResultsView({
               <div className="mb-4 rounded-lg border border-amber-500/25 bg-amber-500/8 px-3 py-2.5">
                 <p className="text-sm text-amber-200 leading-relaxed">
                   <span className="font-semibold">
-                    Your score above does not carry into your final ranking.
+                    {t("sas.results.scoreDoesNotCarry")}
                   </span>{" "}
-                  It is used at shortlisting only — to win you an interview.
+                  {t("sas.results.usedAtShortlisting")}
                   {specialty.interviewScoring.weightedMaxScore && (
                     <>
-                      {" "}Offers are ranked on the weighted interview score out
-                      of {specialty.interviewScoring.weightedMaxScore}, awarded
-                      on the day.
+                      {" "}{t("sas.results.offersRankedOn", { max: specialty.interviewScoring.weightedMaxScore })}
                     </>
                   )}
                 </p>
                 <p className="text-sm text-amber-200/85 leading-relaxed mt-2">
-                  Your achievements still matter after shortlisting, but as
-                  something you discuss rather than a score you carry: they are
-                  assessed at interview under "Application and achievements".
-                  So once you are comfortably shortlisted, being able to talk
-                  about the evidence you already have beats gathering more of
-                  it.
+                  {t("sas.results.achievementsStillMatter")}
                 </p>
               </div>
             )}
@@ -570,7 +598,7 @@ function ResultsView({
             {specialty.interviewScoring.appointabilityCriteria && (
               <div className="mt-4">
                 <p className="text-sm font-medium text-white mb-2">
-                  To be appointable you must meet all of these
+                  {t("sas.results.appointableHeading")}
                 </p>
                 <ul className="space-y-1">
                   {specialty.interviewScoring.appointabilityCriteria.map((c) => (
@@ -581,8 +609,7 @@ function ResultsView({
                   ))}
                 </ul>
                 <p className="text-xs text-gray-500 mt-2">
-                  Failing any one of these makes an application not appointable,
-                  however strong the rest of it is.
+                  {t("sas.results.appointableNote")}
                 </p>
               </div>
             )}
@@ -590,7 +617,7 @@ function ResultsView({
             {specialty.interviewScoring.weightedAreas && (
               <div className="mt-4">
                 <p className="text-sm font-medium text-white mb-2">
-                  How the interview is weighted
+                  {t("sas.results.interviewWeightedHeading")}
                 </p>
                 <div className="overflow-x-auto">
                   <table className="w-full text-xs">
@@ -609,9 +636,7 @@ function ResultsView({
             )}
 
             <p className="text-xs text-gray-500 mt-4">
-              None of this is included in the score above — interviewers award
-              these marks on the day, so it is not something you can score
-              yourself in advance.
+              {t("sas.results.interviewFooter")}
             </p>
           </CardContent>
         </Card>
@@ -622,16 +647,16 @@ function ResultsView({
         <CardHeader>
           <CardTitle className="text-base text-white flex items-center gap-2">
             <BarChart3 className="w-4 h-4 text-purple-400" />
-            Score Breakdown by Domain
+            {t("sas.results.breakdownHeading")}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          {Object.values(sectionScores).map((section) => {
+          {Object.entries(sectionScores).map(([domainId, section]) => {
             const pct = Math.round((section.score / section.maxScore) * 100);
             return (
-              <div key={section.name}>
+              <div key={domainId}>
                 <div className="flex justify-between text-sm mb-1">
-                  <span className="text-gray-300">{section.name}</span>
+                  <span className="text-gray-300"><BiText ar={sasAr(domainId)?.name} en={section.name} /></span>
                   <span className="text-gray-400">
                     <span className="text-white font-semibold">{section.score}</span>/{section.maxScore}
                   </span>
@@ -651,7 +676,7 @@ function ResultsView({
           <CardHeader>
             <CardTitle className="text-base text-white flex items-center gap-2">
               <Award className="w-4 h-4 text-emerald-400" />
-              After the interview: how offers are made
+              {t("sas.results.offersHeading")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -666,8 +691,7 @@ function ResultsView({
               ))}
             </ul>
             <p className="text-xs text-gray-500 mt-4">
-              Programme details and regional information change every cycle —
-              check the official source for the round you are applying to.
+              {t("sas.results.offersFooter")}
             </p>
           </CardContent>
         </Card>
@@ -682,7 +706,7 @@ function ResultsView({
           <CardHeader>
             <CardTitle className="text-base text-white flex items-center gap-2">
               <FileText className="w-4 h-4 text-purple-400" />
-              Can you prove what you claimed?
+              {t("sas.results.evidenceHeading")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -714,7 +738,7 @@ function ResultsView({
         <CardHeader>
           <CardTitle className="text-base text-white flex items-center gap-2">
             <BookOpen className="w-4 h-4 text-purple-400" />
-            What to Focus On Next
+            {t("sas.results.focusHeading")}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -736,9 +760,9 @@ function ResultsView({
                   <span className="text-xs font-bold text-orange-400">+{gap}</span>
                 </div>
                 <div className="min-w-0">
-                  <p className="text-sm text-gray-200 font-medium">{domain.name}</p>
+                  <p className="text-sm text-gray-200 font-medium"><BiText ar={sasAr(domain.id)?.name} en={domain.name} /></p>
                   <p className="text-xs text-gray-500">
-                    You scored {domainScore}/{domain.maxScore} — {gap} point{gap !== 1 ? "s" : ""} available
+                    {t("sas.results.focusMeta", { score: domainScore, max: domain.maxScore, gap, plural: gap !== 1 ? "s" : "" })}
                   </p>
                   {course && (
                     <a
@@ -754,7 +778,7 @@ function ResultsView({
                             {course.title}
                           </span>
                           <Badge variant="secondary" className="text-[10px] px-1.5 py-0 font-normal">
-                            Our course
+                            {t("sas.results.ourCourse")}
                           </Badge>
                         </span>
                         <span className="block text-[11px] text-gray-400 mt-0.5 leading-relaxed">
@@ -773,7 +797,7 @@ function ResultsView({
           }) && (
             <div className="text-center py-4 text-emerald-400">
               <CheckCircle2 className="w-8 h-8 mx-auto mb-2" />
-              <p className="font-semibold">Maximum score achieved!</p>
+              <p className="font-semibold">{t("sas.results.maxAchieved")}</p>
             </div>
           )}
         </CardContent>
@@ -785,9 +809,9 @@ function ResultsView({
           <div className="w-12 h-12 rounded-2xl bg-orange-500/15 flex items-center justify-center mx-auto mb-3">
             <Sparkles className="w-6 h-6 text-orange-400" />
           </div>
-          <h3 className="text-lg font-bold text-white mb-2">Get Your Personalised Improvement Roadmap</h3>
+          <h3 className="text-lg font-bold text-white mb-2">{t("sas.results.roadmapHeading")}</h3>
           <p className="text-sm text-gray-400 mb-4">
-            Our AI will analyse your weakest scoring domains and generate specific, actionable steps to strengthen your {specialty.shortName} portfolio.
+            {t("sas.results.roadmapBody", { specialty: specialty.shortName })}
           </p>
           <Button
             onClick={handleGenerateSuggestions}
@@ -795,14 +819,14 @@ function ResultsView({
             className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold px-6"
           >
             <Sparkles className="w-4 h-4 me-2" />
-            {isAuthenticated ? "Generate My Roadmap" : "Sign In to Generate Roadmap"}
+            {isAuthenticated ? t("sas.results.generateRoadmap") : t("sas.results.signInToGenerate")}
           </Button>
         </div>
       ) : generateSuggestions.isPending ? (
         <div className="mb-6 bg-white/3 border border-white/8 rounded-2xl p-8 text-center">
           <div className="w-12 h-12 rounded-full border-2 border-purple-500/30 border-t-purple-500 animate-spin mx-auto mb-4" />
-          <p className="text-gray-300 font-medium">Analysing your portfolio and generating personalised milestones...</p>
-          <p className="text-sm text-gray-500 mt-1">This may take a few seconds</p>
+          <p className="text-gray-300 font-medium">{t("sas.results.analysing")}</p>
+          <p className="text-sm text-gray-500 mt-1">{t("sas.results.analysingHint")}</p>
         </div>
       ) : suggestions ? (
         <div className="mb-6 space-y-4">
@@ -813,7 +837,7 @@ function ResultsView({
                 <Sparkles className="w-4 h-4 text-purple-400" />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-purple-300 mb-1">AI Assessment Summary</h3>
+                <h3 className="text-sm font-semibold text-purple-300 mb-1">{t("sas.results.aiSummaryHeading")}</h3>
                 <p className="text-sm text-gray-300 leading-relaxed">{suggestions.summary}</p>
                 {suggestions.overallAdvice && (
                   <p className="text-sm text-gray-400 mt-2 italic">{suggestions.overallAdvice}</p>
@@ -827,12 +851,12 @@ function ResultsView({
             <div className="flex items-center gap-2">
               <Zap className="w-4 h-4 text-emerald-400 shrink-0" />
               <p className="text-sm text-gray-300">
-                {savedToRoadmap ? "Milestones added to your Roadmap!" : "Add these milestones directly to your personal Roadmap for ongoing tracking."}
+                {savedToRoadmap ? t("sas.results.milestonesAdded") : t("sas.results.addMilestones")}
               </p>
             </div>
             {savedToRoadmap ? (
               <a href="/roadmap" className="text-xs font-semibold text-emerald-400 hover:text-emerald-300 whitespace-nowrap underline">
-                View Roadmap →
+                {t("sas.results.viewRoadmap")}
               </a>
             ) : (
               <Button
@@ -841,7 +865,7 @@ function ResultsView({
                 disabled={saveMilestonesToRoadmap.isPending}
                 className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold whitespace-nowrap shrink-0"
               >
-                {saveMilestonesToRoadmap.isPending ? "Saving..." : "Save to Roadmap"}
+                {saveMilestonesToRoadmap.isPending ? t("sas.results.saving") : t("sas.results.saveToRoadmap")}
               </Button>
             )}
           </div>
@@ -850,7 +874,7 @@ function ResultsView({
           <div>
             <h3 className="text-base font-bold text-white mb-3 flex items-center gap-2">
               <Target className="w-4 h-4 text-orange-400" />
-              Personalised Improvement Milestones
+              {t("sas.results.milestonesHeading")}
             </h3>
             <div className="space-y-4">
               {suggestions.milestones.map((milestone, idx) => {
@@ -862,7 +886,7 @@ function ResultsView({
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${pc.bg} ${pc.color}`}>
-                            {pc.label}
+                            {t(pc.labelKey)}
                           </span>
                           <span className="text-xs text-gray-500">{milestone.timeframe}</span>
                         </div>
@@ -870,7 +894,7 @@ function ResultsView({
                         <p className="text-xs text-gray-500 mt-0.5">{milestone.domain}</p>
                       </div>
                       <div className="text-end shrink-0">
-                        <div className="text-xs text-gray-500">Current</div>
+                        <div className="text-xs text-gray-500">{t("sas.results.current")}</div>
                         <div className="text-sm font-bold text-orange-400">{milestone.currentScore}/{milestone.maxScore}</div>
                       </div>
                     </div>
@@ -894,7 +918,7 @@ function ResultsView({
                     {milestone.resources.length > 0 && (
                       <div className="border-t border-white/5 pt-3">
                         <p className="text-xs text-gray-500 mb-2 flex items-center gap-1">
-                          <ExternalLink className="w-3 h-3" /> Useful Resources
+                          <ExternalLink className="w-3 h-3" /> {t("sas.results.usefulResources")}
                         </p>
                         <div className="flex flex-wrap gap-2">
                           {milestone.resources.map((res, rIdx) => (
@@ -926,8 +950,8 @@ function ResultsView({
         <ExternalLink className="w-4 h-4 shrink-0" />
         <span>
           {isVerified(specialty.id)
-            ? "Scoring based on official criteria from"
-            : "Confirm the current criteria at"}
+            ? t("sas.results.sourceVerified")
+            : t("sas.results.sourceUnverified")}
         </span>
         <a
           href={specialty.sourceUrl}
@@ -935,7 +959,7 @@ function ResultsView({
           rel="noopener noreferrer"
           className="text-purple-400 hover:text-purple-300 underline"
         >
-          {specialty.shortName} Recruitment
+          {t("sas.results.sourceLink", { specialty: specialty.shortName })}
         </a>
       </div>
 
@@ -946,15 +970,15 @@ function ResultsView({
           disabled={saveResult.isPending || !isAuthenticated}
           className="flex-1 bg-purple-600 hover:bg-purple-700 text-white"
         >
-          {saveResult.isPending ? "Saving..." : isAuthenticated ? "Save Results to Profile" : "Sign In to Save"}
+          {saveResult.isPending ? t("sas.results.saving") : isAuthenticated ? t("sas.results.saveResults") : t("sas.results.signInToSave")}
         </Button>
         <Button variant="outline" onClick={onRetake} className="flex-1 border-white/15 text-gray-300 hover:bg-white/5">
           <RotateCcw className="w-4 h-4 me-2" />
-          Retake Assessment
+          {t("sas.results.retake")}
         </Button>
         <Button variant="outline" onClick={onReset} className="flex-1 border-white/15 text-gray-300 hover:bg-white/5">
           <Stethoscope className="w-4 h-4 me-2" />
-          Try Another Specialty
+          {t("sas.results.tryAnother")}
         </Button>
       </div>
     </div>
@@ -971,36 +995,27 @@ function NotPortfolioScored({
   specialty: SASSpecialty;
   onBack: () => void;
 }) {
+  const { t } = useLanguage();
   const { note, scoringModel } = getVerification(specialty.id);
 
   // Several distinct situations reach this screen and conflating them would
   // mislead badly. Only under "msra-only" does the portfolio earn nothing;
   // elsewhere it carries real marks and simply is not self-scored. Telling an
   // O&G applicant their portfolio is not scored would send them away from 40 of
-  // the 150 marks available to them.
-  const COPY: Record<string, { heading: string; body: string; areasLabel: string }> = {
-    "interview-portfolio": {
-      heading: `${specialty.name} is scored at interview, not on the form`,
-      body: "Your portfolio still carries real marks here — a panel assesses it on the day rather than you declaring a score on your application, so no self-assessment can predict the result. What this can do is show you which areas are marked, so you arrive with evidence for each.",
-      areasLabel: "What the panel marks you on",
-    },
-    "application-assessed": {
-      heading: `${specialty.name} is scored from your application, not self-assessed`,
-      body: "Your portfolio carries real marks here, but assessors award them by reading your written answers rather than you selecting a category. There is no score to calculate in advance — what matters is having evidence in each scored area and describing it well in the words you are given.",
-      areasLabel: "What your application is scored on",
-    },
-    "msra-only": {
-      heading: `${specialty.name} is not scored by portfolio`,
-      body: "Because no portfolio is scored at any stage, a self-assessment cannot tell you anything useful here. Preparing for what is actually assessed is what moves your application.",
-      areasLabel: "What you are assessed on instead",
-    },
-    unknown: {
-      heading: `${specialty.name} — scoring still being checked`,
-      body: "There is no self-assessment to complete for this specialty, so no score is offered. Exactly how the rest of the process is scored has not been established against an official source, and is set out below only as far as it has been confirmed. Check the current guidance for the round you are applying to.",
-      areasLabel: "What has been confirmed so far",
-    },
+  // the 150 marks available to them. The wording for each case lives in the sas
+  // dictionary; here we pick the right variant key.
+  const VARIANT_KEY: Record<string, string> = {
+    "interview-portfolio": "interviewPortfolio",
+    "application-assessed": "applicationAssessed",
+    "msra-only": "msraOnly",
+    unknown: "unknown",
   };
-  const copy = COPY[scoringModel] ?? COPY.unknown;
+  const variant = VARIANT_KEY[scoringModel] ?? "unknown";
+  const copy = {
+    heading: t(`sas.notPortfolioScored.${variant}.heading`, { specialty: specialty.name }),
+    body: t(`sas.notPortfolioScored.${variant}.body`),
+    areasLabel: t(`sas.notPortfolioScored.${variant}.areasLabel`),
+  };
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-16">
@@ -1046,14 +1061,14 @@ function NotPortfolioScored({
             className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white px-4 py-2.5 text-sm font-medium transition-colors"
           >
             <ExternalLink className="w-4 h-4" />
-            Official {specialty.shortName} guidance
+            {t("sas.notPortfolioScored.officialGuidance", { specialty: specialty.shortName })}
           </a>
           <Button
             variant="outline"
             onClick={onBack}
             className="flex-1 border-white/15 text-gray-300 hover:bg-white/5"
           >
-            Choose another specialty
+            {t("sas.notPortfolioScored.chooseAnother")}
           </Button>
         </div>
       </div>
@@ -1064,6 +1079,7 @@ function NotPortfolioScored({
 // ─── Main Assessment Flow ─────────────────────────────────────────────────────
 export default function SASAssessment() {
   const { isAuthenticated } = useAuth();
+  const { t } = useLanguage();
   const [selectedSpecialty, setSelectedSpecialty] = useState<SASSpecialty | null>(null);
   const [currentDomainIdx, setCurrentDomainIdx] = useState(0);
   const [answers, setAnswers] = useState<AnswerMap>({});
@@ -1152,23 +1168,24 @@ export default function SASAssessment() {
               className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-white transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
-              Change Specialty
+              {t("sas.progress.changeSpecialty")}
             </button>
-            <div className="text-center">
+            <div className="text-center flex items-center gap-2">
               <span className="text-sm font-semibold text-white">{selectedSpecialty.shortName}</span>
-              <span className="text-xs text-gray-500 ms-2">
-                Domain {currentDomainIdx + 1} of {domains.length}
+              <span className="text-xs text-gray-500">
+                {t("sas.progress.domainOf", { current: currentDomainIdx + 1, total: domains.length })}
               </span>
+              <LanguageToggle />
             </div>
             <div className="text-end">
               <span className="text-sm font-bold text-purple-400">{currentScore}</span>
-              <span className="text-xs text-gray-500">/{currentMax} pts</span>
+              <span className="text-xs text-gray-500">{t("sas.progress.pts", { max: currentMax })}</span>
             </div>
           </div>
           <Progress value={overallProgress} className="h-1.5" />
           <div className="flex justify-between text-xs text-gray-600 mt-1">
-            <span>{answeredCriteria}/{totalCriteria} questions answered</span>
-            <span>{overallProgress}% complete</span>
+            <span>{t("sas.progress.questionsAnswered", { answered: answeredCriteria, total: totalCriteria })}</span>
+            <span>{t("sas.progress.percentComplete", { percent: overallProgress })}</span>
           </div>
         </div>
       </div>
@@ -1181,11 +1198,7 @@ export default function SASAssessment() {
           <div className="mb-6 flex gap-3 rounded-xl border border-amber-500/25 bg-amber-500/8 px-4 py-3">
             <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
             <p className="text-xs text-amber-200/90 leading-relaxed">
-              These criteria are under review and have not been confirmed
-              against {selectedSpecialty.shortName} recruitment for the current
-              cycle. Use this to reflect on your portfolio, not to judge whether
-              you are competitive — and check the official criteria before
-              planning around it.
+              {t("sas.progress.unverifiedNotice", { specialty: selectedSpecialty.shortName })}
             </p>
           </div>
         )}
@@ -1198,13 +1211,11 @@ export default function SASAssessment() {
           <details className="mb-6 rounded-xl border border-blue-500/25 bg-blue-500/8 px-4 py-3 group">
             <summary className="flex cursor-pointer items-center gap-2 text-sm font-medium text-blue-200 marker:content-none">
               <ClipboardList className="w-4 h-4 shrink-0" />
-              Before you apply: {selectedSpecialty.shortName} eligibility
-              requirements
+              {t("sas.progress.eligibilitySummary", { specialty: selectedSpecialty.shortName })}
               <ChevronRight className="w-4 h-4 ms-auto shrink-0 transition-transform group-open:rotate-90" />
             </summary>
             <p className="mt-2 text-xs text-blue-200/70">
-              A strong portfolio counts for nothing if you cannot apply. These
-              are the {selectedSpecialty.eligibility.cycle} entry requirements.
+              {t("sas.progress.eligibilityIntro", { cycle: selectedSpecialty.eligibility.cycle })}
             </p>
             <ul className="mt-3 space-y-3">
               {selectedSpecialty.eligibility.requirements.map((req) => (
@@ -1223,17 +1234,19 @@ export default function SASAssessment() {
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xs text-purple-400 font-medium uppercase tracking-wider">
-              Domain {currentDomainIdx + 1}
+              {t("sas.progress.domainLabel", { current: currentDomainIdx + 1 })}
             </span>
             {domainComplete && (
               <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 text-xs">
-                Complete
+                {t("sas.progress.complete")}
               </Badge>
             )}
           </div>
-          <h2 className="text-xl font-bold text-white">{currentDomain?.name}</h2>
+          <h2 className="text-xl font-bold text-white">
+            {currentDomain && <BiText ar={sasAr(currentDomain.id)?.name} en={currentDomain.name} />}
+          </h2>
           <p className="text-sm text-gray-500 mt-1">
-            Max {currentDomain?.maxScore} points · {domainAnswered}/{domainTotal} answered
+            {t("sas.progress.domainMeta", { max: currentDomain?.maxScore ?? 0, answered: domainAnswered, total: domainTotal })}
           </p>
         </div>
 
@@ -1255,7 +1268,7 @@ export default function SASAssessment() {
             className="border-white/15 text-gray-300 hover:bg-white/5"
           >
             <ChevronLeft className="w-4 h-4 me-1" />
-            Previous
+            {t("sas.progress.previous")}
           </Button>
 
           <div className="flex gap-1.5">
@@ -1282,7 +1295,7 @@ export default function SASAssessment() {
               onClick={() => setCurrentDomainIdx((i) => i + 1)}
               className="bg-purple-600 hover:bg-purple-700 text-white"
             >
-              Next Domain
+              {t("sas.progress.nextDomain")}
               <ChevronRight className="w-4 h-4 ms-1" />
             </Button>
           ) : (
@@ -1291,7 +1304,7 @@ export default function SASAssessment() {
               className="bg-gradient-to-r from-purple-600 to-orange-500 hover:from-purple-700 hover:to-orange-600 text-white font-semibold"
             >
               <Award className="w-4 h-4 me-2" />
-              View My Score
+              {t("sas.progress.viewMyScore")}
             </Button>
           )}
         </div>
@@ -1301,7 +1314,7 @@ export default function SASAssessment() {
           <div className="mt-4 flex items-center gap-3 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
             <Lock className="w-4 h-4 text-amber-400 shrink-0" />
             <p className="text-xs text-amber-300">
-              <a href="/login" className="underline font-semibold">Sign in</a> to save your assessment results to your profile
+              <a href="/login" className="underline font-semibold">{t("sas.progress.signInPrefix")}</a> {t("sas.progress.signInSuffix")}
             </p>
           </div>
         )}
