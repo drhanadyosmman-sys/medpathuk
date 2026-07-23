@@ -6,8 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Stethoscope, Lock, Eye, EyeOff, CheckCircle2, AlertCircle } from "lucide-react";
+import { useT } from "@/contexts/LanguageContext";
+import LanguageToggle from "@/components/LanguageToggle";
 
 export default function ResetPassword() {
+  const tr = useT();
   const [, navigate] = useLocation();
   const [token, setToken] = useState("");
   const [password, setPassword] = useState("");
@@ -20,7 +23,8 @@ export default function ResetPassword() {
     const params = new URLSearchParams(window.location.search);
     const t = params.get("token");
     if (t) setToken(t);
-    else setError("Invalid reset link. Please request a new one.");
+    else setError(tr("auth.reset.invalidLink"));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const resetMutation = trpc.auth.resetPassword.useMutation({
@@ -29,7 +33,7 @@ export default function ResetPassword() {
       setTimeout(() => navigate("/login"), 3000);
     },
     onError: (err) => {
-      setError(err.message || "Failed to reset password. Please try again.");
+      setError(err.message || tr("auth.reset.failed"));
     },
   });
 
@@ -37,11 +41,11 @@ export default function ResetPassword() {
     e.preventDefault();
     setError("");
     if (password.length < 8) {
-      setError("Password must be at least 8 characters.");
+      setError(tr("auth.reset.tooShort"));
       return;
     }
     if (password !== confirmPassword) {
-      setError("Passwords do not match.");
+      setError(tr("auth.reset.mismatch"));
       return;
     }
     resetMutation.mutate({ token, password });
@@ -58,19 +62,23 @@ export default function ResetPassword() {
           <span className="text-xl font-bold text-foreground">MedPath UK</span>
         </div>
 
+        <div className="flex justify-center">
+          <LanguageToggle />
+        </div>
+
         {done ? (
           <div className="text-center space-y-4">
             <div className="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center mx-auto">
               <CheckCircle2 className="w-8 h-8 text-green-500" />
             </div>
-            <h2 className="text-2xl font-bold text-foreground">Password reset!</h2>
-            <p className="text-muted-foreground">Your password has been updated. Redirecting to sign in...</p>
+            <h2 className="text-2xl font-bold text-foreground">{tr("auth.reset.successTitle")}</h2>
+            <p className="text-muted-foreground">{tr("auth.reset.successBody")}</p>
           </div>
         ) : (
           <>
             <div>
-              <h2 className="text-3xl font-bold text-foreground">Set new password</h2>
-              <p className="mt-2 text-muted-foreground">Choose a strong password for your account.</p>
+              <h2 className="text-3xl font-bold text-foreground">{tr("auth.reset.title")}</h2>
+              <p className="mt-2 text-muted-foreground">{tr("auth.reset.body")}</p>
             </div>
 
             {error && (
@@ -82,22 +90,22 @@ export default function ResetPassword() {
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-1.5">
-                <Label htmlFor="password" className="text-foreground font-medium">New Password</Label>
+                <Label htmlFor="password" className="text-foreground font-medium">{tr("auth.reset.password")}</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Lock className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Minimum 8 characters"
+                    placeholder={tr("auth.reset.passwordPlaceholder")}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 pr-10 bg-card border-border text-foreground placeholder:text-muted-foreground"
+                    className="ps-10 pe-10 bg-card border-border text-foreground placeholder:text-muted-foreground"
                     autoFocus
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(p => !p)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    className="absolute end-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -105,16 +113,16 @@ export default function ResetPassword() {
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="confirmPassword" className="text-foreground font-medium">Confirm New Password</Label>
+                <Label htmlFor="confirmPassword" className="text-foreground font-medium">{tr("auth.reset.confirm")}</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Lock className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
                     id="confirmPassword"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Repeat your password"
+                    placeholder={tr("auth.reset.confirmPlaceholder")}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="pl-10 bg-card border-border text-foreground placeholder:text-muted-foreground"
+                    className="ps-10 bg-card border-border text-foreground placeholder:text-muted-foreground"
                   />
                 </div>
               </div>
@@ -127,9 +135,9 @@ export default function ResetPassword() {
                 {resetMutation.isPending ? (
                   <span className="flex items-center gap-2">
                     <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
-                    Resetting...
+                    {tr("auth.reset.updating")}
                   </span>
-                ) : "Reset Password"}
+                ) : tr("auth.reset.submit")}
               </Button>
             </form>
           </>

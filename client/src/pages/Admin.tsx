@@ -109,7 +109,7 @@ export default function Admin() {
               <Stethoscope className="w-4 h-4 text-white" />
             </div>
             <span className="font-bold text-foreground">MedPath UK</span>
-            <Badge className="bg-red-100 text-red-700 ml-2">Admin</Badge>
+            <Badge className="bg-red-100 text-red-700 ms-2">Admin</Badge>
           </div>
           <nav className="hidden md:flex items-center gap-1">
             {[
@@ -216,9 +216,9 @@ export default function Admin() {
                 className="w-full gradient-purple text-white border-0"
               >
                 {generating ? (
-                  <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Generating...</>
+                  <><Loader2 className="w-4 h-4 me-2 animate-spin" />Generating...</>
                 ) : (
-                  <><Plus className="w-4 h-4 mr-2" />Generate & Copy Code</>
+                  <><Plus className="w-4 h-4 me-2" />Generate & Copy Code</>
                 )}
               </Button>
             </div>
@@ -255,7 +255,7 @@ export default function Admin() {
                         <div className="flex items-center gap-2">
                           <code className="text-sm font-mono font-bold text-foreground">{code.code}</code>
                           <Badge className={`text-xs ${TIER_COLORS[code.subscriptionTier]}`}>
-                            <TierIcon className="w-2.5 h-2.5 mr-1" />{code.subscriptionTier}
+                            <TierIcon className="w-2.5 h-2.5 me-1" />{code.subscriptionTier}
                           </Badge>
                           {code.usedAt && <Badge className="text-xs bg-green-100 text-green-700">Used</Badge>}
                         </div>
@@ -310,12 +310,12 @@ export default function Admin() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border">
-                    <th className="text-left py-2 px-3 text-muted-foreground font-medium">Name</th>
-                    <th className="text-left py-2 px-3 text-muted-foreground font-medium">Email</th>
-                    <th className="text-left py-2 px-3 text-muted-foreground font-medium">Specialty</th>
-                    <th className="text-left py-2 px-3 text-muted-foreground font-medium">Tier</th>
-                    <th className="text-left py-2 px-3 text-muted-foreground font-medium">Role</th>
-                    <th className="text-left py-2 px-3 text-muted-foreground font-medium">Joined</th>
+                    <th className="text-start py-2 px-3 text-muted-foreground font-medium">Name</th>
+                    <th className="text-start py-2 px-3 text-muted-foreground font-medium">Email</th>
+                    <th className="text-start py-2 px-3 text-muted-foreground font-medium">Specialty</th>
+                    <th className="text-start py-2 px-3 text-muted-foreground font-medium">Tier</th>
+                    <th className="text-start py-2 px-3 text-muted-foreground font-medium">Role</th>
+                    <th className="text-start py-2 px-3 text-muted-foreground font-medium">Joined</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -328,7 +328,7 @@ export default function Admin() {
                         <td className="py-2.5 px-3 text-muted-foreground">{u.specialty || "—"}</td>
                         <td className="py-2.5 px-3">
                           <Badge className={`text-xs ${TIER_COLORS[u.subscriptionTier || "free"]}`}>
-                            <TierIcon className="w-2.5 h-2.5 mr-1" />{u.subscriptionTier || "free"}
+                            <TierIcon className="w-2.5 h-2.5 me-1" />{u.subscriptionTier || "free"}
                           </Badge>
                         </td>
                         <td className="py-2.5 px-3">

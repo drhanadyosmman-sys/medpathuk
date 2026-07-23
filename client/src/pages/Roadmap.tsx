@@ -59,7 +59,7 @@ function PageHeader({ tier }: { tier: string }) {
           ))}
         </nav>
         <div className="flex items-center gap-2">
-          <Badge className={tierConfig.color}><TierIcon className="w-3 h-3 mr-1" />{tierConfig.label}</Badge>
+          <Badge className={tierConfig.color}><TierIcon className="w-3 h-3 me-1" />{tierConfig.label}</Badge>
           <div className="w-8 h-8 rounded-full gradient-purple flex items-center justify-center">
             <User className="w-4 h-4 text-white" />
           </div>
@@ -145,7 +145,7 @@ export default function Roadmap() {
           </div>
           {!roadmapLoading && !roadmapData && user?.onboardingCompleted && (
             <Button onClick={handleGenerate} disabled={generating} className="gradient-purple text-white border-0">
-              {generating ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Generating...</> : <><Zap className="w-4 h-4 mr-2" />Generate Roadmap</>}
+              {generating ? <><Loader2 className="w-4 h-4 me-2 animate-spin" />Generating...</> : <><Zap className="w-4 h-4 me-2" />Generate Roadmap</>}
             </Button>
           )}
         </div>
@@ -168,7 +168,7 @@ export default function Roadmap() {
             {!user?.onboardingCompleted && (
               <Link href="/onboarding">
                 <Button className="gradient-purple text-white border-0">
-                  Start Assessment <ArrowRight className="w-4 h-4 ml-2" />
+                  Start Assessment <ArrowRight className="w-4 h-4 ms-2" />
                 </Button>
               </Link>
             )}
@@ -182,7 +182,7 @@ export default function Roadmap() {
                   <h2 className="text-lg font-bold">{roadmapData.title}</h2>
                   {roadmapData.summary && <p className="text-white/70 text-sm mt-1">{roadmapData.summary}</p>}
                 </div>
-                <div className="text-right">
+                <div className="text-end">
                   <div className="text-3xl font-bold">{progress}%</div>
                   <div className="text-white/70 text-sm">Complete</div>
                 </div>

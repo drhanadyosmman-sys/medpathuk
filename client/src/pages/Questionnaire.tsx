@@ -63,7 +63,7 @@ function SelectButton({ value, selected, onClick, children }: { value: string; s
     <button
       type="button"
       onClick={onClick}
-      className={`px-3 py-2 rounded-lg text-sm border transition-all text-left ${
+      className={`px-3 py-2 rounded-lg text-sm border transition-all text-start ${
         selected
           ? "bg-primary text-primary-foreground border-primary"
           : "bg-background border-border text-foreground hover:border-primary/50"
@@ -311,7 +311,7 @@ export default function Questionnaire() {
                 >
                   <Icon className="w-5 h-5" />
                   <span className="text-sm font-medium">{label}</span>
-                  {formData[key as keyof FormData] && <CheckCircle2 className="w-4 h-4 ml-auto" />}
+                  {formData[key as keyof FormData] && <CheckCircle2 className="w-4 h-4 ms-auto" />}
                 </button>
               ))}
             </div>

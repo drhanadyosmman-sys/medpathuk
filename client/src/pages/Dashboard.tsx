@@ -117,7 +117,7 @@ export default function Dashboard() {
           </nav>
           <div className="flex items-center gap-3">
             <Badge className={tierConfig.color}>
-              <TierIcon className="w-3 h-3 mr-1" />
+              <TierIcon className="w-3 h-3 me-1" />
               {tierConfig.label}
             </Badge>
             <div className="w-8 h-8 rounded-full gradient-purple flex items-center justify-center">
@@ -147,7 +147,7 @@ export default function Dashboard() {
             </div>
             <Link href="/onboarding">
               <Button className="gradient-orange text-white border-0 flex-shrink-0">
-                Start Assessment <ArrowRight className="w-4 h-4 ml-2" />
+                Start Assessment <ArrowRight className="w-4 h-4 ms-2" />
               </Button>
             </Link>
           </div>
@@ -353,7 +353,7 @@ export default function Dashboard() {
                     <div className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-secondary/50 transition-all cursor-pointer group">
                       <item.icon className="w-4 h-4 text-primary" />
                       <span className="text-sm text-foreground group-hover:text-primary transition-colors">{item.label}</span>
-                      <ChevronRight className="w-3.5 h-3.5 text-muted-foreground ml-auto" />
+                      <ChevronRight className="w-3.5 h-3.5 text-muted-foreground ms-auto" />
                     </div>
                   </Link>
                 ))}

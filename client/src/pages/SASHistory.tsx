@@ -92,7 +92,7 @@ function PageHeader() {
         </div>
         <Link href="/sas">
           <Button size="sm" className="bg-purple-600 hover:bg-purple-700 text-white text-xs">
-            <ClipboardList className="w-3.5 h-3.5 mr-1.5" />
+            <ClipboardList className="w-3.5 h-3.5 me-1.5" />
             New Assessment
           </Button>
         </Link>
@@ -218,7 +218,7 @@ function ResultCard({ result, previousResult }: { result: any; previousResult?: 
             <h3 className="text-sm font-bold text-white">{result.specialtyName || result.specialty}</h3>
             <p className="text-xs text-gray-500 mt-0.5">{formatDate(result.createdAt)}</p>
           </div>
-          <div className="text-right shrink-0">
+          <div className="text-end shrink-0">
             <div className="text-2xl font-black text-white">
               {result.totalScore}
               <span className="text-sm text-gray-400 font-normal">/{result.maxScore}</span>
@@ -294,7 +294,7 @@ function SpecialtySummary({ results }: { results: any[] }) {
                 <p className="text-xs text-gray-500">Latest</p>
                 <p className="text-xl font-black text-white">{latestPct.toFixed(0)}<span className="text-xs text-gray-400">%</span></p>
               </div>
-              <div className="text-right">
+              <div className="text-end">
                 <p className="text-xs text-gray-500">Best</p>
                 <p className="text-sm font-bold text-purple-400">{bestPct.toFixed(0)}%</p>
               </div>
@@ -369,7 +369,7 @@ export default function SASHistory() {
             <p className="text-gray-500 text-sm mb-6">Complete your first SAS assessment to start tracking your progress.</p>
             <Link href="/sas">
               <Button className="bg-purple-600 hover:bg-purple-700 text-white">
-                <ClipboardList className="w-4 h-4 mr-2" />
+                <ClipboardList className="w-4 h-4 me-2" />
                 Start Assessment
               </Button>
             </Link>

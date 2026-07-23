@@ -144,7 +144,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 glass">
+      <nav className="fixed top-0 start-0 end-0 z-50 border-b border-white/10 glass">
         <div className="container flex items-center justify-between h-16">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg gradient-purple flex items-center justify-center">
@@ -173,8 +173,8 @@ export default function Home() {
       {/* Hero */}
       <section className="gradient-hero flex items-center pt-16 relative overflow-hidden">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-purple-500/10 blur-3xl" />
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full bg-orange-500/10 blur-3xl" />
+          <div className="absolute top-1/4 start-1/4 w-96 h-96 rounded-full bg-purple-500/10 blur-3xl" />
+          <div className="absolute bottom-1/4 end-1/4 w-96 h-96 rounded-full bg-orange-500/10 blur-3xl" />
         </div>
 
         <div className="container relative z-10 py-24 lg:py-32">
@@ -204,14 +204,14 @@ export default function Home() {
               {isAuthenticated ? (
                 <Link href="/dashboard">
                   <Button size="lg" className="gradient-orange text-white border-0 px-8 py-6 text-base font-semibold shadow-lg">
-                    Go to Dashboard <ArrowRight className="w-5 h-5 ml-2" />
+                    Go to Dashboard <ArrowRight className="w-5 h-5 ms-2" />
                   </Button>
                 </Link>
               ) : (
                 <>
                   <a href="/register">
                     <Button size="lg" className="gradient-orange text-white border-0 px-8 py-6 text-base font-semibold shadow-lg">
-                      Check my specialty free <ArrowRight className="w-5 h-5 ml-2" />
+                      Check my specialty free <ArrowRight className="w-5 h-5 ms-2" />
                     </Button>
                   </a>
                   <a href="/login">
@@ -480,8 +480,8 @@ export default function Home() {
       {/* CTA */}
       <section className="py-24 gradient-hero relative overflow-hidden">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/2 left-1/4 w-64 h-64 rounded-full bg-purple-500/10 blur-3xl" />
-          <div className="absolute top-1/2 right-1/4 w-64 h-64 rounded-full bg-orange-500/10 blur-3xl" />
+          <div className="absolute top-1/2 start-1/4 w-64 h-64 rounded-full bg-purple-500/10 blur-3xl" />
+          <div className="absolute top-1/2 end-1/4 w-64 h-64 rounded-full bg-orange-500/10 blur-3xl" />
         </div>
         <div className="container relative z-10 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Find out where you actually stand</h2>
@@ -491,7 +491,7 @@ export default function Home() {
           </p>
           <a href="/register">
             <Button size="lg" className="gradient-orange text-white border-0 px-10 py-6 text-base font-semibold shadow-xl">
-              Start my self-assessment <ArrowRight className="w-5 h-5 ml-2" />
+              Start my self-assessment <ArrowRight className="w-5 h-5 ms-2" />
             </Button>
           </a>
         </div>
@@ -550,7 +550,7 @@ export default function Home() {
             <p className="text-xs text-muted-foreground">
               © 2026 Healthcare Quality School. All rights reserved.
             </p>
-            <p className="text-xs text-muted-foreground max-w-xl sm:text-right">
+            <p className="text-xs text-muted-foreground max-w-xl sm:text-end">
               MedPath UK supports planning and preparation. It does not replace official regulatory
               requirements — always confirm current criteria with the recruiting body before you apply.
             </p>

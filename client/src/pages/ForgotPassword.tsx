@@ -5,8 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Stethoscope, Mail, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { useT } from "@/contexts/LanguageContext";
+import LanguageToggle from "@/components/LanguageToggle";
 
 export default function ForgotPassword() {
+  const t = useT();
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
 
@@ -15,7 +18,7 @@ export default function ForgotPassword() {
       setSent(true);
     },
     onError: (err) => {
-      toast.error(err.message || "Something went wrong. Please try again.");
+      toast.error(err.message || t("auth.forgot.error"));
     },
   });
 
@@ -39,42 +42,46 @@ export default function ForgotPassword() {
           <span className="text-xl font-bold text-foreground">MedPath UK</span>
         </div>
 
+        <div className="flex justify-center">
+          <LanguageToggle />
+        </div>
+
         {sent ? (
           <div className="text-center space-y-4">
             <div className="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center mx-auto">
               <CheckCircle2 className="w-8 h-8 text-green-500" />
             </div>
-            <h2 className="text-2xl font-bold text-foreground">Check your inbox</h2>
+            <h2 className="text-2xl font-bold text-foreground">{t("auth.forgot.sentTitle")}</h2>
             <p className="text-muted-foreground leading-relaxed">
-              If an account exists for <strong className="text-foreground">{email}</strong>, we've sent a password reset link. Check your inbox and spam folder.
+              {t("auth.forgot.sentBody", { email })}
             </p>
-            <p className="text-muted-foreground text-sm">The link expires in 1 hour.</p>
+            <p className="text-muted-foreground text-sm">{t("auth.forgot.expires")}</p>
             <a href="/login" className="inline-flex items-center gap-2 text-primary hover:underline text-sm font-medium mt-4">
               <ArrowLeft className="w-4 h-4" />
-              Back to Sign In
+              {t("auth.forgot.backToLogin")}
             </a>
           </div>
         ) : (
           <>
             <div>
-              <h2 className="text-3xl font-bold text-foreground">Forgot your password?</h2>
+              <h2 className="text-3xl font-bold text-foreground">{t("auth.forgot.title")}</h2>
               <p className="mt-2 text-muted-foreground">
-                Enter your email address and we'll send you a reset link.
+                {t("auth.forgot.body")}
               </p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-1.5">
-                <Label htmlFor="email" className="text-foreground font-medium">Email Address</Label>
+                <Label htmlFor="email" className="text-foreground font-medium">{t("auth.forgot.email")}</Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Mail className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
                     id="email"
                     type="email"
                     placeholder="doctor@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 bg-card border-border text-foreground placeholder:text-muted-foreground"
+                    className="ps-10 bg-card border-border text-foreground placeholder:text-muted-foreground"
                     autoFocus
                     autoComplete="email"
                   />
@@ -89,16 +96,16 @@ export default function ForgotPassword() {
                 {forgotMutation.isPending ? (
                   <span className="flex items-center gap-2">
                     <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
-                    Sending...
+                    {t("auth.forgot.sending")}
                   </span>
-                ) : "Send Reset Link"}
+                ) : t("auth.forgot.submit")}
               </Button>
             </form>
 
             <div className="text-center">
               <a href="/login" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm transition-colors">
                 <ArrowLeft className="w-4 h-4" />
-                Back to Sign In
+                {t("auth.forgot.backToLogin")}
               </a>
             </div>
           </>

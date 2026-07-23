@@ -139,7 +139,7 @@ function PageHeader({ tier }: { tier: string }) {
           ))}
         </nav>
         <div className="flex items-center gap-2">
-          <Badge className={tierConfig.color}><TierIcon className="w-3 h-3 mr-1" />{tierConfig.label}</Badge>
+          <Badge className={tierConfig.color}><TierIcon className="w-3 h-3 me-1" />{tierConfig.label}</Badge>
           <div className="w-8 h-8 rounded-full gradient-purple flex items-center justify-center">
             <User className="w-4 h-4 text-white" />
           </div>
@@ -182,13 +182,13 @@ export default function Links() {
 
         {/* Search */}
         <div className="relative mb-6">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             type="text"
             placeholder="Search links..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 rounded-xl border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+            className="w-full ps-10 pe-4 py-3 rounded-xl border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
           />
         </div>
 

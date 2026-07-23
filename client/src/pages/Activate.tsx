@@ -53,7 +53,7 @@ export default function Activate() {
           <h2 className="text-2xl font-bold text-white mb-2">Already Activated</h2>
           <p className="text-white/70 mb-6">Your account is active. Head to your dashboard to continue.</p>
           <Button onClick={() => navigate("/dashboard")} className="gradient-orange text-white border-0 w-full">
-            Go to Dashboard <ArrowRight className="w-4 h-4 ml-2" />
+            Go to Dashboard <ArrowRight className="w-4 h-4 ms-2" />
           </Button>
         </div>
       </div>
@@ -74,7 +74,7 @@ export default function Activate() {
           </p>
           <a href="/login">
             <Button className="gradient-orange text-white border-0 w-full">
-              Sign In to Continue <ArrowRight className="w-4 h-4 ml-2" />
+              Sign In to Continue <ArrowRight className="w-4 h-4 ms-2" />
             </Button>
           </a>
         </div>
@@ -86,8 +86,8 @@ export default function Activate() {
     <div className="min-h-screen gradient-hero flex items-center justify-center p-4">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-purple-500/10 blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full bg-orange-500/10 blur-3xl" />
+        <div className="absolute top-1/4 start-1/4 w-96 h-96 rounded-full bg-purple-500/10 blur-3xl" />
+        <div className="absolute bottom-1/4 end-1/4 w-96 h-96 rounded-full bg-orange-500/10 blur-3xl" />
       </div>
 
       <div className="relative z-10 w-full max-w-md">
@@ -123,12 +123,12 @@ export default function Activate() {
               <div>
                 <Label className="text-white/80 text-sm mb-1.5 block">Access Code</Label>
                 <div className="relative">
-                  <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                  <KeyRound className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
                   <Input
                     value={code}
                     onChange={(e) => setCode(e.target.value.toUpperCase())}
                     placeholder="XXXX-XXXX-XXXX"
-                    className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/30 focus:border-purple-400 uppercase tracking-widest font-mono"
+                    className="ps-10 bg-white/10 border-white/20 text-white placeholder:text-white/30 focus:border-purple-400 uppercase tracking-widest font-mono"
                     maxLength={20}
                   />
                 </div>
@@ -137,13 +137,13 @@ export default function Activate() {
               <div>
                 <Label className="text-white/80 text-sm mb-1.5 block">Authorised Email Address</Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                  <Mail className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
                   <Input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="your.email@example.com"
-                    className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/30 focus:border-purple-400"
+                    className="ps-10 bg-white/10 border-white/20 text-white placeholder:text-white/30 focus:border-purple-400"
                   />
                 </div>
                 <p className="text-white/40 text-xs mt-1.5">
@@ -158,12 +158,12 @@ export default function Activate() {
               >
                 {validateCode.isPending ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin me-2" />
                     Verifying...
                   </>
                 ) : (
                   <>
-                    Activate Access <ArrowRight className="w-4 h-4 ml-2" />
+                    Activate Access <ArrowRight className="w-4 h-4 ms-2" />
                   </>
                 )}
               </Button>

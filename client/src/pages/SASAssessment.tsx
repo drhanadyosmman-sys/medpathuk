@@ -122,7 +122,7 @@ function SpecialtySelector({ onSelect }: { onSelect: (s: SASSpecialty) => void }
         {/* A portfolio score is not the whole picture any more. Someone about to
             plan two years around this number needs the prioritisation rules in
             front of them now, not after they have built the evidence. */}
-        <div className="max-w-2xl mx-auto mt-5 rounded-xl border border-blue-500/25 bg-blue-500/8 px-4 py-3 text-left">
+        <div className="max-w-2xl mx-auto mt-5 rounded-xl border border-blue-500/25 bg-blue-500/8 px-4 py-3 text-start">
           <p className="text-xs text-blue-200/90 leading-relaxed">
             <span className="font-semibold">Before you plan around a score:</span>{" "}
             the Medical Training (Prioritisation) Act gives UK graduates and
@@ -160,7 +160,7 @@ function SpecialtySelector({ onSelect }: { onSelect: (s: SASSpecialty) => void }
           <button
             key={specialty.id}
             onClick={() => onSelect(specialty)}
-            className="group text-left bg-white/3 hover:bg-white/6 border border-white/8 hover:border-purple-500/40 rounded-2xl p-5 transition-all duration-200 hover:shadow-lg hover:shadow-purple-500/10"
+            className="group text-start bg-white/3 hover:bg-white/6 border border-white/8 hover:border-purple-500/40 rounded-2xl p-5 transition-all duration-200 hover:shadow-lg hover:shadow-purple-500/10"
           >
             <div className="flex items-start justify-between mb-3">
               <div className="w-10 h-10 rounded-xl bg-purple-500/15 flex items-center justify-center group-hover:bg-purple-500/25 transition-colors">
@@ -493,9 +493,9 @@ function ResultsView({
             Competitive threshold for {specialty.shortName}:{" "}
             <span className="text-orange-400 font-semibold">{specialty.competitiveThreshold}/{maxScore}</span>
             {totalScore >= specialty.competitiveThreshold ? (
-              <span className="text-emerald-400 ml-2">✓ You meet this threshold</span>
+              <span className="text-emerald-400 ms-2">✓ You meet this threshold</span>
             ) : (
-              <span className="text-red-400 ml-2">
+              <span className="text-red-400 ms-2">
                 You need {specialty.competitiveThreshold - totalScore} more points
               </span>
             )}
@@ -594,9 +594,9 @@ function ResultsView({
                     <tbody>
                       {specialty.interviewScoring.weightedAreas.map((a) => (
                         <tr key={a.area} className="border-b border-white/5">
-                          <td className="py-1.5 pr-3 text-gray-400">{a.area}</td>
-                          <td className="py-1.5 pr-3 text-gray-500 whitespace-nowrap">{a.weighting}</td>
-                          <td className="py-1.5 text-right text-gray-300 whitespace-nowrap">{a.maxScore === undefined ? "—" : `/${a.maxScore}`}</td>
+                          <td className="py-1.5 pe-3 text-gray-400">{a.area}</td>
+                          <td className="py-1.5 pe-3 text-gray-500 whitespace-nowrap">{a.weighting}</td>
+                          <td className="py-1.5 text-end text-gray-300 whitespace-nowrap">{a.maxScore === undefined ? "—" : `/${a.maxScore}`}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -791,7 +791,7 @@ function ResultsView({
             disabled={!isAuthenticated}
             className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold px-6"
           >
-            <Sparkles className="w-4 h-4 mr-2" />
+            <Sparkles className="w-4 h-4 me-2" />
             {isAuthenticated ? "Generate My Roadmap" : "Sign In to Generate Roadmap"}
           </Button>
         </div>
@@ -866,7 +866,7 @@ function ResultsView({
                         <h4 className="text-sm font-bold text-white">{milestone.title}</h4>
                         <p className="text-xs text-gray-500 mt-0.5">{milestone.domain}</p>
                       </div>
-                      <div className="text-right shrink-0">
+                      <div className="text-end shrink-0">
                         <div className="text-xs text-gray-500">Current</div>
                         <div className="text-sm font-bold text-orange-400">{milestone.currentScore}/{milestone.maxScore}</div>
                       </div>
@@ -946,11 +946,11 @@ function ResultsView({
           {saveResult.isPending ? "Saving..." : isAuthenticated ? "Save Results to Profile" : "Sign In to Save"}
         </Button>
         <Button variant="outline" onClick={onRetake} className="flex-1 border-white/15 text-gray-300 hover:bg-white/5">
-          <RotateCcw className="w-4 h-4 mr-2" />
+          <RotateCcw className="w-4 h-4 me-2" />
           Retake Assessment
         </Button>
         <Button variant="outline" onClick={onReset} className="flex-1 border-white/15 text-gray-300 hover:bg-white/5">
-          <Stethoscope className="w-4 h-4 mr-2" />
+          <Stethoscope className="w-4 h-4 me-2" />
           Try Another Specialty
         </Button>
       </div>
@@ -1024,9 +1024,9 @@ function NotPortfolioScored({
                   <tbody>
                     {specialty.interviewScoring.weightedAreas.map((a) => (
                       <tr key={a.area} className="border-b border-white/5">
-                        <td className="py-1.5 pr-3 text-gray-400">{a.area}</td>
-                        <td className="py-1.5 pr-3 text-gray-500 whitespace-nowrap">{a.weighting}</td>
-                        <td className="py-1.5 text-right text-gray-300 whitespace-nowrap">{a.maxScore === undefined ? "—" : `/${a.maxScore}`}</td>
+                        <td className="py-1.5 pe-3 text-gray-400">{a.area}</td>
+                        <td className="py-1.5 pe-3 text-gray-500 whitespace-nowrap">{a.weighting}</td>
+                        <td className="py-1.5 text-end text-gray-300 whitespace-nowrap">{a.maxScore === undefined ? "—" : `/${a.maxScore}`}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -1153,11 +1153,11 @@ export default function SASAssessment() {
             </button>
             <div className="text-center">
               <span className="text-sm font-semibold text-white">{selectedSpecialty.shortName}</span>
-              <span className="text-xs text-gray-500 ml-2">
+              <span className="text-xs text-gray-500 ms-2">
                 Domain {currentDomainIdx + 1} of {domains.length}
               </span>
             </div>
-            <div className="text-right">
+            <div className="text-end">
               <span className="text-sm font-bold text-purple-400">{currentScore}</span>
               <span className="text-xs text-gray-500">/{currentMax} pts</span>
             </div>
@@ -1197,7 +1197,7 @@ export default function SASAssessment() {
               <ClipboardList className="w-4 h-4 shrink-0" />
               Before you apply: {selectedSpecialty.shortName} eligibility
               requirements
-              <ChevronRight className="w-4 h-4 ml-auto shrink-0 transition-transform group-open:rotate-90" />
+              <ChevronRight className="w-4 h-4 ms-auto shrink-0 transition-transform group-open:rotate-90" />
             </summary>
             <p className="mt-2 text-xs text-blue-200/70">
               A strong portfolio counts for nothing if you cannot apply. These
@@ -1251,7 +1251,7 @@ export default function SASAssessment() {
             disabled={currentDomainIdx === 0}
             className="border-white/15 text-gray-300 hover:bg-white/5"
           >
-            <ChevronLeft className="w-4 h-4 mr-1" />
+            <ChevronLeft className="w-4 h-4 me-1" />
             Previous
           </Button>
 
@@ -1280,14 +1280,14 @@ export default function SASAssessment() {
               className="bg-purple-600 hover:bg-purple-700 text-white"
             >
               Next Domain
-              <ChevronRight className="w-4 h-4 ml-1" />
+              <ChevronRight className="w-4 h-4 ms-1" />
             </Button>
           ) : (
             <Button
               onClick={() => setShowResults(true)}
               className="bg-gradient-to-r from-purple-600 to-orange-500 hover:from-purple-700 hover:to-orange-600 text-white font-semibold"
             >
-              <Award className="w-4 h-4 mr-2" />
+              <Award className="w-4 h-4 me-2" />
               View My Score
             </Button>
           )}

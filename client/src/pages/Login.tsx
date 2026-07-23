@@ -7,11 +7,14 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Eye, EyeOff, Stethoscope, ArrowRight, Mail, Lock } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { useT } from "@/contexts/LanguageContext";
+import LanguageToggle from "@/components/LanguageToggle";
 
 export default function Login() {
   const [, navigate] = useLocation();
   const { isAuthenticated, loading } = useAuth();
   const utils = trpc.useUtils();
+  const t = useT();
 
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ email: "", password: "" });
@@ -26,18 +29,18 @@ export default function Login() {
   const loginMutation = trpc.auth.login.useMutation({
     onSuccess: async () => {
       await utils.auth.me.invalidate();
-      toast.success("Welcome back!");
+      toast.success(t("auth.login.success"));
       navigate("/dashboard");
     },
     onError: (err) => {
-      setErrors({ general: err.message || "Invalid email or password." });
+      setErrors({ general: err.message || t("auth.login.invalid") });
     },
   });
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
-    if (!form.email.trim()) newErrors.email = "Email is required.";
-    if (!form.password) newErrors.password = "Password is required.";
+    if (!form.email.trim()) newErrors.email = t("auth.login.emailRequired");
+    if (!form.password) newErrors.password = t("auth.login.passwordRequired");
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -71,18 +74,18 @@ export default function Login() {
         </div>
         <div className="space-y-6">
           <h1 className="text-4xl font-bold text-foreground leading-tight">
-            Welcome Back, Doctor
+            {t("auth.login.welcome")}
           </h1>
           <p className="text-muted-foreground text-lg leading-relaxed">
-            Continue your journey towards UK medical training. Your personalised roadmap and progress are waiting for you.
+            {t("auth.login.intro")}
           </p>
           <div className="bg-card/50 border border-border rounded-xl p-5 space-y-3">
-            <p className="text-foreground font-medium text-sm">What's waiting for you:</p>
+            <p className="text-foreground font-medium text-sm">{t("auth.login.waitingHeading")}</p>
             {[
-              "Your personalised career roadmap",
-              "SAS assessment history & trends",
-              "AI workspace conversations",
-              "Progress tracking & milestones",
+              t("auth.login.waiting.roadmap"),
+              t("auth.login.waiting.history"),
+              t("auth.login.waiting.workspaces"),
+              t("auth.login.waiting.progress"),
             ].map((item) => (
               <div key={item} className="flex items-center gap-3">
                 <div className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
@@ -92,7 +95,7 @@ export default function Login() {
           </div>
         </div>
         <p className="text-muted-foreground text-sm">
-          © 2026 Healthcare Quality School. Planning support — not a guarantee of a training post.
+          {t("common.footer.rights")}
         </p>
       </div>
 
@@ -107,12 +110,16 @@ export default function Login() {
             <span className="text-xl font-bold text-foreground">MedPath UK</span>
           </div>
 
+          <div className="flex justify-end">
+            <LanguageToggle />
+          </div>
+
           <div>
-            <h2 className="text-3xl font-bold text-foreground">Sign in to your account</h2>
+            <h2 className="text-3xl font-bold text-foreground">{t("auth.login.title")}</h2>
             <p className="mt-2 text-muted-foreground">
-              Don't have an account?{" "}
+              {t("auth.login.noAccount")}{" "}
               <a href="/register" className="text-primary hover:underline font-medium">
-                Create one free
+                {t("auth.login.createOne")}
               </a>
             </p>
           </div>
@@ -128,7 +135,7 @@ export default function Login() {
             {/* Email */}
             <div className="space-y-1.5">
               <Label htmlFor="email" className="text-foreground font-medium">
-                Email Address
+                {t("auth.login.email")}
               </Label>
               <div className="relative">
                 <Mail className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -152,14 +159,14 @@ export default function Login() {
             {/* Password */}
             <div className="space-y-1.5">
               <Label htmlFor="password" className="text-foreground font-medium">
-                Password
+                {t("auth.login.password")}
               </Label>
               <div className="relative">
                 <Lock className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Your password"
+                  placeholder={t("auth.login.passwordPlaceholder")}
                   value={form.password}
                   onChange={(e) => {
                     setForm(p => ({ ...p, password: e.target.value }));
@@ -178,7 +185,7 @@ export default function Login() {
               </div>
               {errors.password && <p className="text-destructive text-sm">{errors.password}</p>}
               <div className="text-end">
-                <a href="/forgot-password" className="text-sm text-primary hover:underline">Forgot password?</a>
+                <a href="/forgot-password" className="text-sm text-primary hover:underline">{t("auth.login.forgot")}</a>
               </div>
             </div>
 
@@ -190,11 +197,11 @@ export default function Login() {
               {loginMutation.isPending ? (
                 <span className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
-                  Signing in...
+                  {t("auth.login.signingIn")}
                 </span>
               ) : (
                 <span className="flex items-center gap-2">
-                  Sign In
+                  {t("auth.login.submit")}
                   <ArrowRight className="w-4 h-4" />
                 </span>
               )}
@@ -203,7 +210,7 @@ export default function Login() {
 
           <div className="text-center">
             <a href="/" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
-              ← Back to home
+              {t("auth.login.backHome")}
             </a>
           </div>
         </div>

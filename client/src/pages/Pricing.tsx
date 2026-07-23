@@ -120,7 +120,7 @@ function PageHeader({ tier }: { tier: string }) {
           ))}
         </nav>
         <div className="flex items-center gap-2">
-          <Badge className={tierConfig.color}><TierIcon className="w-3 h-3 mr-1" />{tierConfig.label}</Badge>
+          <Badge className={tierConfig.color}><TierIcon className="w-3 h-3 me-1" />{tierConfig.label}</Badge>
           <div className="w-8 h-8 rounded-full gradient-purple flex items-center justify-center">
             <User className="w-4 h-4 text-white" />
           </div>
@@ -204,7 +204,7 @@ export default function Pricing() {
                   <div className="mb-4">
                     <span className="text-3xl font-bold text-foreground">{plan.price}</span>
                     {plan.period !== "forever" && (
-                      <span className="text-muted-foreground text-sm ml-1">/{plan.period}</span>
+                      <span className="text-muted-foreground text-sm ms-1">/{plan.period}</span>
                     )}
                   </div>
 
@@ -216,7 +216,7 @@ export default function Pricing() {
                     className={`w-full ${plan.ctaClass} ${isCurrentPlan ? "opacity-60 cursor-not-allowed" : ""}`}
                   >
                     {isLoading ? (
-                      <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Upgrading...</>
+                      <><Loader2 className="w-4 h-4 me-2 animate-spin" />Upgrading...</>
                     ) : isCurrentPlan ? (
                       "Current Plan"
                     ) : (

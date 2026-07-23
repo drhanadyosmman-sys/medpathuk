@@ -142,7 +142,7 @@ function PageHeader({ tier }: { tier: string }) {
           ))}
         </nav>
         <div className="flex items-center gap-2">
-          <Badge className={tierConfig.color}><TierIcon className="w-3 h-3 mr-1" />{tierConfig.label}</Badge>
+          <Badge className={tierConfig.color}><TierIcon className="w-3 h-3 me-1" />{tierConfig.label}</Badge>
           <div className="w-8 h-8 rounded-full gradient-purple flex items-center justify-center">
             <User className="w-4 h-4 text-white" />
           </div>
@@ -177,7 +177,7 @@ export default function Resources() {
               <p className="text-sm font-medium text-foreground">Unlock all resources with Professional or Premium</p>
               <p className="text-xs text-muted-foreground mt-0.5">Some guides are locked on the Starter plan.</p>
             </div>
-            <Link href="/pricing" className="ml-auto">
+            <Link href="/pricing" className="ms-auto">
               <Button size="sm" className="gradient-purple text-white border-0 whitespace-nowrap">Upgrade Now</Button>
             </Link>
           </div>
@@ -206,7 +206,7 @@ export default function Resources() {
                       <div key={key} className={`bg-card border rounded-xl overflow-hidden transition-all ${accessible ? "border-border" : "border-border/50 opacity-75"}`}>
                         <button
                           onClick={() => accessible && toggleItem(key)}
-                          className={`w-full flex items-center gap-3 p-4 text-left ${accessible ? "hover:bg-secondary/30 cursor-pointer" : "cursor-not-allowed"}`}
+                          className={`w-full flex items-center gap-3 p-4 text-start ${accessible ? "hover:bg-secondary/30 cursor-pointer" : "cursor-not-allowed"}`}
                         >
                           <div className="flex-1">
                             <div className="flex items-center gap-2 flex-wrap">
@@ -229,8 +229,8 @@ export default function Resources() {
                             <div className="pt-4 space-y-1">
                               {item.content.split("\n").map((line: string, li: number) => {
                                 if (line === "") return <div key={li} className="h-2" />;
-                                if (line.startsWith("- ")) return <p key={li} className="text-sm text-muted-foreground ml-4">• {line.slice(2)}</p>;
-                                if (line.match(/^\d+\./)) return <p key={li} className="text-sm text-foreground ml-4">{line}</p>;
+                                if (line.startsWith("- ")) return <p key={li} className="text-sm text-muted-foreground ms-4">• {line.slice(2)}</p>;
+                                if (line.match(/^\d+\./)) return <p key={li} className="text-sm text-foreground ms-4">{line}</p>;
                                 if (line.endsWith(":")) return <p key={li} className="text-sm font-semibold text-foreground mt-3">{line}</p>;
                                 return <p key={li} className="text-sm text-muted-foreground">{line}</p>;
                               })}

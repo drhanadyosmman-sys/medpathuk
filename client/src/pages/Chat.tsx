@@ -170,10 +170,10 @@ export default function Chat() {
                 <button
                   key={ws.key}
                   onClick={() => handleSelectWorkspace(ws.key)}
-                  className="workspace-card text-left group"
+                  className="workspace-card text-start group"
                 >
                   {ws.badge && (
-                    <Badge className="absolute top-3 right-3 text-xs gradient-orange text-white border-0">{ws.badge}</Badge>
+                    <Badge className="absolute top-3 end-3 text-xs gradient-orange text-white border-0">{ws.badge}</Badge>
                   )}
                   <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${ws.color} flex items-center justify-center mb-4 shadow-md`}>
                     <ws.icon className="w-6 h-6 text-white" />
@@ -208,7 +208,7 @@ export default function Chat() {
             <div className="font-semibold text-foreground text-sm">{currentWs?.title}</div>
             <div className="text-xs text-muted-foreground">{currentWs?.desc}</div>
           </div>
-          <Badge variant="secondary" className="ml-auto capitalize">{user?.subscriptionTier || "free"}</Badge>
+          <Badge variant="secondary" className="ms-auto capitalize">{user?.subscriptionTier || "free"}</Badge>
         </div>
       </div>
 
@@ -227,7 +227,7 @@ export default function Chat() {
                   <button
                     key={q}
                     onClick={() => handleSend(q)}
-                    className="text-left px-4 py-3 rounded-xl border border-border bg-card hover:border-primary/40 hover:bg-secondary/50 transition-all text-sm text-foreground"
+                    className="text-start px-4 py-3 rounded-xl border border-border bg-card hover:border-primary/40 hover:bg-secondary/50 transition-all text-sm text-foreground"
                   >
                     {q}
                   </button>
