@@ -99,6 +99,50 @@ with the schema and live in `drizzle/_legacy/`; the current baseline is
 `.env` is git-ignored and must never be committed. API keys are set by the
 owner directly in Railway — do not ask for them and do not handle them.
 
+## Bilingual (English + Arabic)
+
+The site is English + Arabic, RTL-aware. A reader who picks Arabic is told they
+do not read English, so nothing may be left in English that a person has to
+read — official terms are the deliberate exception (below).
+
+- `client/src/contexts/LanguageContext.tsx` — the whole system. `useT()` for one
+  string, `useLanguage()` for `{ t, dict, language, isRTL, setLanguage }`.
+  Choice persists in localStorage; missing Arabic falls back to English (never a
+  raw key). `dict` is the current language's whole dictionary, for mapping over
+  lists.
+- Dictionaries: `client/src/i18n/en/<area>.ts` + `ar/<area>.ts`, one module per
+  page/area, each `export const <area> = {…} as const`. Registered in
+  `i18n/en.ts` and `i18n/ar.ts` — **add both when you add a module**. English is
+  the canonical shape; Arabic mirrors it.
+- RTL is done with logical CSS (`ms-`/`me-`/`ps-`/`pe-`/`start-`/`end-`), not a
+  second stylesheet. Direction-of-travel arrows flip by icon class in
+  `index.css`; opt out with `.no-flip`. Arabic uses the Cairo face.
+- `<LanguageToggle />` sits in every page header, visible on mobile too.
+
+**Keep in English inside Arabic** — the terms a doctor meets on Oriel and the
+college sites, because those pages are in English: MSRA, Oriel, GMC, PLAB,
+MRCP/MRCS/MRCGP/MRCPCH/MRCOG/MRCPsych/FRCA/FRCR, OET, IELTS, IMT, CST, ACCS,
+PHST, CREST, NHS, NICE, PubMed, NIHR, UKPRN, ILR, EU Settlement Scheme, Royal
+College names. Numbers, prices and dates stay Western digits.
+
+**Two hard rules that protect data:**
+- Stored/submitted values stay English; only the label is translated. The
+  questionnaire submits `specialty: "Surgery"`, never `"الجراحة"` — the roadmap
+  generator and DB see the same values as before. Same for any enum the client
+  maps back to a label (roadmap `category`/`priority`).
+- The SAS scoring criteria in `shared/sas-data.ts` are the authoritative English
+  and are **never** translated in place. Arabic for them lives in a separate
+  additive layer, `shared/sas-i18n-ar.ts` (keyed by specialty/domain/criterion
+  id), shown *above* the English, which stays visible. A missing Arabic entry
+  just shows English — safe. Never edit sas-data.ts to add Arabic.
+
+**AI answers** in the reader's language: the three prompts in `server/routers.ts`
+take an optional `language` and append `languageInstruction()` from
+`server/_core/llm.ts`, which tells the model to write prose in Arabic but keep
+enum tokens, URLs and official UK terms in English.
+
+`content-data.json` is dead (unreferenced) — do not spend time translating it.
+
 ## Still outstanding
 
 - `ANTHROPIC_API_KEY` and `RESEND_API_KEY` to be set in Railway by the owner
@@ -106,6 +150,20 @@ owner directly in Railway — do not ask for them and do not handle them.
 - Cancel the Manus subscription after ~a week of stable running
 - Stripe integration pending the owner's keys
 - T&O weighting document; Radiology's portfolio/MSRA/interview weighting
+- Arabic scoring-data layer (`shared/sas-i18n-ar.ts`) may not cover all 46
+  specialties yet. Any id without an entry shows English, which is safe. To
+  finish: add entries keyed by specialty/domain/criterion id, translating
+  faithfully — never touch the English in sas-data.ts.
+
+## Manus and GitHub — do not reconnect
+
+The GitHub repo (`drhanadyosmman-sys/medpathuk`) is the single source of truth;
+Railway deploys from it. Manus once force-pushed its old pre-migration history
+over this repo and wiped the work from GitHub (recovered from local). Manus is
+now disconnected (its GitHub tab shows "Connect"). Do NOT reconnect it or press
+Publish-to-GitHub from Manus — a sync would clobber this history again, and
+Railway would then deploy the old build (no login fix, no Arabic). Push only
+from here.
 
 ## History worth knowing
 
