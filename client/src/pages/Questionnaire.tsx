@@ -91,7 +91,7 @@ function NumberInput({ value, onChange, label, min = 0, max = 50 }: { value: num
 
 export default function Questionnaire() {
   const { user, isAuthenticated, loading } = useAuth();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [, navigate] = useLocation();
   const [step, setStep] = useState(0);
   const [formData, setFormData] = useState<FormData>({
@@ -152,7 +152,7 @@ export default function Questionnaire() {
       const result = await submitAssessment.mutateAsync(formData);
       toast.success(t("questionnaire.toasts.saved"));
 
-      await generateRoadmap.mutateAsync({ assessmentId: result.assessmentId });
+      await generateRoadmap.mutateAsync({ assessmentId: result.assessmentId, language });
       toast.success(t("questionnaire.toasts.ready"));
       navigate("/roadmap");
     } catch (error: any) {

@@ -5,7 +5,7 @@ import { nanoid } from "nanoid";
 import { z } from "zod";
 import { sendWelcomeEmail, sendPasswordResetEmail } from "./email";
 import { getSessionCookieOptions } from "./_core/cookies";
-import { invokeLLM, invokeLLMJson } from "./_core/llm";
+import { invokeLLM, invokeLLMJson, languageInstruction } from "./_core/llm";
 import { sdk } from "./_core/sdk";
 import { systemRouter } from "./_core/systemRouter";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
@@ -262,7 +262,10 @@ export const appRouter = router({
     }),
 
     generate: protectedProcedure
-      .input(z.object({ assessmentId: z.number() }))
+      .input(z.object({
+        assessmentId: z.number(),
+        language: z.enum(["en", "ar"]).optional(),
+      }))
       .mutation(async ({ ctx, input }) => {
         const assessment = await getLatestAssessment(ctx.user.id);
         if (!assessment) throw new TRPCError({ code: "BAD_REQUEST", message: "Please complete the onboarding assessment first." });
@@ -307,7 +310,7 @@ Return ONLY valid JSON in this exact format:
       "resources": [{"title": "Resource name", "url": "https://..."}]
     }
   ]
-}`;
+}${languageInstruction(input.language)}`;
 
         let roadmapData: { title: string; summary: string; totalDurationMonths: number; milestones: any[] };
         try {
@@ -467,6 +470,7 @@ Return ONLY valid JSON in this exact format:
       .input(z.object({
         workspace: z.enum(["research", "qip", "audit", "teaching", "presentation", "interview", "oet", "cv", "pathway", "general"]),
         message: z.string().max(4000),
+        language: z.enum(["en", "ar"]).optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         const tier = ctx.user.subscriptionTier ?? "free";
@@ -504,7 +508,7 @@ Current user: ${ctx.user.name || "Healthcare Professional"} | Subscription: ${ti
 ${tier === "free" ? "Provide helpful general guidance. For detailed personalised support, mention that premium plans offer more comprehensive assistance." : ""}
 ${tier === "premium" ? "Provide comprehensive, detailed, personalised guidance with specific resources, timelines, and step-by-step action plans." : ""}
 
-IMPORTANT: Always respond in English. Be professional, supportive, and evidence-based. If you reference official sources, provide the correct website URLs. Always add: "Please verify current requirements with the official source before taking action."`;
+IMPORTANT: Be professional, supportive, and evidence-based. If you reference official sources, provide the correct website URLs. Always add a closing reminder to verify current requirements with the official source before taking action.${languageInstruction(input.language) || "\n\nRespond in English."}`;
 
         let assistantMessage: string;
         try {
@@ -683,6 +687,7 @@ IMPORTANT: Always respond in English. Be professional, supportive, and evidence-
         percentageScore: z.number(),
         competitiveLevel: z.string(),
         sectionScores: z.string(), // JSON string: { domainId: { name, score, maxScore } }
+        language: z.enum(["en", "ar"]).optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         const sectionScores = JSON.parse(input.sectionScores) as Record<string, { name: string; score: number; maxScore: number }>;
@@ -735,7 +740,7 @@ Return a JSON object with this exact structure:
       "resources": [{ "title": "resource name", "url": "https://..." }]
     }
   ]
-}`;
+}${languageInstruction(input.language)}`;
 
         // The schema is enforced by the API, so the prompt no longer has to ask
         // for "valid JSON only, no markdown" — that instruction existed to work

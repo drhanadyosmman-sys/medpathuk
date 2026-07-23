@@ -17,6 +17,7 @@ import {
   type SASScoringModel,
 } from "../../../shared/sas-data";
 import { courseForDomain } from "../../../shared/courses";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   AlertCircle,
   Award,
@@ -352,6 +353,7 @@ function ResultsView({
   onRetake: () => void;
 }) {
   const { isAuthenticated } = useAuth();
+  const { language } = useLanguage();
   const saveResult = trpc.sas.saveResult.useMutation();
   const generateSuggestions = trpc.sas.generateRoadmapSuggestions.useMutation();
   const saveMilestonesToRoadmap = trpc.sas.saveMilestonesToRoadmap.useMutation();
@@ -425,6 +427,7 @@ function ResultsView({
         percentageScore: percentage,
         competitiveLevel: level,
         sectionScores: JSON.stringify(sectionScores),
+        language,
       });
       setSuggestions(result);
     } catch {

@@ -64,7 +64,7 @@ const SUGGESTED: Record<WorkspaceKey, string[]> = {
 export default function Chat() {
   const { user, isAuthenticated, loading } = useAuth();
   const t = useT();
-  const { dict } = useLanguage();
+  const { dict, language } = useLanguage();
   // Translated title/desc for a workspace, keyed by its stable code key.
   const wsMeta = (key: WorkspaceKey) => dict.chat.workspaces[key];
   const [selectedWorkspace, setSelectedWorkspace] = useState<WorkspaceKey | null>(null);
@@ -130,7 +130,7 @@ export default function Chat() {
     setIsSending(true);
 
     try {
-      const response = await sendMessage.mutateAsync({ workspace: selectedWorkspace, message: msgText });
+      const response = await sendMessage.mutateAsync({ workspace: selectedWorkspace, message: msgText, language });
       setLocalMessages(prev => [...prev, { role: "assistant", content: response.message, id: (Date.now() + 1).toString() }]);
     } catch {
       setLocalMessages(prev => [...prev, { role: "assistant", content: t("chat.errorReply"), id: (Date.now() + 1).toString() }]);

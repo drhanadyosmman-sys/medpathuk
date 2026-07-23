@@ -82,6 +82,33 @@ function readText(message: Anthropic.Message): string {
   return text;
 }
 
+export type ResponseLanguage = "en" | "ar";
+
+/**
+ * A directive appended to a prompt so the model answers in the reader's
+ * language. English is the default and adds nothing.
+ *
+ * Arabic keeps three kinds of thing in English on purpose: any value the
+ * response must return as a fixed token that the client maps back to a label
+ * (translating it silently breaks the mapping); every URL; and the official UK
+ * names, bodies and exam abbreviations, because those are what the doctor will
+ * actually meet on Oriel and the college sites — all of which are in English.
+ * The point is comprehension for the reader, not a translation of the system.
+ */
+export function languageInstruction(
+  language: ResponseLanguage | undefined
+): string {
+  if (language !== "ar") return "";
+  return `
+
+Respond in clear, professional Arabic (العربية), suitable for a doctor.
+Translate all human-readable prose — titles, summaries, descriptions, advice, steps — into Arabic.
+Keep the following in English, do NOT translate them:
+- Any field this response must return as a fixed token (for example the "category" and "priority" values) — return those EXACTLY as the English options listed above, unchanged.
+- Every URL.
+- Official UK names, bodies and exam abbreviations: NHS, GMC, GDC, PLAB, MRCP, MRCS, MRCGP, MRCPCH, MRCOG, MRCPsych, FRCA, FRCR, OET, IELTS, Oriel, PubMed, NIHR, NICE, MSRA, IMT, CST, ACCS, PHST, UKFPO, HEE, and Royal College names.`;
+}
+
 /** A plain text completion. */
 export async function invokeLLM(params: {
   messages: Message[];
