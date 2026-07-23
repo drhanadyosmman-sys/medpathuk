@@ -14,6 +14,8 @@ export const home = {
       "Most doctors build a portfolio on guesswork — advice from colleagues, forum posts, whatever turns up in a search. Meanwhile the recruitment criteria are published, specific, and different for every specialty.",
     body2:
       "MedPath UK measures your portfolio against those criteria, shows you where the marks are, and tells you what to do next.",
+    positioning:
+      "A planning and preparation tool for UK specialty training — not a recruitment agency or a jobs board.",
     goToDashboard: "Go to Dashboard",
     ctaPrimary: "Check my specialty free",
     ctaSignIn: "Sign In",

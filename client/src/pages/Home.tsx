@@ -93,7 +93,13 @@ export default function Home() {
             </h1>
 
             <p className="text-lg sm:text-xl text-white/75 mb-4 leading-relaxed">{h.hero.body1}</p>
-            <p className="text-lg sm:text-xl text-white/75 mb-10 leading-relaxed">{h.hero.body2}</p>
+            <p className="text-lg sm:text-xl text-white/75 mb-5 leading-relaxed">{h.hero.body2}</p>
+
+            {/* States the positioning outright: a planning tool, not recruitment.
+                A name cannot carry this distinction; a plain sentence can. */}
+            <p className="inline-block text-sm sm:text-base text-white/90 font-medium border-s-2 border-orange-400/70 ps-3 mb-10 leading-relaxed">
+              {h.hero.positioning}
+            </p>
 
             <div className="flex flex-col sm:flex-row gap-4 mb-8">
               {isAuthenticated ? (
