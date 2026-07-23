@@ -122,6 +122,20 @@ export async function getAllUsers() {
   return db.select().from(users).orderBy(desc(users.createdAt));
 }
 
+/**
+ * Make the owner an admin. Called on sign-in for the account whose email
+ * matches OWNER_EMAIL, so the owner reaches the admin panel without anyone
+ * editing the database by hand. A no-op if they are already admin.
+ */
+export async function promoteToAdminByEmail(email: string): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+  await db
+    .update(users)
+    .set({ role: "admin" })
+    .where(eq(users.email, email.toLowerCase()));
+}
+
 // ─── Access Codes ─────────────────────────────────────────────────────────────
 export async function createAccessCode(data: typeof accessCodes.$inferInsert) {
   const db = await getDb();

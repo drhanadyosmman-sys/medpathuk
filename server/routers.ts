@@ -39,7 +39,9 @@ import {
   getPasswordResetToken,
   markPasswordResetTokenUsed,
   updateUserPassword,
+  promoteToAdminByEmail,
 } from "./db";
+import { ENV } from "./_core/env";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function getTierLevel(tier: string): number {
@@ -109,6 +111,16 @@ export const appRouter = router({
         const valid = await bcrypt.compare(input.password, user.passwordHash);
         if (!valid) {
           throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid email or password." });
+        }
+        // The owner becomes an admin on sign-in — role is read fresh from the
+        // database on every request, so the admin panel is available from here
+        // on without a database edit or a re-login.
+        if (
+          ENV.ownerEmail &&
+          user.email?.toLowerCase() === ENV.ownerEmail &&
+          user.role !== "admin"
+        ) {
+          await promoteToAdminByEmail(user.email);
         }
         const sessionToken = await sdk.createSessionToken(user.openId, { name: user.name || "", expiresInMs: ONE_YEAR_MS });
         const cookieOptions = getSessionCookieOptions(ctx.req);

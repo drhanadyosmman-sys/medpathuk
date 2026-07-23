@@ -9,6 +9,12 @@ export const ENV = {
   databaseUrl: process.env.DATABASE_URL ?? "",
   oAuthServerUrl: process.env.OAUTH_SERVER_URL ?? "",
   ownerOpenId: process.env.OWNER_OPEN_ID ?? "",
+  /**
+   * The account that owns this deployment. On sign-in, a user whose email
+   * matches this is made an admin — so the owner gets the admin panel without
+   * anyone editing the database by hand. Compared lowercased.
+   */
+  ownerEmail: (process.env.OWNER_EMAIL ?? "").toLowerCase(),
   isProduction: process.env.NODE_ENV === "production",
   /** Anthropic API key. The AI features do nothing without it. */
   anthropicApiKey: process.env.ANTHROPIC_API_KEY ?? "",
