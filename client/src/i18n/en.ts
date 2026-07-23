@@ -8,7 +8,10 @@ import { home } from "./en/home";
 import { links } from "./en/links";
 import { notFound } from "./en/notFound";
 import { pricing } from "./en/pricing";
+import { questionnaire } from "./en/questionnaire";
 import { resources } from "./en/resources";
+import { roadmap } from "./en/roadmap";
+import { sasHistory } from "./en/sasHistory";
 
 /**
  * English is the fallback dictionary. Every key that exists anywhere must exist
@@ -29,7 +32,10 @@ export const en = {
   links,
   notFound,
   pricing,
+  questionnaire,
   resources,
+  roadmap,
+  sasHistory,
 } as const;
 
 export type Dictionary = typeof en;

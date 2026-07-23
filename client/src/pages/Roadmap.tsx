@@ -12,6 +12,8 @@ import {
 import { Link } from "wouter";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
+import LanguageToggle from "@/components/LanguageToggle";
 
 const CATEGORY_CONFIG: Record<string, { icon: any; color: string; bg: string }> = {
   research: { icon: Microscope, color: "text-purple-600", bg: "bg-purple-100" },
@@ -28,13 +30,16 @@ const CATEGORY_CONFIG: Record<string, { icon: any; color: string; bg: string }> 
 };
 
 const TIER_CONFIG = {
-  free: { label: "Starter", color: "bg-secondary text-secondary-foreground", icon: Zap },
-  pro: { label: "Professional", color: "bg-primary/10 text-primary", icon: Star },
-  premium: { label: "Premium", color: "bg-amber-100 text-amber-700", icon: Crown },
+  free: { color: "bg-secondary text-secondary-foreground", icon: Zap },
+  pro: { color: "bg-primary/10 text-primary", icon: Star },
+  premium: { color: "bg-amber-100 text-amber-700", icon: Crown },
 };
 
 function PageHeader({ tier }: { tier: string }) {
-  const tierConfig = TIER_CONFIG[tier as keyof typeof TIER_CONFIG] || TIER_CONFIG.free;
+  const { t, dict } = useLanguage();
+  const r = dict.roadmap;
+  const tierKey = (tier in TIER_CONFIG ? tier : "free") as keyof typeof TIER_CONFIG;
+  const tierConfig = TIER_CONFIG[tierKey];
   const TierIcon = tierConfig.icon;
   return (
     <header className="border-b border-border bg-card sticky top-0 z-10">
@@ -47,11 +52,11 @@ function PageHeader({ tier }: { tier: string }) {
         </div>
         <nav className="hidden md:flex items-center gap-1">
           {[
-            { href: "/dashboard", label: "Dashboard" },
-            { href: "/roadmap", label: "Roadmap" },
-            { href: "/workspaces", label: "AI Workspaces" },
-            { href: "/resources", label: "Resources" },
-            { href: "/links", label: "Official Links" },
+            { href: "/dashboard", label: r.nav.dashboard },
+            { href: "/roadmap", label: r.nav.roadmap },
+            { href: "/workspaces", label: r.nav.workspaces },
+            { href: "/resources", label: r.nav.resources },
+            { href: "/links", label: r.nav.links },
           ].map(item => (
             <Link key={item.href} href={item.href}>
               <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">{item.label}</Button>
@@ -59,7 +64,8 @@ function PageHeader({ tier }: { tier: string }) {
           ))}
         </nav>
         <div className="flex items-center gap-2">
-          <Badge className={tierConfig.color}><TierIcon className="w-3 h-3 me-1" />{tierConfig.label}</Badge>
+          <LanguageToggle className="hidden sm:inline-flex" />
+          <Badge className={tierConfig.color}><TierIcon className="w-3 h-3 me-1" />{t(`roadmap.tiers.${tierKey}`)}</Badge>
           <div className="w-8 h-8 rounded-full gradient-purple flex items-center justify-center">
             <User className="w-4 h-4 text-white" />
           </div>
@@ -71,12 +77,22 @@ function PageHeader({ tier }: { tier: string }) {
 
 export default function Roadmap() {
   const { user, isAuthenticated, loading } = useAuth();
+  const { t, dict } = useLanguage();
+  const r = dict.roadmap;
   const { data: roadmapData, isLoading: roadmapLoading } = trpc.roadmap.getActive.useQuery(undefined, { enabled: isAuthenticated });
   const generateRoadmap = trpc.roadmap.generate.useMutation();
   const toggleMilestone = trpc.roadmap.toggleMilestone.useMutation();
   const utils = trpc.useUtils();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [generating, setGenerating] = useState(false);
+
+  // Milestone `category` and `priority` are fixed enums stored in English in
+  // the data. Show a translated label but fall back to the raw value if a new
+  // enum value ever appears that the dictionary hasn't caught up with.
+  const cats = r.categories as Record<string, string>;
+  const prios = r.priority as Record<string, string>;
+  const catLabel = (cat: string) => (cat === "all" ? r.filter.all : cats[cat] ?? cat);
+  const prioLabel = (p: string) => prios[p] ?? p;
 
   if (loading) {
     return (
@@ -93,8 +109,8 @@ export default function Roadmap() {
           <div className="w-16 h-16 rounded-2xl gradient-purple flex items-center justify-center mx-auto mb-4">
             <Target className="w-8 h-8 text-white" />
           </div>
-          <h2 className="text-2xl font-bold text-foreground mb-2">Sign In to View Your Roadmap</h2>
-          <a href="/login"><Button className="gradient-purple text-white border-0">Sign In</Button></a>
+          <h2 className="text-2xl font-bold text-foreground mb-2">{t("roadmap.gate.title")}</h2>
+          <a href="/login"><Button className="gradient-purple text-white border-0">{t("roadmap.gate.signIn")}</Button></a>
         </div>
       </div>
     );
@@ -111,7 +127,7 @@ export default function Roadmap() {
   const handleToggle = async (milestoneId: number, current: boolean) => {
     await toggleMilestone.mutateAsync({ milestoneId, isCompleted: !current });
     utils.roadmap.getActive.invalidate();
-    if (!current) toast.success("Milestone completed! 🎉");
+    if (!current) toast.success(t("roadmap.toast.milestoneCompleted"));
   };
 
   const handleGenerate = async () => {
@@ -119,9 +135,9 @@ export default function Roadmap() {
     try {
       await generateRoadmap.mutateAsync({ assessmentId: 0 });
       utils.roadmap.getActive.invalidate();
-      toast.success("Roadmap generated successfully!");
+      toast.success(t("roadmap.toast.generated"));
     } catch (e: any) {
-      toast.error(e.message || "Failed to generate roadmap");
+      toast.error(e.message || t("roadmap.toast.generateFailed"));
     } finally {
       setGenerating(false);
     }
@@ -140,12 +156,12 @@ export default function Roadmap() {
       <div className="container py-8 max-w-5xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Your Career Roadmap</h1>
-            <p className="text-muted-foreground mt-1">Personalised milestones to achieve your UK career goals</p>
+            <h1 className="text-2xl font-bold text-foreground">{t("roadmap.header.title")}</h1>
+            <p className="text-muted-foreground mt-1">{t("roadmap.header.subtitle")}</p>
           </div>
           {!roadmapLoading && !roadmapData && user?.onboardingCompleted && (
             <Button onClick={handleGenerate} disabled={generating} className="gradient-purple text-white border-0">
-              {generating ? <><Loader2 className="w-4 h-4 me-2 animate-spin" />Generating...</> : <><Zap className="w-4 h-4 me-2" />Generate Roadmap</>}
+              {generating ? <><Loader2 className="w-4 h-4 me-2 animate-spin" />{t("roadmap.generate.generating")}</> : <><Zap className="w-4 h-4 me-2" />{t("roadmap.generate.idle")}</>}
             </Button>
           )}
         </div>
@@ -159,16 +175,16 @@ export default function Roadmap() {
             <div className="w-20 h-20 rounded-2xl gradient-purple flex items-center justify-center mx-auto mb-6">
               <Target className="w-10 h-10 text-white" />
             </div>
-            <h2 className="text-xl font-bold text-foreground mb-3">No Roadmap Yet</h2>
+            <h2 className="text-xl font-bold text-foreground mb-3">{t("roadmap.empty.title")}</h2>
             <p className="text-muted-foreground mb-6 max-w-md mx-auto">
               {user?.onboardingCompleted
-                ? "Click the button above to generate your personalised AI roadmap."
-                : "Complete your onboarding assessment first to generate a personalised roadmap."}
+                ? t("roadmap.empty.bodyReady")
+                : t("roadmap.empty.bodyOnboard")}
             </p>
             {!user?.onboardingCompleted && (
               <Link href="/onboarding">
                 <Button className="gradient-purple text-white border-0">
-                  Start Assessment <ArrowRight className="w-4 h-4 ms-2" />
+                  {t("roadmap.empty.startAssessment")} <ArrowRight className="w-4 h-4 ms-2" />
                 </Button>
               </Link>
             )}
@@ -184,15 +200,15 @@ export default function Roadmap() {
                 </div>
                 <div className="text-end">
                   <div className="text-3xl font-bold">{progress}%</div>
-                  <div className="text-white/70 text-sm">Complete</div>
+                  <div className="text-white/70 text-sm">{t("roadmap.progress.complete")}</div>
                 </div>
               </div>
               <div className="h-3 bg-white/20 rounded-full overflow-hidden">
                 <div className="h-full bg-white rounded-full transition-all duration-500" style={{ width: `${progress}%` }} />
               </div>
               <div className="flex items-center justify-between mt-2 text-sm text-white/70">
-                <span>{completedCount} of {milestones.length} milestones completed</span>
-                {roadmapData.totalDurationMonths && <span>{roadmapData.totalDurationMonths} month plan</span>}
+                <span>{t("roadmap.progress.milestones", { done: completedCount, total: milestones.length })}</span>
+                {roadmapData.totalDurationMonths && <span>{t("roadmap.progress.monthPlan", { months: roadmapData.totalDurationMonths })}</span>}
               </div>
             </div>
 
@@ -204,7 +220,7 @@ export default function Roadmap() {
                   onClick={() => setSelectedCategory(cat)}
                   className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all capitalize ${selectedCategory === cat ? "gradient-purple text-white" : "bg-secondary text-secondary-foreground hover:bg-secondary/80"}`}
                 >
-                  {cat}
+                  {catLabel(cat)}
                 </button>
               ))}
             </div>
@@ -237,7 +253,7 @@ export default function Roadmap() {
                             {milestone.title}
                           </h3>
                           <div className="flex items-center gap-2 flex-shrink-0">
-                            <Badge className={`text-xs ${getPriorityColor(milestone.priority)}`}>{milestone.priority}</Badge>
+                            <Badge className={`text-xs ${getPriorityColor(milestone.priority)}`}>{prioLabel(milestone.priority)}</Badge>
                             <div className={`w-7 h-7 rounded-lg ${catConfig.bg} flex items-center justify-center`}>
                               <CatIcon className={`w-3.5 h-3.5 ${catConfig.color}`} />
                             </div>
@@ -249,16 +265,16 @@ export default function Roadmap() {
                         )}
 
                         <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                          <span className="capitalize font-medium">{milestone.category}</span>
+                          <span className="capitalize font-medium">{catLabel(milestone.category)}</span>
                           {milestone.dueDate && (
                             <span className="flex items-center gap-1">
                               <Calendar className="w-3 h-3" />
-                              Due: {new Date(milestone.dueDate).toLocaleDateString()}
+                              {t("roadmap.milestone.due")} {new Date(milestone.dueDate).toLocaleDateString()}
                             </span>
                           )}
                           <span className="flex items-center gap-1">
                             <Flag className="w-3 h-3" />
-                            Step {index + 1}
+                            {t("roadmap.milestone.step", { n: index + 1 })}
                           </span>
                         </div>
 
@@ -268,7 +284,7 @@ export default function Roadmap() {
                               <a key={i} href={r.url || r} target="_blank" rel="noopener noreferrer"
                                 className="flex items-center gap-1 text-xs text-primary hover:underline">
                                 <ExternalLink className="w-3 h-3" />
-                                {r.title || `Resource ${i + 1}`}
+                                {r.title || t("roadmap.milestone.resourceFallback", { n: i + 1 })}
                               </a>
                             ))}
                           </div>
@@ -283,10 +299,10 @@ export default function Roadmap() {
             {tier === "free" && (
               <div className="mt-8 gradient-hero rounded-2xl p-6 text-center text-white">
                 <Lock className="w-8 h-8 mx-auto mb-3 text-white/70" />
-                <h3 className="font-bold text-lg mb-2">Unlock Your Full Roadmap</h3>
-                <p className="text-white/70 text-sm mb-4">Upgrade to Professional or Premium for up to 20 detailed milestones with resources and 1-to-1 guidance.</p>
+                <h3 className="font-bold text-lg mb-2">{t("roadmap.upsell.title")}</h3>
+                <p className="text-white/70 text-sm mb-4">{t("roadmap.upsell.body")}</p>
                 <Link href="/pricing">
-                  <Button className="gradient-orange text-white border-0">Upgrade Now</Button>
+                  <Button className="gradient-orange text-white border-0">{t("roadmap.upsell.cta")}</Button>
                 </Link>
               </div>
             )}

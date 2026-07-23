@@ -19,6 +19,8 @@ import {
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
+import LanguageToggle from "@/components/LanguageToggle";
 
 type FormData = {
   specialty: string;
@@ -89,6 +91,7 @@ function NumberInput({ value, onChange, label, min = 0, max = 50 }: { value: num
 
 export default function Questionnaire() {
   const { user, isAuthenticated, loading } = useAuth();
+  const { t } = useLanguage();
   const [, navigate] = useLocation();
   const [step, setStep] = useState(0);
   const [formData, setFormData] = useState<FormData>({
@@ -147,13 +150,13 @@ export default function Questionnaire() {
   const handleSubmit = async () => {
     try {
       const result = await submitAssessment.mutateAsync(formData);
-      toast.success("Assessment saved! Generating your personalised roadmap...");
+      toast.success(t("questionnaire.toasts.saved"));
 
       await generateRoadmap.mutateAsync({ assessmentId: result.assessmentId });
-      toast.success("Your personalised roadmap is ready! 🎉");
+      toast.success(t("questionnaire.toasts.ready"));
       navigate("/roadmap");
     } catch (error: any) {
-      toast.error(error?.message || "An error occurred. Please try again.");
+      toast.error(error?.message || t("questionnaire.toasts.error"));
     }
   };
 
@@ -169,7 +172,12 @@ export default function Questionnaire() {
               </div>
               <span className="font-bold text-foreground">MedPath UK</span>
             </div>
-            <Badge variant="secondary">Step {step + 1} of {STEPS.length}</Badge>
+            <div className="flex items-center gap-2">
+              <LanguageToggle />
+              <Badge variant="secondary">
+                {t("questionnaire.stepBadge", { current: step + 1, total: STEPS.length })}
+              </Badge>
+            </div>
           </div>
           <div className="h-2 bg-secondary rounded-full overflow-hidden">
             <div
@@ -197,40 +205,40 @@ export default function Questionnaire() {
               </div>
             ))}
           </div>
-          <h1 className="text-2xl font-bold text-foreground mt-4">{STEPS[step].title}</h1>
-          <p className="text-muted-foreground">{STEPS[step].desc}</p>
+          <h1 className="text-2xl font-bold text-foreground mt-4">{t(`questionnaire.steps.${step}.title`)}</h1>
+          <p className="text-muted-foreground">{t(`questionnaire.steps.${step}.desc`)}</p>
         </div>
 
         {/* Step 0: Background */}
         {step === 0 && (
           <div className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-foreground mb-3">Current Specialty</label>
+              <label className="block text-sm font-medium text-foreground mb-3">{t("questionnaire.fields.currentSpecialty")}</label>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {SPECIALTIES.map(s => (
                   <SelectButton key={s} value={s} selected={formData.specialty === s} onClick={() => setFormData(p => ({ ...p, specialty: s }))}>
-                    {s}
+                    {t(`questionnaire.specialties.${s}`)}
                   </SelectButton>
                 ))}
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-foreground mb-3">Current Career Level</label>
+              <label className="block text-sm font-medium text-foreground mb-3">{t("questionnaire.fields.currentCareerLevel")}</label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {CAREER_LEVELS.map(l => (
                   <SelectButton key={l} value={l} selected={formData.careerLevel === l} onClick={() => setFormData(p => ({ ...p, careerLevel: l }))}>
-                    {l}
+                    {t(`questionnaire.careerLevels.${l}`)}
                   </SelectButton>
                 ))}
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">Country of Origin</label>
+              <label className="block text-sm font-medium text-foreground mb-2">{t("questionnaire.fields.countryOfOrigin")}</label>
               <input
                 type="text"
                 value={formData.country}
                 onChange={e => setFormData(p => ({ ...p, country: e.target.value }))}
-                placeholder="e.g. Egypt, Pakistan, Nigeria..."
+                placeholder={t("questionnaire.fields.countryPlaceholder")}
                 className="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
               />
             </div>
@@ -241,41 +249,41 @@ export default function Questionnaire() {
         {step === 1 && (
           <div className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-foreground mb-3">English Language Status</label>
+              <label className="block text-sm font-medium text-foreground mb-3">{t("questionnaire.fields.englishStatus")}</label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {ENGLISH_STATUSES.map(s => (
                   <SelectButton key={s} value={s} selected={formData.englishStatus === s} onClick={() => setFormData(p => ({ ...p, englishStatus: s }))}>
-                    {s}
+                    {t(`questionnaire.englishStatuses.${s}`)}
                   </SelectButton>
                 ))}
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-foreground mb-3">OET Status</label>
+              <label className="block text-sm font-medium text-foreground mb-3">{t("questionnaire.fields.oetStatus")}</label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {OET_STATUSES.map(s => (
                   <SelectButton key={s} value={s} selected={formData.oetStatus === s} onClick={() => setFormData(p => ({ ...p, oetStatus: s }))}>
-                    {s}
+                    {t(`questionnaire.oetStatuses.${s}`)}
                   </SelectButton>
                 ))}
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-foreground mb-3">Target UK Pathway</label>
+              <label className="block text-sm font-medium text-foreground mb-3">{t("questionnaire.fields.targetPathway")}</label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {PATHWAYS.map(p => (
                   <SelectButton key={p} value={p} selected={formData.targetPathway === p} onClick={() => setFormData(prev => ({ ...prev, targetPathway: p }))}>
-                    {p}
+                    {t(`questionnaire.pathways.${p}`)}
                   </SelectButton>
                 ))}
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">Target Specialty (if different)</label>
+              <label className="block text-sm font-medium text-foreground mb-2">{t("questionnaire.fields.targetSpecialty")}</label>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {SPECIALTIES.map(s => (
                   <SelectButton key={s} value={s} selected={formData.targetSpecialty === s} onClick={() => setFormData(p => ({ ...p, targetSpecialty: s }))}>
-                    {s}
+                    {t(`questionnaire.specialties.${s}`)}
                   </SelectButton>
                 ))}
               </div>
@@ -287,17 +295,17 @@ export default function Questionnaire() {
         {step === 2 && (
           <div className="space-y-6">
             <div className="bg-secondary/50 rounded-xl p-5 space-y-4">
-              <h3 className="font-semibold text-foreground">Academic Portfolio</h3>
-              <NumberInput value={formData.researchCount} onChange={v => setFormData(p => ({ ...p, researchCount: v }))} label="Published / submitted research papers" />
-              <NumberInput value={formData.auditCount} onChange={v => setFormData(p => ({ ...p, auditCount: v }))} label="Completed clinical audits" />
-              <NumberInput value={formData.qipCount} onChange={v => setFormData(p => ({ ...p, qipCount: v }))} label="Quality Improvement Projects (QIPs)" />
-              <NumberInput value={formData.presentationsCount} onChange={v => setFormData(p => ({ ...p, presentationsCount: v }))} label="Conference presentations / posters" />
+              <h3 className="font-semibold text-foreground">{t("questionnaire.fields.academicPortfolio")}</h3>
+              <NumberInput value={formData.researchCount} onChange={v => setFormData(p => ({ ...p, researchCount: v }))} label={t("questionnaire.fields.researchPapers")} />
+              <NumberInput value={formData.auditCount} onChange={v => setFormData(p => ({ ...p, auditCount: v }))} label={t("questionnaire.fields.clinicalAudits")} />
+              <NumberInput value={formData.qipCount} onChange={v => setFormData(p => ({ ...p, qipCount: v }))} label={t("questionnaire.fields.qips")} />
+              <NumberInput value={formData.presentationsCount} onChange={v => setFormData(p => ({ ...p, presentationsCount: v }))} label={t("questionnaire.fields.presentations")} />
             </div>
             <div className="space-y-3">
-              <h3 className="font-semibold text-foreground">Experience</h3>
+              <h3 className="font-semibold text-foreground">{t("questionnaire.fields.experience")}</h3>
               {[
-                { key: "teachingExperience", label: "Teaching experience (formal or informal)", icon: GraduationCap },
-                { key: "leadershipExperience", label: "Leadership or management experience", icon: Users },
+                { key: "teachingExperience", label: t("questionnaire.fields.teaching"), icon: GraduationCap },
+                { key: "leadershipExperience", label: t("questionnaire.fields.leadership"), icon: Users },
               ].map(({ key, label, icon: Icon }) => (
                 <button
                   key={key}
@@ -322,21 +330,21 @@ export default function Questionnaire() {
         {step === 3 && (
           <div className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-foreground mb-3">Exams Currently Preparing For</label>
+              <label className="block text-sm font-medium text-foreground mb-3">{t("questionnaire.fields.examsPreparing")}</label>
               <div className="grid grid-cols-2 gap-2">
                 {EXAMS.map(e => (
                   <SelectButton key={e} value={e} selected={formData.currentExams.includes(e)} onClick={() => toggleExam(e, "currentExams")}>
-                    {e}
+                    {t(`questionnaire.exams.${e}`)}
                   </SelectButton>
                 ))}
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-foreground mb-3">Exams Already Passed</label>
+              <label className="block text-sm font-medium text-foreground mb-3">{t("questionnaire.fields.examsPassed")}</label>
               <div className="grid grid-cols-2 gap-2">
                 {EXAMS.map(e => (
                   <SelectButton key={e} value={e} selected={formData.examsPassed.includes(e)} onClick={() => toggleExam(e, "examsPassed")}>
-                    {e}
+                    {t(`questionnaire.exams.${e}`)}
                   </SelectButton>
                 ))}
               </div>
@@ -348,11 +356,11 @@ export default function Questionnaire() {
         {step === 4 && (
           <div className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-foreground mb-3">Primary Goal</label>
+              <label className="block text-sm font-medium text-foreground mb-3">{t("questionnaire.fields.primaryGoal")}</label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {GOALS.map(g => (
                   <SelectButton key={g} value={g} selected={formData.mainGoal === g} onClick={() => setFormData(p => ({ ...p, mainGoal: g }))}>
-                    {g}
+                    {t(`questionnaire.goals.${g}`)}
                   </SelectButton>
                 ))}
               </div>
@@ -360,7 +368,7 @@ export default function Questionnaire() {
             <div className="grid grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-foreground mb-3">
-                  Available Hours/Week: <span className="text-primary">{formData.availableHoursPerWeek}h</span>
+                  {t("questionnaire.fields.availableHours")} <span className="text-primary">{t("questionnaire.fields.hoursValue", { hours: formData.availableHoursPerWeek })}</span>
                 </label>
                 <input
                   type="range" min={2} max={40} step={2}
@@ -368,11 +376,11 @@ export default function Questionnaire() {
                   onChange={e => setFormData(p => ({ ...p, availableHoursPerWeek: parseInt(e.target.value) }))}
                   className="w-full accent-primary"
                 />
-                <div className="flex justify-between text-xs text-muted-foreground mt-1"><span>2h</span><span>40h</span></div>
+                <div className="flex justify-between text-xs text-muted-foreground mt-1"><span>{t("questionnaire.fields.hoursMin")}</span><span>{t("questionnaire.fields.hoursMax")}</span></div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-foreground mb-3">
-                  Timeline: <span className="text-primary">{formData.goalTimelineMonths} months</span>
+                  {t("questionnaire.fields.timeline")} <span className="text-primary">{t("questionnaire.fields.monthsValue", { months: formData.goalTimelineMonths })}</span>
                 </label>
                 <input
                   type="range" min={3} max={36} step={3}
@@ -380,15 +388,15 @@ export default function Questionnaire() {
                   onChange={e => setFormData(p => ({ ...p, goalTimelineMonths: parseInt(e.target.value) }))}
                   className="w-full accent-primary"
                 />
-                <div className="flex justify-between text-xs text-muted-foreground mt-1"><span>3mo</span><span>36mo</span></div>
+                <div className="flex justify-between text-xs text-muted-foreground mt-1"><span>{t("questionnaire.fields.monthsMin")}</span><span>{t("questionnaire.fields.monthsMax")}</span></div>
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">Anything else you'd like us to know?</label>
+              <label className="block text-sm font-medium text-foreground mb-2">{t("questionnaire.fields.additionalInfo")}</label>
               <textarea
                 value={formData.additionalInfo}
                 onChange={e => setFormData(p => ({ ...p, additionalInfo: e.target.value }))}
-                placeholder="Any specific challenges, previous UK experience, or goals not covered above..."
+                placeholder={t("questionnaire.fields.additionalPlaceholder")}
                 rows={4}
                 className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
               />
@@ -403,7 +411,7 @@ export default function Questionnaire() {
             onClick={() => step > 0 ? setStep(step - 1) : navigate("/")}
             className="gap-2"
           >
-            <ArrowLeft className="w-4 h-4" /> Back
+            <ArrowLeft className="w-4 h-4" /> {t("questionnaire.buttons.back")}
           </Button>
 
           {step < STEPS.length - 1 ? (
@@ -412,7 +420,7 @@ export default function Questionnaire() {
               disabled={!isStepValid()}
               className="gradient-purple text-white border-0 gap-2"
             >
-              Continue <ArrowRight className="w-4 h-4" />
+              {t("questionnaire.buttons.continue")} <ArrowRight className="w-4 h-4" />
             </Button>
           ) : (
             <Button
@@ -421,9 +429,9 @@ export default function Questionnaire() {
               className="gradient-orange text-white border-0 gap-2 px-6"
             >
               {(submitAssessment.isPending || generateRoadmap.isPending) ? (
-                <><Loader2 className="w-4 h-4 animate-spin" /> Generating Roadmap...</>
+                <><Loader2 className="w-4 h-4 animate-spin" /> {t("questionnaire.buttons.generating")}</>
               ) : (
-                <><TrendingUp className="w-4 h-4" /> Generate My Roadmap</>
+                <><TrendingUp className="w-4 h-4" /> {t("questionnaire.buttons.generate")}</>
               )}
             </Button>
           )}

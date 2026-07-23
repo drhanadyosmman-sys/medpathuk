@@ -8,7 +8,10 @@ import { home } from "./ar/home";
 import { links } from "./ar/links";
 import { notFound } from "./ar/notFound";
 import { pricing } from "./ar/pricing";
+import { questionnaire } from "./ar/questionnaire";
 import { resources } from "./ar/resources";
+import { roadmap } from "./ar/roadmap";
+import { sasHistory } from "./ar/sasHistory";
 
 /**
  * Arabic. Structure mirrors the English dictionary; anything absent here falls
@@ -25,5 +28,8 @@ export const ar = {
   links,
   notFound,
   pricing,
+  questionnaire,
   resources,
+  roadmap,
+  sasHistory,
 } as const;

@@ -32,20 +32,24 @@ import {
 } from "lucide-react";
 import { Link } from "wouter";
 import { useMemo } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import LanguageToggle from "@/components/LanguageToggle";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
+// Returns the i18n level key plus its colour; the label is translated at the
+// render site via t(`sasHistory.levels.${key}`) so both languages resolve.
 function levelBadge(level: string | null) {
   switch (level) {
     case "excellent":
-      return { label: "Excellent", color: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" };
+      return { key: "excellent", color: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" };
     case "competitive":
-      return { label: "Competitive", color: "bg-blue-500/15 text-blue-400 border-blueald-500/30" };
+      return { key: "competitive", color: "bg-blue-500/15 text-blue-400 border-blueald-500/30" };
     case "borderline":
-      return { label: "Borderline", color: "bg-amber-500/15 text-amber-400 border-amber-500/30" };
+      return { key: "borderline", color: "bg-amber-500/15 text-amber-400 border-amber-500/30" };
     case "needs_improvement":
-      return { label: "Needs Improvement", color: "bg-red-500/15 text-red-400 border-red-500/30" };
+      return { key: "needs_improvement", color: "bg-red-500/15 text-red-400 border-red-500/30" };
     default:
-      return { label: "Unknown", color: "bg-gray-500/15 text-gray-400 border-gray-500/30" };
+      return { key: "unknown", color: "bg-gray-500/15 text-gray-400 border-gray-500/30" };
   }
 }
 
@@ -59,11 +63,12 @@ function formatShortDate(d: Date | string) {
 
 // ─── Trend icon ───────────────────────────────────────────────────────────────
 function TrendIcon({ current, previous }: { current: number; previous?: number }) {
+  const { t } = useLanguage();
   if (previous === undefined) return null;
   const diff = current - previous;
   if (diff > 0) return <span className="flex items-center gap-0.5 text-emerald-400 text-xs font-semibold"><TrendingUp className="w-3 h-3" />+{diff.toFixed(1)}%</span>;
   if (diff < 0) return <span className="flex items-center gap-0.5 text-red-400 text-xs font-semibold"><TrendingDown className="w-3 h-3" />{diff.toFixed(1)}%</span>;
-  return <span className="flex items-center gap-0.5 text-gray-500 text-xs"><Minus className="w-3 h-3" />No change</span>;
+  return <span className="flex items-center gap-0.5 text-gray-500 text-xs"><Minus className="w-3 h-3" />{t("sasHistory.trend.noChange")}</span>;
 }
 
 // ─── Colour palette for chart lines ───────────────────────────────────────────
@@ -74,6 +79,7 @@ const CHART_COLORS = [
 
 // ─── Page Header ──────────────────────────────────────────────────────────────
 function PageHeader() {
+  const { t } = useLanguage();
   return (
     <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-white/8">
       <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
@@ -81,21 +87,24 @@ function PageHeader() {
           <Link href="/dashboard">
             <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white gap-1 px-2">
               <ChevronLeft className="w-4 h-4" />
-              Dashboard
+              {t("sasHistory.header.back")}
             </Button>
           </Link>
           <div className="h-4 w-px bg-white/10" />
           <div className="flex items-center gap-2">
             <History className="w-4 h-4 text-purple-400" />
-            <span className="text-sm font-semibold text-white">SAS Assessment History</span>
+            <span className="text-sm font-semibold text-white">{t("sasHistory.header.title")}</span>
           </div>
         </div>
-        <Link href="/sas">
-          <Button size="sm" className="bg-purple-600 hover:bg-purple-700 text-white text-xs">
-            <ClipboardList className="w-3.5 h-3.5 me-1.5" />
-            New Assessment
-          </Button>
-        </Link>
+        <div className="flex items-center gap-3">
+          <LanguageToggle className="hidden sm:inline-flex" />
+          <Link href="/sas">
+            <Button size="sm" className="bg-purple-600 hover:bg-purple-700 text-white text-xs">
+              <ClipboardList className="w-3.5 h-3.5 me-1.5" />
+              {t("sasHistory.header.newAssessment")}
+            </Button>
+          </Link>
+        </div>
       </div>
     </header>
   );
@@ -103,6 +112,7 @@ function PageHeader() {
 
 // ─── Score Trend Chart ────────────────────────────────────────────────────────
 function ScoreTrendChart({ results }: { results: any[] }) {
+  const { t } = useLanguage();
   // Group by specialty and build chart data (chronological)
   const specialties = useMemo(() => {
     const map: Record<string, { name: string; data: { date: string; score: number }[] }> = {};
@@ -144,13 +154,13 @@ function ScoreTrendChart({ results }: { results: any[] }) {
         <CardHeader>
           <CardTitle className="text-base text-white flex items-center gap-2">
             <BarChart3 className="w-4 h-4 text-purple-400" />
-            Score Trend Over Time
+            {t("sasHistory.chart.title")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8 text-gray-500">
             <BarChart3 className="w-10 h-10 mx-auto mb-2 opacity-30" />
-            <p className="text-sm">Complete at least 2 assessments to see your score trend.</p>
+            <p className="text-sm">{t("sasHistory.chart.empty")}</p>
           </div>
         </CardContent>
       </Card>
@@ -162,7 +172,7 @@ function ScoreTrendChart({ results }: { results: any[] }) {
       <CardHeader>
         <CardTitle className="text-base text-white flex items-center gap-2">
           <BarChart3 className="w-4 h-4 text-purple-400" />
-          Score Trend Over Time
+          {t("sasHistory.chart.title")}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -198,6 +208,7 @@ function ScoreTrendChart({ results }: { results: any[] }) {
 
 // ─── Result Card ──────────────────────────────────────────────────────────────
 function ResultCard({ result, previousResult }: { result: any; previousResult?: any }) {
+  const { t } = useLanguage();
   const badge = levelBadge(result.competitiveLevel);
   const pct = parseFloat(result.percentageScore ?? "0");
   const prevPct = previousResult ? parseFloat(previousResult.percentageScore ?? "0") : undefined;
@@ -211,7 +222,7 @@ function ResultCard({ result, previousResult }: { result: any; previousResult?: 
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${badge.color}`}>
-                {badge.label}
+                {t(`sasHistory.levels.${badge.key}`)}
               </span>
               <TrendIcon current={pct} previous={prevPct} />
             </div>
@@ -258,6 +269,7 @@ function ResultCard({ result, previousResult }: { result: any; previousResult?: 
 
 // ─── Specialty Summary ────────────────────────────────────────────────────────
 function SpecialtySummary({ results }: { results: any[] }) {
+  const { t } = useLanguage();
   const bySpecialty = useMemo(() => {
     const map: Record<string, any[]> = {};
     for (const r of results) {
@@ -283,19 +295,19 @@ function SpecialtySummary({ results }: { results: any[] }) {
             <div className="flex items-start justify-between mb-3">
               <div>
                 <p className="text-sm font-bold text-white leading-tight">{name}</p>
-                <p className="text-xs text-gray-500 mt-0.5">{count} assessment{count !== 1 ? "s" : ""}</p>
+                <p className="text-xs text-gray-500 mt-0.5">{count === 1 ? t("sasHistory.summary.assessmentOne") : t("sasHistory.summary.assessmentsOther", { count })}</p>
               </div>
               <span className={`text-xs px-2 py-0.5 rounded-full border font-medium shrink-0 ${badge.color}`}>
-                {badge.label}
+                {t(`sasHistory.levels.${badge.key}`)}
               </span>
             </div>
             <div className="flex items-end justify-between">
               <div>
-                <p className="text-xs text-gray-500">Latest</p>
+                <p className="text-xs text-gray-500">{t("sasHistory.summary.latest")}</p>
                 <p className="text-xl font-black text-white">{latestPct.toFixed(0)}<span className="text-xs text-gray-400">%</span></p>
               </div>
               <div className="text-end">
-                <p className="text-xs text-gray-500">Best</p>
+                <p className="text-xs text-gray-500">{t("sasHistory.summary.best")}</p>
                 <p className="text-sm font-bold text-purple-400">{bestPct.toFixed(0)}%</p>
               </div>
             </div>
@@ -309,6 +321,7 @@ function SpecialtySummary({ results }: { results: any[] }) {
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function SASHistory() {
+  const { t } = useLanguage();
   const { isAuthenticated, loading } = useAuth();
   const { data: results, isLoading } = trpc.sas.getResults.useQuery(undefined, {
     enabled: isAuthenticated,
@@ -330,10 +343,10 @@ export default function SASHistory() {
           <div className="w-16 h-16 rounded-2xl bg-purple-500/10 flex items-center justify-center mx-auto mb-4">
             <Lock className="w-8 h-8 text-purple-400" />
           </div>
-          <h2 className="text-xl font-bold text-white mb-2">Sign In Required</h2>
-          <p className="text-gray-400 text-sm mb-6">Sign in to view your SAS assessment history and track your progress over time.</p>
+          <h2 className="text-xl font-bold text-white mb-2">{t("sasHistory.gate.title")}</h2>
+          <p className="text-gray-400 text-sm mb-6">{t("sasHistory.gate.body")}</p>
           <a href="/login">
-            <Button className="bg-purple-600 hover:bg-purple-700 text-white">Sign In</Button>
+            <Button className="bg-purple-600 hover:bg-purple-700 text-white">{t("sasHistory.gate.signIn")}</Button>
           </a>
         </div>
       </div>
@@ -348,10 +361,10 @@ export default function SASHistory() {
         <div className="mb-8">
           <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 rounded-full px-4 py-2 mb-4">
             <History className="w-4 h-4 text-purple-400" />
-            <span className="text-sm text-purple-300 font-medium">Assessment History</span>
+            <span className="text-sm text-purple-300 font-medium">{t("sasHistory.intro.badge")}</span>
           </div>
-          <h1 className="text-2xl font-bold text-white mb-1">Your SAS Score History</h1>
-          <p className="text-gray-400 text-sm">Track your portfolio progress across specialties over time.</p>
+          <h1 className="text-2xl font-bold text-white mb-1">{t("sasHistory.intro.title")}</h1>
+          <p className="text-gray-400 text-sm">{t("sasHistory.intro.subtitle")}</p>
         </div>
 
         {isLoading ? (
@@ -365,12 +378,12 @@ export default function SASHistory() {
             <div className="w-16 h-16 rounded-2xl bg-purple-500/10 flex items-center justify-center mx-auto mb-4">
               <Award className="w-8 h-8 text-purple-400 opacity-50" />
             </div>
-            <h3 className="text-lg font-semibold text-white mb-2">No Assessments Yet</h3>
-            <p className="text-gray-500 text-sm mb-6">Complete your first SAS assessment to start tracking your progress.</p>
+            <h3 className="text-lg font-semibold text-white mb-2">{t("sasHistory.empty.title")}</h3>
+            <p className="text-gray-500 text-sm mb-6">{t("sasHistory.empty.body")}</p>
             <Link href="/sas">
               <Button className="bg-purple-600 hover:bg-purple-700 text-white">
                 <ClipboardList className="w-4 h-4 me-2" />
-                Start Assessment
+                {t("sasHistory.empty.cta")}
               </Button>
             </Link>
           </div>
@@ -380,32 +393,32 @@ export default function SASHistory() {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
               <div className="bg-white/3 border border-white/8 rounded-2xl p-4 text-center">
                 <div className="text-2xl font-black text-white">{results.length}</div>
-                <div className="text-xs text-gray-500 mt-0.5">Total Assessments</div>
+                <div className="text-xs text-gray-500 mt-0.5">{t("sasHistory.stats.total")}</div>
               </div>
               <div className="bg-white/3 border border-white/8 rounded-2xl p-4 text-center">
                 <div className="text-2xl font-black text-purple-400">
                   {new Set(results.map((r) => r.specialty)).size}
                 </div>
-                <div className="text-xs text-gray-500 mt-0.5">Specialties Tested</div>
+                <div className="text-xs text-gray-500 mt-0.5">{t("sasHistory.stats.specialties")}</div>
               </div>
               <div className="bg-white/3 border border-white/8 rounded-2xl p-4 text-center">
                 <div className="text-2xl font-black text-emerald-400">
                   {Math.max(...results.map((r) => parseFloat(r.percentageScore ?? "0"))).toFixed(0)}%
                 </div>
-                <div className="text-xs text-gray-500 mt-0.5">Best Score</div>
+                <div className="text-xs text-gray-500 mt-0.5">{t("sasHistory.stats.best")}</div>
               </div>
               <div className="bg-white/3 border border-white/8 rounded-2xl p-4 text-center">
                 <div className="text-2xl font-black text-orange-400">
                   {(results.reduce((sum, r) => sum + parseFloat(r.percentageScore ?? "0"), 0) / results.length).toFixed(0)}%
                 </div>
-                <div className="text-xs text-gray-500 mt-0.5">Average Score</div>
+                <div className="text-xs text-gray-500 mt-0.5">{t("sasHistory.stats.average")}</div>
               </div>
             </div>
 
             {/* Specialty summary cards */}
             <h2 className="text-base font-bold text-white mb-3 flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-purple-400" />
-              By Specialty
+              {t("sasHistory.summary.heading")}
             </h2>
             <SpecialtySummary results={results} />
 
@@ -415,7 +428,7 @@ export default function SASHistory() {
             {/* Full history list */}
             <h2 className="text-base font-bold text-white mb-3 flex items-center gap-2">
               <History className="w-4 h-4 text-purple-400" />
-              All Assessments
+              {t("sasHistory.list.heading")}
             </h2>
             <div className="space-y-4">
               {results.map((result, idx) => (
