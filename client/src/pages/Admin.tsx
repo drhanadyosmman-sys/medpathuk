@@ -9,6 +9,8 @@ import { Link, useLocation } from "wouter";
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import { useT, useLanguage } from "@/contexts/LanguageContext";
+import LanguageToggle from "@/components/LanguageToggle";
 
 const TIER_COLORS: Record<string, string> = {
   free: "bg-secondary text-secondary-foreground",
@@ -25,6 +27,8 @@ const TIER_ICONS: Record<string, typeof Zap> = {
 export default function Admin() {
   const { user, isAuthenticated, loading } = useAuth();
   const [, navigate] = useLocation();
+  const t = useT();
+  const { dict } = useLanguage();
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [newCodeEmail, setNewCodeEmail] = useState("");
   const [newCodeTier, setNewCodeTier] = useState<"free" | "pro" | "premium">("pro");
@@ -54,10 +58,10 @@ export default function Admin() {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <Shield className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-          <h2 className="text-xl font-bold text-foreground mb-2">Access Denied</h2>
-          <p className="text-muted-foreground mb-4">You don't have permission to view this page.</p>
+          <h2 className="text-xl font-bold text-foreground mb-2">{t("admin.denied.title")}</h2>
+          <p className="text-muted-foreground mb-4">{t("admin.denied.body")}</p>
           <Link href="/dashboard">
-            <Button>Go to Dashboard</Button>
+            <Button>{t("admin.denied.cta")}</Button>
           </Link>
         </div>
       </div>
@@ -68,12 +72,12 @@ export default function Admin() {
     navigator.clipboard.writeText(code);
     setCopiedCode(code);
     setTimeout(() => setCopiedCode(null), 2000);
-    toast.success("Code copied to clipboard!");
+    toast.success(t("admin.toast.copied"));
   };
 
   const handleGenerateCode = async () => {
     if (!newCodeEmail) {
-      toast.error("Please enter an email address.");
+      toast.error(t("admin.toast.emailRequired"));
       return;
     }
     setGenerating(true);
@@ -84,13 +88,13 @@ export default function Admin() {
         notes: newCodeNotes || undefined,
         expiresInDays: newCodeExpiry,
       });
-      toast.success(`Access code generated: ${result.code}`);
+      toast.success(t("admin.toast.generated", { code: result.code }));
       handleCopyCode(result.code);
       setNewCodeEmail("");
       setNewCodeNotes("");
       refetchCodes();
     } catch (e: any) {
-      toast.error(e.message || "Failed to generate code.");
+      toast.error(e.message || t("admin.toast.failed"));
     } finally {
       setGenerating(false);
     }
@@ -109,38 +113,41 @@ export default function Admin() {
               <Stethoscope className="w-4 h-4 text-white" />
             </div>
             <span className="font-bold text-foreground">MedPath UK</span>
-            <Badge className="bg-red-100 text-red-700 ms-2">Admin</Badge>
+            <Badge className="bg-red-100 text-red-700 ms-2">{t("admin.badge")}</Badge>
           </div>
           <nav className="hidden md:flex items-center gap-1">
             {[
-              { href: "/dashboard", label: "Dashboard" },
-              { href: "/roadmap", label: "Roadmap" },
-              { href: "/workspaces", label: "AI Workspaces" },
+              { href: "/dashboard", label: t("admin.nav.dashboard") },
+              { href: "/roadmap", label: t("admin.nav.roadmap") },
+              { href: "/workspaces", label: t("admin.nav.workspaces") },
             ].map(item => (
               <Link key={item.href} href={item.href}>
                 <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">{item.label}</Button>
               </Link>
             ))}
           </nav>
-          <div className="w-8 h-8 rounded-full gradient-purple flex items-center justify-center">
-            <User className="w-4 h-4 text-white" />
+          <div className="flex items-center gap-3">
+            <LanguageToggle />
+            <div className="w-8 h-8 rounded-full gradient-purple flex items-center justify-center">
+              <User className="w-4 h-4 text-white" />
+            </div>
           </div>
         </div>
       </header>
 
       <div className="container py-8 max-w-6xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-foreground">Admin Dashboard</h1>
-          <p className="text-muted-foreground mt-1">Manage users, access codes, and platform settings</p>
+          <h1 className="text-2xl font-bold text-foreground">{t("admin.title")}</h1>
+          <p className="text-muted-foreground mt-1">{t("admin.subtitle")}</p>
         </div>
 
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {[
-            { label: "Total Users", value: users.length, icon: Users, color: "text-blue-500" },
-            { label: "Active Codes", value: codes.filter((c: any) => !c.usedAt).length, icon: Key, color: "text-green-500" },
-            { label: "Used Codes", value: codes.filter((c: any) => c.usedAt).length, icon: Check, color: "text-purple-500" },
-            { label: "Premium Users", value: users.filter((u: any) => u.subscriptionTier === "premium").length, icon: Crown, color: "text-amber-500" },
+            { label: t("admin.stats.totalUsers"), value: users.length, icon: Users, color: "text-blue-500" },
+            { label: t("admin.stats.activeCodes"), value: codes.filter((c: any) => !c.usedAt).length, icon: Key, color: "text-green-500" },
+            { label: t("admin.stats.usedCodes"), value: codes.filter((c: any) => c.usedAt).length, icon: Check, color: "text-purple-500" },
+            { label: t("admin.stats.premiumUsers"), value: users.filter((u: any) => u.subscriptionTier === "premium").length, icon: Crown, color: "text-amber-500" },
           ].map((stat, i) => {
             const StatIcon = stat.icon;
             return (
@@ -160,12 +167,12 @@ export default function Admin() {
           <div className="bg-card border border-border rounded-2xl p-6">
             <div className="flex items-center gap-2 mb-6">
               <Key className="w-5 h-5 text-primary" />
-              <h2 className="text-lg font-bold text-foreground">Generate Access Code</h2>
+              <h2 className="text-lg font-bold text-foreground">{t("admin.generate.title")}</h2>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="text-sm font-medium text-foreground mb-1.5 block">Email Address *</label>
+                <label className="text-sm font-medium text-foreground mb-1.5 block">{t("admin.generate.email")}</label>
                 <input
                   type="email"
                   placeholder="doctor@example.com"
@@ -176,23 +183,23 @@ export default function Admin() {
               </div>
 
               <div>
-                <label className="text-sm font-medium text-foreground mb-1.5 block">Subscription Tier</label>
+                <label className="text-sm font-medium text-foreground mb-1.5 block">{t("admin.generate.tier")}</label>
                 <select
                   value={newCodeTier}
                   onChange={e => setNewCodeTier(e.target.value as "free" | "pro" | "premium")}
                   className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
                 >
-                  <option value="free">Starter (Free)</option>
-                  <option value="pro">Professional (£29.99/mo)</option>
-                  <option value="premium">Premium (£79.99/mo)</option>
+                  <option value="free">{t("admin.generate.tierFree")}</option>
+                  <option value="pro">{t("admin.generate.tierPro")}</option>
+                  <option value="premium">{t("admin.generate.tierPremium")}</option>
                 </select>
               </div>
 
               <div>
-                <label className="text-sm font-medium text-foreground mb-1.5 block">Expires in (days, optional)</label>
+                <label className="text-sm font-medium text-foreground mb-1.5 block">{t("admin.generate.expiry")}</label>
                 <input
                   type="number"
-                  placeholder="e.g. 30"
+                  placeholder={t("admin.generate.expiryPlaceholder")}
                   value={newCodeExpiry ?? ""}
                   onChange={e => setNewCodeExpiry(e.target.value ? Number(e.target.value) : undefined)}
                   className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
@@ -200,10 +207,10 @@ export default function Admin() {
               </div>
 
               <div>
-                <label className="text-sm font-medium text-foreground mb-1.5 block">Notes (optional)</label>
+                <label className="text-sm font-medium text-foreground mb-1.5 block">{t("admin.generate.notes")}</label>
                 <input
                   type="text"
-                  placeholder="e.g. Referred by Dr. Ahmed"
+                  placeholder={t("admin.generate.notesPlaceholder")}
                   value={newCodeNotes}
                   onChange={e => setNewCodeNotes(e.target.value)}
                   className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
@@ -216,9 +223,9 @@ export default function Admin() {
                 className="w-full gradient-purple text-white border-0"
               >
                 {generating ? (
-                  <><Loader2 className="w-4 h-4 me-2 animate-spin" />Generating...</>
+                  <><Loader2 className="w-4 h-4 me-2 animate-spin" />{t("admin.generate.generating")}</>
                 ) : (
-                  <><Plus className="w-4 h-4 me-2" />Generate & Copy Code</>
+                  <><Plus className="w-4 h-4 me-2" />{t("admin.generate.submit")}</>
                 )}
               </Button>
             </div>
@@ -229,7 +236,7 @@ export default function Admin() {
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2">
                 <Key className="w-5 h-5 text-primary" />
-                <h2 className="text-lg font-bold text-foreground">Access Codes</h2>
+                <h2 className="text-lg font-bold text-foreground">{t("admin.codes.title")}</h2>
               </div>
               <Button variant="ghost" size="sm" onClick={() => refetchCodes()}>
                 <RefreshCw className="w-4 h-4" />
@@ -243,7 +250,7 @@ export default function Admin() {
             ) : codes.length === 0 ? (
               <div className="text-center py-8">
                 <Key className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                <p className="text-muted-foreground text-sm">No access codes yet.</p>
+                <p className="text-muted-foreground text-sm">{t("admin.codes.empty")}</p>
               </div>
             ) : (
               <div className="space-y-2 max-h-80 overflow-y-auto">
@@ -257,7 +264,7 @@ export default function Admin() {
                           <Badge className={`text-xs ${TIER_COLORS[code.subscriptionTier]}`}>
                             <TierIcon className="w-2.5 h-2.5 me-1" />{code.subscriptionTier}
                           </Badge>
-                          {code.usedAt && <Badge className="text-xs bg-green-100 text-green-700">Used</Badge>}
+                          {code.usedAt && <Badge className="text-xs bg-green-100 text-green-700">{t("admin.codes.used")}</Badge>}
                         </div>
                         <div className="text-xs text-muted-foreground mt-0.5 truncate">{code.email}</div>
                         {code.notes && <div className="text-xs text-muted-foreground/70 truncate">{code.notes}</div>}
@@ -289,7 +296,7 @@ export default function Admin() {
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
               <Users className="w-5 h-5 text-primary" />
-              <h2 className="text-lg font-bold text-foreground">Registered Users</h2>
+              <h2 className="text-lg font-bold text-foreground">{t("admin.users.title")}</h2>
             </div>
             <Button variant="ghost" size="sm" onClick={() => refetchUsers()}>
               <RefreshCw className="w-4 h-4" />
@@ -303,19 +310,16 @@ export default function Admin() {
           ) : users.length === 0 ? (
             <div className="text-center py-8">
               <Users className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-              <p className="text-muted-foreground text-sm">No users registered yet.</p>
+              <p className="text-muted-foreground text-sm">{t("admin.users.empty")}</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border">
-                    <th className="text-start py-2 px-3 text-muted-foreground font-medium">Name</th>
-                    <th className="text-start py-2 px-3 text-muted-foreground font-medium">Email</th>
-                    <th className="text-start py-2 px-3 text-muted-foreground font-medium">Specialty</th>
-                    <th className="text-start py-2 px-3 text-muted-foreground font-medium">Tier</th>
-                    <th className="text-start py-2 px-3 text-muted-foreground font-medium">Role</th>
-                    <th className="text-start py-2 px-3 text-muted-foreground font-medium">Joined</th>
+                    {dict.admin.users.columns.map(col => (
+                      <th key={col} className="text-start py-2 px-3 text-muted-foreground font-medium">{col}</th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>

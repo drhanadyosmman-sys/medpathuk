@@ -8,112 +8,121 @@ import {
 } from "lucide-react";
 import { Link } from "wouter";
 import { useState } from "react";
+import { useT, useLanguage } from "@/contexts/LanguageContext";
+import LanguageToggle from "@/components/LanguageToggle";
 
+// Colour, icon and tier keys only — the human-readable label comes from the
+// dictionary (links.tiers).
 const TIER_CONFIG = {
-  free: { label: "Starter", color: "bg-secondary text-secondary-foreground", icon: Zap },
-  pro: { label: "Professional", color: "bg-primary/10 text-primary", icon: Star },
-  premium: { label: "Premium", color: "bg-amber-100 text-amber-700", icon: Crown },
-};
+  free: { tierKey: "free", color: "bg-secondary text-secondary-foreground", icon: Zap },
+  pro: { tierKey: "pro", color: "bg-primary/10 text-primary", icon: Star },
+  premium: { tierKey: "premium", color: "bg-amber-100 text-amber-700", icon: Crown },
+} as const;
 
+// Structural data only: category id, icon, colour, and each link's official
+// title and URL. These are proper names and addresses and are never translated.
+// The category `label` and each link `desc` are held in the dictionary
+// (links.categories), matched by category id and by position in `links`.
 const LINK_CATEGORIES = [
   {
-    id: "registration", label: "Registration & Licensing", icon: Shield, color: "from-blue-500 to-blue-700",
+    id: "registration", icon: Shield, color: "from-blue-500 to-blue-700",
     links: [
-      { title: "GMC – General Medical Council", url: "https://www.gmc-uk.org", desc: "Medical registration, PLAB, revalidation" },
-      { title: "PLAB Information", url: "https://www.gmc-uk.org/registration-and-licensing/join-the-register/plab", desc: "PLAB 1 & 2 guidance and booking" },
-      { title: "OET Official Website", url: "https://www.occupationalenglishtest.org", desc: "English language test for healthcare" },
-      { title: "NHS Employers", url: "https://www.nhsemployers.org", desc: "Employment guidance for NHS staff" },
+      { title: "GMC – General Medical Council", url: "https://www.gmc-uk.org" },
+      { title: "PLAB Information", url: "https://www.gmc-uk.org/registration-and-licensing/join-the-register/plab" },
+      { title: "OET Official Website", url: "https://www.occupationalenglishtest.org" },
+      { title: "NHS Employers", url: "https://www.nhsemployers.org" },
     ],
   },
   {
-    id: "training", label: "Training & Applications", icon: GraduationCap, color: "from-purple-500 to-purple-700",
+    id: "training", icon: GraduationCap, color: "from-purple-500 to-purple-700",
     links: [
-      { title: "Oriel – Specialty Training Applications", url: "https://www.oriel.nhs.uk", desc: "Apply for specialty training posts" },
-      { title: "Health Education England (HEE)", url: "https://www.hee.nhs.uk", desc: "Postgraduate medical education" },
-      { title: "Foundation Programme", url: "https://www.foundationprogramme.nhs.uk", desc: "Foundation year information" },
-      { title: "NHS Medical Careers", url: "https://www.healthcareers.nhs.uk", desc: "Career pathways and specialty info" },
-      { title: "Medical Training Initiative (MTI)", url: "https://www.rcplondon.ac.uk/projects/medical-training-initiative", desc: "Training pathway for IMGs" },
+      { title: "Oriel – Specialty Training Applications", url: "https://www.oriel.nhs.uk" },
+      { title: "Health Education England (HEE)", url: "https://www.hee.nhs.uk" },
+      { title: "Foundation Programme", url: "https://www.foundationprogramme.nhs.uk" },
+      { title: "NHS Medical Careers", url: "https://www.healthcareers.nhs.uk" },
+      { title: "Medical Training Initiative (MTI)", url: "https://www.rcplondon.ac.uk/projects/medical-training-initiative" },
     ],
   },
   {
-    id: "royal-colleges", label: "Royal Colleges", icon: Crown, color: "from-amber-500 to-amber-700",
+    id: "royal-colleges", icon: Crown, color: "from-amber-500 to-amber-700",
     links: [
-      { title: "Royal College of Physicians (RCP)", url: "https://www.rcplondon.ac.uk", desc: "MRCP exams and physician resources" },
-      { title: "Royal College of Surgeons (RCS)", url: "https://www.rcseng.ac.uk", desc: "MRCS exams and surgical training" },
-      { title: "Royal College of GPs (RCGP)", url: "https://www.rcgp.org.uk", desc: "MRCGP and GP training" },
-      { title: "Royal College of Psychiatrists", url: "https://www.rcpsych.ac.uk", desc: "MRCPsych and psychiatry resources" },
-      { title: "Royal College of Radiologists", url: "https://www.rcr.ac.uk", desc: "Radiology and oncology training" },
-      { title: "Royal College of Anaesthetists", url: "https://www.rcoa.ac.uk", desc: "Anaesthesia training and exams" },
-      { title: "Royal College of Paediatrics", url: "https://www.rcpch.ac.uk", desc: "MRCPCH and paediatric training" },
-      { title: "Royal College of Obstetricians", url: "https://www.rcog.org.uk", desc: "MRCOG and O&G training" },
-      { title: "Royal College of Emergency Medicine", url: "https://rcem.ac.uk", desc: "FRCEM and emergency medicine" },
+      { title: "Royal College of Physicians (RCP)", url: "https://www.rcplondon.ac.uk" },
+      { title: "Royal College of Surgeons (RCS)", url: "https://www.rcseng.ac.uk" },
+      { title: "Royal College of GPs (RCGP)", url: "https://www.rcgp.org.uk" },
+      { title: "Royal College of Psychiatrists", url: "https://www.rcpsych.ac.uk" },
+      { title: "Royal College of Radiologists", url: "https://www.rcr.ac.uk" },
+      { title: "Royal College of Anaesthetists", url: "https://www.rcoa.ac.uk" },
+      { title: "Royal College of Paediatrics", url: "https://www.rcpch.ac.uk" },
+      { title: "Royal College of Obstetricians", url: "https://www.rcog.org.uk" },
+      { title: "Royal College of Emergency Medicine", url: "https://rcem.ac.uk" },
     ],
   },
   {
-    id: "research", label: "Research & Publications", icon: Microscope, color: "from-indigo-500 to-indigo-700",
+    id: "research", icon: Microscope, color: "from-indigo-500 to-indigo-700",
     links: [
-      { title: "Research Methodology & Publication — training courses", url: "https://www.healthcarequalityschools.com/p/home", desc: "Specialty-specific research and publication courses. Run by Health Care Quality School, who operate this platform", ours: true },
-      { title: "NIHR – National Institute for Health Research", url: "https://www.nihr.ac.uk", desc: "Research funding and opportunities" },
-      { title: "BMJ – British Medical Journal", url: "https://www.bmj.com", desc: "Leading medical journal" },
-      { title: "BMJ Case Reports", url: "https://casereports.bmj.com", desc: "Submit case reports" },
-      { title: "The Lancet", url: "https://www.thelancet.com", desc: "High-impact medical research" },
-      { title: "PubMed", url: "https://pubmed.ncbi.nlm.nih.gov", desc: "Medical literature database" },
-      { title: "Cochrane Library", url: "https://www.cochranelibrary.com", desc: "Systematic reviews and evidence" },
-      { title: "HRA – Health Research Authority", url: "https://www.hra.nhs.uk", desc: "Research ethics approval" },
+      { title: "Research Methodology & Publication — training courses", url: "https://www.healthcarequalityschools.com/p/home", ours: true },
+      { title: "NIHR – National Institute for Health Research", url: "https://www.nihr.ac.uk" },
+      { title: "BMJ – British Medical Journal", url: "https://www.bmj.com" },
+      { title: "BMJ Case Reports", url: "https://casereports.bmj.com" },
+      { title: "The Lancet", url: "https://www.thelancet.com" },
+      { title: "PubMed", url: "https://pubmed.ncbi.nlm.nih.gov" },
+      { title: "Cochrane Library", url: "https://www.cochranelibrary.com" },
+      { title: "HRA – Health Research Authority", url: "https://www.hra.nhs.uk" },
     ],
   },
   {
-    id: "quality", label: "Quality Improvement", icon: TrendingUp, color: "from-teal-500 to-teal-700",
+    id: "quality", icon: TrendingUp, color: "from-teal-500 to-teal-700",
     links: [
-      { title: "QIP in Healthcare — training course", url: "https://www.healthcarequalityschools.com/p/quality-improvement-project-in-healthcare512244112131", desc: "Structured QIP training. Run by Health Care Quality School, who operate this platform", ours: true },
-      { title: "Clinical Audit — training course", url: "https://www.healthcarequalityschools.com/p/clinical-audit-training", desc: "Clinical audit training. Run by Health Care Quality School, who operate this platform", ours: true },
-      { title: "HQIP – Healthcare Quality Improvement Partnership", url: "https://www.hqip.org.uk", desc: "National clinical audit programmes" },
-      { title: "NHS Improvement", url: "https://improvement.nhs.uk", desc: "QI resources and tools" },
-      { title: "IHI – Institute for Healthcare Improvement", url: "https://www.ihi.org", desc: "QI methodology and training" },
-      { title: "NICE Guidelines", url: "https://www.nice.org.uk", desc: "Clinical guidelines and standards" },
+      { title: "QIP in Healthcare — training course", url: "https://www.healthcarequalityschools.com/p/quality-improvement-project-in-healthcare512244112131", ours: true },
+      { title: "Clinical Audit — training course", url: "https://www.healthcarequalityschools.com/p/clinical-audit-training", ours: true },
+      { title: "HQIP – Healthcare Quality Improvement Partnership", url: "https://www.hqip.org.uk" },
+      { title: "NHS Improvement", url: "https://improvement.nhs.uk" },
+      { title: "IHI – Institute for Healthcare Improvement", url: "https://www.ihi.org" },
+      { title: "NICE Guidelines", url: "https://www.nice.org.uk" },
     ],
   },
   {
-    id: "exams", label: "Exams & Study", icon: BookOpen, color: "from-green-500 to-green-700",
+    id: "exams", icon: BookOpen, color: "from-green-500 to-green-700",
     links: [
-      { title: "Passmedicine", url: "https://www.passmedicine.com", desc: "PLAB and specialty exam questions" },
-      { title: "Plabable", url: "https://www.plabable.com", desc: "PLAB question bank" },
-      { title: "OnExamination", url: "https://www.onexamination.com", desc: "Royal College exam preparation" },
-      { title: "MRCP UK", url: "https://www.mrcpuk.org", desc: "Official MRCP exam information" },
+      { title: "Passmedicine", url: "https://www.passmedicine.com" },
+      { title: "Plabable", url: "https://www.plabable.com" },
+      { title: "OnExamination", url: "https://www.onexamination.com" },
+      { title: "MRCP UK", url: "https://www.mrcpuk.org" },
     ],
   },
   {
-    id: "agencies", label: "Recruitment Agencies", icon: Briefcase, color: "from-rose-500 to-rose-700",
+    id: "agencies", icon: Briefcase, color: "from-rose-500 to-rose-700",
     links: [
-      { title: "NHS Jobs", url: "https://www.jobs.nhs.uk", desc: "Official NHS job vacancies" },
-      { title: "BDI Resourcing", url: "https://www.bdiresourcing.com", desc: "IMG specialist recruitment" },
-      { title: "Medacs Healthcare", url: "https://www.medacs.com", desc: "Medical staffing solutions" },
-      { title: "Pulse Jobs", url: "https://www.pulsejobs.com", desc: "Healthcare recruitment" },
-      { title: "ID Medical", url: "https://www.idmedical.co.uk", desc: "Medical locum and permanent" },
-      { title: "Maxxima", url: "https://www.maxxima.com", desc: "NHS staffing agency" },
-      { title: "BMA Jobs", url: "https://jobs.bma.org.uk", desc: "British Medical Association jobs" },
+      { title: "NHS Jobs", url: "https://www.jobs.nhs.uk" },
+      { title: "BDI Resourcing", url: "https://www.bdiresourcing.com" },
+      { title: "Medacs Healthcare", url: "https://www.medacs.com" },
+      { title: "Pulse Jobs", url: "https://www.pulsejobs.com" },
+      { title: "ID Medical", url: "https://www.idmedical.co.uk" },
+      { title: "Maxxima", url: "https://www.maxxima.com" },
+      { title: "BMA Jobs", url: "https://jobs.bma.org.uk" },
     ],
   },
   {
-    id: "support", label: "IMG Support & Wellbeing", icon: Heart, color: "from-pink-500 to-pink-700",
+    id: "support", icon: Heart, color: "from-pink-500 to-pink-700",
     links: [
-      { title: "BMA – British Medical Association", url: "https://www.bma.org.uk", desc: "Doctors' union and support" },
-      { title: "Doctors in Distress", url: "https://doctors-in-distress.org.uk", desc: "Mental health support for doctors" },
-      { title: "IMG Connect", url: "https://www.imgconnect.co.uk", desc: "IMG community and resources" },
-      { title: "NHS Practitioner Health", url: "https://www.practitionerhealth.nhs.uk", desc: "Health support for NHS staff" },
+      { title: "BMA – British Medical Association", url: "https://www.bma.org.uk" },
+      { title: "Doctors in Distress", url: "https://doctors-in-distress.org.uk" },
+      { title: "IMG Connect", url: "https://www.imgconnect.co.uk" },
+      { title: "NHS Practitioner Health", url: "https://www.practitionerhealth.nhs.uk" },
     ],
   },
   {
-    id: "visa", label: "Visa & Immigration", icon: Globe, color: "from-cyan-500 to-cyan-700",
+    id: "visa", icon: Globe, color: "from-cyan-500 to-cyan-700",
     links: [
-      { title: "UK Visas & Immigration", url: "https://www.gov.uk/skilled-worker-visa", desc: "Skilled Worker Visa information" },
-      { title: "UKVI Guidance", url: "https://www.gov.uk/browse/visas-immigration", desc: "All UK visa types" },
-      { title: "NHS International Recruitment", url: "https://www.nhsemployers.org/articles/international-recruitment", desc: "International recruitment guidance" },
+      { title: "UK Visas & Immigration", url: "https://www.gov.uk/skilled-worker-visa" },
+      { title: "UKVI Guidance", url: "https://www.gov.uk/browse/visas-immigration" },
+      { title: "NHS International Recruitment", url: "https://www.nhsemployers.org/articles/international-recruitment" },
     ],
   },
 ];
 
 function PageHeader({ tier }: { tier: string }) {
+  const t = useT();
   const tierConfig = TIER_CONFIG[tier as keyof typeof TIER_CONFIG] || TIER_CONFIG.free;
   const TierIcon = tierConfig.icon;
   return (
@@ -127,11 +136,11 @@ function PageHeader({ tier }: { tier: string }) {
         </div>
         <nav className="hidden md:flex items-center gap-1">
           {[
-            { href: "/dashboard", label: "Dashboard" },
-            { href: "/roadmap", label: "Roadmap" },
-            { href: "/workspaces", label: "AI Workspaces" },
-            { href: "/resources", label: "Resources" },
-            { href: "/links", label: "Official Links" },
+            { href: "/dashboard", label: t("links.nav.dashboard") },
+            { href: "/roadmap", label: t("links.nav.roadmap") },
+            { href: "/workspaces", label: t("links.nav.workspaces") },
+            { href: "/resources", label: t("links.nav.resources") },
+            { href: "/links", label: t("links.nav.links") },
           ].map(item => (
             <Link key={item.href} href={item.href}>
               <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">{item.label}</Button>
@@ -139,7 +148,8 @@ function PageHeader({ tier }: { tier: string }) {
           ))}
         </nav>
         <div className="flex items-center gap-2">
-          <Badge className={tierConfig.color}><TierIcon className="w-3 h-3 me-1" />{tierConfig.label}</Badge>
+          <LanguageToggle />
+          <Badge className={tierConfig.color}><TierIcon className="w-3 h-3 me-1" />{t(`links.tiers.${tierConfig.tierKey}`)}</Badge>
           <div className="w-8 h-8 rounded-full gradient-purple flex items-center justify-center">
             <User className="w-4 h-4 text-white" />
           </div>
@@ -151,13 +161,33 @@ function PageHeader({ tier }: { tier: string }) {
 
 export default function Links() {
   const { user } = useAuth();
+  const t = useT();
+  const { dict } = useLanguage();
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const tier = (user?.subscriptionTier ?? "free") as string;
 
+  // Category labels and link descriptions live in the dictionary, keyed by
+  // category id and matched to each link by position. Titles and URLs stay as
+  // the untranslated data defined above.
+  // `as const` dictionaries expose readonly arrays; reflect that in the cast.
+  const catI18n = dict.links.categories as Record<
+    string,
+    { label: string; descs: readonly string[] }
+  >;
+
+  const localisedCategories = LINK_CATEGORIES.map(cat => ({
+    ...cat,
+    label: catI18n[cat.id]?.label ?? cat.id,
+    links: cat.links.map((link, i) => ({
+      ...link,
+      desc: catI18n[cat.id]?.descs[i] ?? "",
+    })),
+  }));
+
   const totalLinks = LINK_CATEGORIES.reduce((a, c) => a + c.links.length, 0);
 
-  const filteredCategories = LINK_CATEGORIES
+  const filteredCategories = localisedCategories
     .filter(cat => selectedCategory === "all" || cat.id === selectedCategory)
     .map(cat => ({
       ...cat,
@@ -176,8 +206,8 @@ export default function Links() {
 
       <div className="container py-8 max-w-6xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-foreground">Official UK Medical Links</h1>
-          <p className="text-muted-foreground mt-1">Curated directory of {totalLinks}+ essential resources for IMGs in the UK</p>
+          <h1 className="text-2xl font-bold text-foreground">{t("links.meta.title")}</h1>
+          <p className="text-muted-foreground mt-1">{t("links.meta.subtitle", { count: totalLinks })}</p>
         </div>
 
         {/* Search */}
@@ -185,7 +215,7 @@ export default function Links() {
           <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             type="text"
-            placeholder="Search links..."
+            placeholder={t("links.meta.searchPlaceholder")}
             value={search}
             onChange={e => setSearch(e.target.value)}
             className="w-full ps-10 pe-4 py-3 rounded-xl border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
@@ -198,9 +228,9 @@ export default function Links() {
             onClick={() => setSelectedCategory("all")}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${selectedCategory === "all" ? "gradient-purple text-white" : "bg-secondary text-secondary-foreground hover:bg-secondary/80"}`}
           >
-            All Categories
+            {t("links.meta.allCategories")}
           </button>
-          {LINK_CATEGORIES.map(cat => (
+          {localisedCategories.map(cat => (
             <button
               key={cat.id}
               onClick={() => setSelectedCategory(cat.id)}
@@ -222,7 +252,7 @@ export default function Links() {
                     <CatIcon className="w-4 h-4 text-white" />
                   </div>
                   <h2 className="text-lg font-bold text-foreground">{cat.label}</h2>
-                  <Badge variant="secondary" className="text-xs">{cat.links.length} links</Badge>
+                  <Badge variant="secondary" className="text-xs">{cat.links.length} {t("links.meta.linksCount")}</Badge>
                 </div>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   {cat.links.map((link, i) => (
@@ -244,7 +274,7 @@ export default function Links() {
                               cannot be mistaken for a neutral recommendation. */}
                           {"ours" in link && link.ours && (
                             <Badge variant="secondary" className="text-[10px] px-1.5 py-0 font-normal">
-                              Our course
+                              {t("links.meta.ourCourse")}
                             </Badge>
                           )}
                         </div>
@@ -261,7 +291,7 @@ export default function Links() {
         {filteredCategories.length === 0 && (
           <div className="text-center py-16">
             <Globe className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-            <p className="text-muted-foreground">No links found for your search.</p>
+            <p className="text-muted-foreground">{t("links.meta.empty")}</p>
           </div>
         )}
       </div>

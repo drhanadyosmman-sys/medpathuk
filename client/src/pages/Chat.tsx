@@ -25,22 +25,29 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import { Streamdown } from "streamdown";
+import { useT, useLanguage } from "@/contexts/LanguageContext";
+import LanguageToggle from "@/components/LanguageToggle";
 
 type WorkspaceKey = "research" | "qip" | "audit" | "teaching" | "presentation" | "interview" | "oet" | "cv" | "pathway" | "general";
 
-const WORKSPACES: { key: WorkspaceKey; icon: any; title: string; desc: string; color: string; badge?: string }[] = [
-  { key: "research", icon: Microscope, title: "Research Workspace", desc: "Journal selection, manuscript writing, ICMJE authorship, Think.Check.Submit.", color: "from-purple-500 to-purple-700", badge: "Popular" },
-  { key: "qip", icon: TrendingUp, title: "QI Project Workspace", desc: "PDSA cycles, NHS improvement methodology, project timelines", color: "from-blue-500 to-blue-700" },
-  { key: "audit", icon: ClipboardList, title: "Clinical Audit Workspace", desc: "Audit design, standard setting, gap analysis, re-audit planning", color: "from-indigo-500 to-indigo-700" },
-  { key: "teaching", icon: GraduationCap, title: "Teaching Workspace", desc: "Session planning, learning objectives, teaching portfolios", color: "from-violet-500 to-violet-700" },
-  { key: "presentation", icon: Star, title: "Presentations & Conferences", desc: "Abstract writing, poster design, oral presentation coaching", color: "from-orange-500 to-orange-600" },
-  { key: "interview", icon: MessageSquare, title: "Interview Preparation", desc: "NHS interview coaching, STAR method, mock sessions, role-specific prep", color: "from-amber-500 to-amber-600", badge: "Popular" },
-  { key: "oet", icon: BookOpen, title: "OET Preparation", desc: "All sub-tests, writing review, speaking practice, official OET resources", color: "from-green-500 to-green-700" },
-  { key: "cv", icon: FileText, title: "CV & Portfolio Workspace", desc: "Medical CV structure, portfolio mapping, role-targeted versions", color: "from-teal-500 to-teal-700" },
-  { key: "pathway", icon: Target, title: "UK Pathway Center", desc: "PLAB, Royal College exams, Oriel applications, NHS Jobs guidance", color: "from-rose-500 to-rose-700" },
-  { key: "general", icon: Brain, title: "AI Career Advisor", desc: "General UK medical career guidance, planning, and advice", color: "from-pink-500 to-pink-700" },
+// Visual/structural metadata only. Titles and descriptions are translated and
+// live in the `chat` dictionary, keyed by `key`.
+const WORKSPACES: { key: WorkspaceKey; icon: any; color: string; badge?: boolean }[] = [
+  { key: "research", icon: Microscope, color: "from-purple-500 to-purple-700", badge: true },
+  { key: "qip", icon: TrendingUp, color: "from-blue-500 to-blue-700" },
+  { key: "audit", icon: ClipboardList, color: "from-indigo-500 to-indigo-700" },
+  { key: "teaching", icon: GraduationCap, color: "from-violet-500 to-violet-700" },
+  { key: "presentation", icon: Star, color: "from-orange-500 to-orange-600" },
+  { key: "interview", icon: MessageSquare, color: "from-amber-500 to-amber-600", badge: true },
+  { key: "oet", icon: BookOpen, color: "from-green-500 to-green-700" },
+  { key: "cv", icon: FileText, color: "from-teal-500 to-teal-700" },
+  { key: "pathway", icon: Target, color: "from-rose-500 to-rose-700" },
+  { key: "general", icon: Brain, color: "from-pink-500 to-pink-700" },
 ];
 
+// Left in English on purpose: clicking a suggestion sends it verbatim to the AI
+// as the message prompt. These are prompt text, not interface labels, so they
+// are not translated here (the model replies in the user's language regardless).
 const SUGGESTED: Record<WorkspaceKey, string[]> = {
   research: ["How do I choose a suitable journal using Think.Check.Submit.?", "Explain ICMJE authorship criteria", "Help me write a research abstract", "What's the difference between a case report and a case series?"],
   qip: ["Help me design a PDSA cycle for my QI project", "What makes a good QI project for a medical portfolio?", "How do I measure baseline data for a QIP?", "Help me write a QIP summary for my portfolio"],
@@ -56,6 +63,10 @@ const SUGGESTED: Record<WorkspaceKey, string[]> = {
 
 export default function Chat() {
   const { user, isAuthenticated, loading } = useAuth();
+  const t = useT();
+  const { dict } = useLanguage();
+  // Translated title/desc for a workspace, keyed by its stable code key.
+  const wsMeta = (key: WorkspaceKey) => dict.chat.workspaces[key];
   const [selectedWorkspace, setSelectedWorkspace] = useState<WorkspaceKey | null>(null);
   const [message, setMessage] = useState("");
   const [localMessages, setLocalMessages] = useState<{ role: "user" | "assistant"; content: string; id: string }[]>([]);
@@ -100,9 +111,9 @@ export default function Chat() {
           <div className="w-16 h-16 rounded-2xl gradient-purple flex items-center justify-center mx-auto mb-4">
             <Sparkles className="w-8 h-8 text-white" />
           </div>
-          <h2 className="text-2xl font-bold text-foreground mb-2">Sign In Required</h2>
-          <p className="text-muted-foreground mb-6">Sign in to access the AI Workspaces.</p>
-          <a href="/login"><Button className="gradient-purple text-white border-0">Sign In</Button></a>
+          <h2 className="text-2xl font-bold text-foreground mb-2">{t("chat.gate.title")}</h2>
+          <p className="text-muted-foreground mb-6">{t("chat.gate.body")}</p>
+          <a href="/login"><Button className="gradient-purple text-white border-0">{t("chat.gate.cta")}</Button></a>
         </div>
       </div>
     );
@@ -122,7 +133,7 @@ export default function Chat() {
       const response = await sendMessage.mutateAsync({ workspace: selectedWorkspace, message: msgText });
       setLocalMessages(prev => [...prev, { role: "assistant", content: response.message, id: (Date.now() + 1).toString() }]);
     } catch {
-      setLocalMessages(prev => [...prev, { role: "assistant", content: "I apologise, an error occurred. Please try again.", id: (Date.now() + 1).toString() }]);
+      setLocalMessages(prev => [...prev, { role: "assistant", content: t("chat.errorReply"), id: (Date.now() + 1).toString() }]);
     } finally {
       setIsSending(false);
       inputRef.current?.focus();
@@ -137,6 +148,7 @@ export default function Chat() {
   };
 
   const currentWs = WORKSPACES.find(w => w.key === selectedWorkspace);
+  const currentMeta = selectedWorkspace ? wsMeta(selectedWorkspace) : undefined;
 
   // Workspace selection screen
   if (!selectedWorkspace) {
@@ -146,23 +158,24 @@ export default function Chat() {
           <div className="container py-4 flex items-center gap-3">
             <Link href="/dashboard">
               <Button variant="ghost" size="sm" className="gap-2">
-                <ArrowLeft className="w-4 h-4" /> Dashboard
+                <ArrowLeft className="w-4 h-4" /> {t("chat.backDashboard")}
               </Button>
             </Link>
             <div className="flex items-center gap-2">
               <div className="w-7 h-7 rounded-lg gradient-purple flex items-center justify-center">
                 <Sparkles className="w-3.5 h-3.5 text-white" />
               </div>
-              <span className="font-bold text-foreground">AI Workspaces</span>
+              <span className="font-bold text-foreground">{t("chat.header")}</span>
             </div>
+            <LanguageToggle className="ms-auto" />
           </div>
         </div>
 
         <div className="container py-10">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-10">
-              <h1 className="text-3xl font-bold text-foreground mb-2">Choose Your Workspace</h1>
-              <p className="text-muted-foreground">Select a specialised AI workspace to begin your session.</p>
+              <h1 className="text-3xl font-bold text-foreground mb-2">{t("chat.chooseTitle")}</h1>
+              <p className="text-muted-foreground">{t("chat.chooseSubtitle")}</p>
             </div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -173,15 +186,15 @@ export default function Chat() {
                   className="workspace-card text-start group"
                 >
                   {ws.badge && (
-                    <Badge className="absolute top-3 end-3 text-xs gradient-orange text-white border-0">{ws.badge}</Badge>
+                    <Badge className="absolute top-3 end-3 text-xs gradient-orange text-white border-0">{t("chat.popular")}</Badge>
                   )}
                   <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${ws.color} flex items-center justify-center mb-4 shadow-md`}>
                     <ws.icon className="w-6 h-6 text-white" />
                   </div>
-                  <h3 className="font-semibold text-foreground mb-1">{ws.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{ws.desc}</p>
+                  <h3 className="font-semibold text-foreground mb-1">{wsMeta(ws.key).title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{wsMeta(ws.key).desc}</p>
                   <div className="flex items-center gap-1 mt-3 text-primary text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                    Open Workspace <ChevronRight className="w-4 h-4" />
+                    {t("chat.open")} <ChevronRight className="w-4 h-4" />
                   </div>
                 </button>
               ))}
@@ -199,16 +212,17 @@ export default function Chat() {
       <div className="border-b border-border bg-card flex-shrink-0">
         <div className="container py-3 flex items-center gap-3">
           <Button variant="ghost" size="sm" onClick={() => { setSelectedWorkspace(null); setLocalMessages([]); }} className="gap-2">
-            <ArrowLeft className="w-4 h-4" /> Workspaces
+            <ArrowLeft className="w-4 h-4" /> {t("chat.backWorkspaces")}
           </Button>
           <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${currentWs?.color} flex items-center justify-center`}>
             {currentWs && <currentWs.icon className="w-4 h-4 text-white" />}
           </div>
           <div>
-            <div className="font-semibold text-foreground text-sm">{currentWs?.title}</div>
-            <div className="text-xs text-muted-foreground">{currentWs?.desc}</div>
+            <div className="font-semibold text-foreground text-sm">{currentMeta?.title}</div>
+            <div className="text-xs text-muted-foreground">{currentMeta?.desc}</div>
           </div>
-          <Badge variant="secondary" className="ms-auto capitalize">{user?.subscriptionTier || "free"}</Badge>
+          <LanguageToggle className="ms-auto" />
+          <Badge variant="secondary" className="capitalize">{user?.subscriptionTier || "free"}</Badge>
         </div>
       </div>
 
@@ -220,8 +234,8 @@ export default function Chat() {
               <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${currentWs?.color} flex items-center justify-center mx-auto mb-4 shadow-lg`}>
                 {currentWs && <currentWs.icon className="w-8 h-8 text-white" />}
               </div>
-              <h3 className="text-xl font-bold text-foreground mb-2">{currentWs?.title}</h3>
-              <p className="text-muted-foreground mb-8 max-w-md mx-auto">{currentWs?.desc}</p>
+              <h3 className="text-xl font-bold text-foreground mb-2">{currentMeta?.title}</h3>
+              <p className="text-muted-foreground mb-8 max-w-md mx-auto">{currentMeta?.desc}</p>
               <div className="grid sm:grid-cols-2 gap-3 max-w-xl mx-auto">
                 {(SUGGESTED[selectedWorkspace] || []).map(q => (
                   <button
@@ -287,7 +301,7 @@ export default function Chat() {
               value={message}
               onChange={e => setMessage(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={`Ask the ${currentWs?.title}...`}
+              placeholder={t("chat.inputPlaceholder", { workspace: currentMeta?.title ?? "" })}
               rows={1}
               className="flex-1 px-4 py-3 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none min-h-[48px] max-h-32"
               style={{ height: "auto" }}
@@ -301,7 +315,7 @@ export default function Chat() {
             </Button>
           </div>
           <p className="text-xs text-muted-foreground mt-2 text-center">
-            Always verify current requirements with official sources before taking action.
+            {t("chat.disclaimer")}
           </p>
         </div>
       </div>

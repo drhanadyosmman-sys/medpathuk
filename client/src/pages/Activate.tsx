@@ -8,10 +8,13 @@ import { ArrowRight, CheckCircle2, KeyRound, Lock, Mail, Stethoscope } from "luc
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
+import { useT } from "@/contexts/LanguageContext";
+import LanguageToggle from "@/components/LanguageToggle";
 
 export default function Activate() {
   const { user, isAuthenticated, loading } = useAuth();
   const [, navigate] = useLocation();
+  const t = useT();
   const [code, setCode] = useState("");
   const [email, setEmail] = useState("");
   const [activated, setActivated] = useState(false);
@@ -19,18 +22,18 @@ export default function Activate() {
   const validateCode = trpc.accessCode.validate.useMutation({
     onSuccess: (data) => {
       setActivated(true);
-      toast.success(`Access activated! Your plan: ${data.tier?.toUpperCase()}`);
+      toast.success(t("activate.toast.success", { tier: data.tier?.toUpperCase() ?? "" }));
       setTimeout(() => navigate("/onboarding"), 2000);
     },
     onError: (err) => {
-      toast.error(err.message || "Invalid code or email. Please check and try again.");
+      toast.error(err.message || t("activate.toast.invalid"));
     },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!code.trim() || !email.trim()) {
-      toast.error("Please enter both your access code and email address.");
+      toast.error(t("activate.toast.missing"));
       return;
     }
     validateCode.mutate({ code: code.trim().toUpperCase(), email: email.trim() });
@@ -47,13 +50,16 @@ export default function Activate() {
   // Already activated
   if (isAuthenticated && user?.isActivated) {
     return (
-      <div className="min-h-screen gradient-hero flex items-center justify-center p-4">
+      <div className="min-h-screen gradient-hero flex flex-col items-center justify-center p-4">
+        <div className="w-full max-w-md flex justify-end mb-4">
+          <LanguageToggle />
+        </div>
         <div className="glass rounded-2xl p-10 max-w-md w-full text-center">
           <CheckCircle2 className="w-16 h-16 text-green-400 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-white mb-2">Already Activated</h2>
-          <p className="text-white/70 mb-6">Your account is active. Head to your dashboard to continue.</p>
+          <h2 className="text-2xl font-bold text-white mb-2">{t("activate.already.title")}</h2>
+          <p className="text-white/70 mb-6">{t("activate.already.body")}</p>
           <Button onClick={() => navigate("/dashboard")} className="gradient-orange text-white border-0 w-full">
-            Go to Dashboard <ArrowRight className="w-4 h-4 ms-2" />
+            {t("activate.already.cta")} <ArrowRight className="w-4 h-4 ms-2" />
           </Button>
         </div>
       </div>
@@ -63,18 +69,21 @@ export default function Activate() {
   // Not logged in
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen gradient-hero flex items-center justify-center p-4">
+      <div className="min-h-screen gradient-hero flex flex-col items-center justify-center p-4">
+        <div className="w-full max-w-md flex justify-end mb-4">
+          <LanguageToggle />
+        </div>
         <div className="glass rounded-2xl p-10 max-w-md w-full text-center">
           <div className="w-16 h-16 rounded-2xl gradient-purple flex items-center justify-center mx-auto mb-4">
             <Lock className="w-8 h-8 text-white" />
           </div>
-          <h2 className="text-2xl font-bold text-white mb-2">Sign In First</h2>
+          <h2 className="text-2xl font-bold text-white mb-2">{t("activate.signIn.title")}</h2>
           <p className="text-white/70 mb-6">
-            You need to sign in before activating your access code. Your code is linked to a specific email address.
+            {t("activate.signIn.body")}
           </p>
           <a href="/login">
             <Button className="gradient-orange text-white border-0 w-full">
-              Sign In to Continue <ArrowRight className="w-4 h-4 ms-2" />
+              {t("activate.signIn.cta")} <ArrowRight className="w-4 h-4 ms-2" />
             </Button>
           </a>
         </div>
@@ -91,20 +100,24 @@ export default function Activate() {
       </div>
 
       <div className="relative z-10 w-full max-w-md">
+        <div className="flex justify-end mb-4">
+          <LanguageToggle />
+        </div>
+
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="w-14 h-14 rounded-2xl gradient-purple flex items-center justify-center mx-auto mb-3 shadow-xl">
             <Stethoscope className="w-7 h-7 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-white">MedPath UK</h1>
-          <p className="text-white/60 text-sm">by Health Care Quality School</p>
+          <p className="text-white/60 text-sm">{t("activate.brandBy")}</p>
         </div>
 
         {activated ? (
           <div className="glass rounded-2xl p-8 text-center">
             <CheckCircle2 className="w-16 h-16 text-green-400 mx-auto mb-4" />
-            <h2 className="text-xl font-bold text-white mb-2">Access Activated!</h2>
-            <p className="text-white/70 mb-4">Redirecting you to onboarding...</p>
+            <h2 className="text-xl font-bold text-white mb-2">{t("activate.success.title")}</h2>
+            <p className="text-white/70 mb-4">{t("activate.success.body")}</p>
             <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto" />
           </div>
         ) : (
@@ -114,14 +127,14 @@ export default function Activate() {
                 <KeyRound className="w-5 h-5 text-orange-400" />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-white">Activate Your Access</h2>
-                <p className="text-white/60 text-sm">Enter your invitation code and email</p>
+                <h2 className="text-lg font-bold text-white">{t("activate.form.title")}</h2>
+                <p className="text-white/60 text-sm">{t("activate.form.subtitle")}</p>
               </div>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <Label className="text-white/80 text-sm mb-1.5 block">Access Code</Label>
+                <Label className="text-white/80 text-sm mb-1.5 block">{t("activate.form.codeLabel")}</Label>
                 <div className="relative">
                   <KeyRound className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
                   <Input
@@ -135,7 +148,7 @@ export default function Activate() {
               </div>
 
               <div>
-                <Label className="text-white/80 text-sm mb-1.5 block">Authorised Email Address</Label>
+                <Label className="text-white/80 text-sm mb-1.5 block">{t("activate.form.emailLabel")}</Label>
                 <div className="relative">
                   <Mail className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
                   <Input
@@ -147,7 +160,7 @@ export default function Activate() {
                   />
                 </div>
                 <p className="text-white/40 text-xs mt-1.5">
-                  Must match the email your access code was issued to.
+                  {t("activate.form.emailHint")}
                 </p>
               </div>
 
@@ -159,11 +172,11 @@ export default function Activate() {
                 {validateCode.isPending ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin me-2" />
-                    Verifying...
+                    {t("activate.form.verifying")}
                   </>
                 ) : (
                   <>
-                    Activate Access <ArrowRight className="w-4 h-4 ms-2" />
+                    {t("activate.form.submit")} <ArrowRight className="w-4 h-4 ms-2" />
                   </>
                 )}
               </Button>
@@ -171,8 +184,7 @@ export default function Activate() {
 
             <div className="mt-6 pt-6 border-t border-white/10">
               <p className="text-white/50 text-xs text-center">
-                Each access code is valid for one user only and is linked to a single email address.
-                Contact your programme coordinator if you need a code.
+                {t("activate.form.note")}
               </p>
             </div>
           </div>

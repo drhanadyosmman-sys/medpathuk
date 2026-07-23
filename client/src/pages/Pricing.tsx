@@ -9,92 +9,54 @@ import { Link } from "wouter";
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import { useT, useLanguage } from "@/contexts/LanguageContext";
+import LanguageToggle from "@/components/LanguageToggle";
 
 const TIER_CONFIG = {
-  free: { label: "Starter", color: "bg-secondary text-secondary-foreground", icon: Zap },
-  pro: { label: "Professional", color: "bg-primary/10 text-primary", icon: Star },
-  premium: { label: "Premium", color: "bg-amber-100 text-amber-700", icon: Crown },
+  free: { tierKey: "free" as const, color: "bg-secondary text-secondary-foreground", icon: Zap },
+  pro: { tierKey: "pro" as const, color: "bg-primary/10 text-primary", icon: Star },
+  premium: { tierKey: "premium" as const, color: "bg-amber-100 text-amber-700", icon: Crown },
 };
 
-const PLANS = [
+// Structural, language-independent config for each plan. Translatable text
+// (name, price, description, cta, feature labels) lives in the `pricing`
+// dictionary and is zipped in by index; the `included` flags and styling stay
+// here because they never change between languages.
+const PLAN_META = [
   {
     id: "free",
-    name: "Starter",
-    price: "Free",
-    period: "forever",
-    description: "Get started with essential guidance for your UK medical career.",
     icon: Zap,
     iconStyle: "bg-secondary text-foreground",
     borderColor: "border-border",
     highlight: false,
-    ctaText: "Get Started Free",
     ctaClass: "border border-border bg-transparent text-foreground hover:bg-secondary",
-    features: [
-      { text: "Career roadmap (5 milestones)", included: true },
-      { text: "Basic onboarding assessment", included: true },
-      { text: "Free resources library", included: true },
-      { text: "Official links directory", included: true },
-      { text: "AI chat (10 messages/month)", included: true },
-      { text: "Personalised AI roadmap", included: false },
-      { text: "Professional resources", included: false },
-      { text: "Interview preparation guides", included: false },
-      { text: "1-to-1 guidance sessions", included: false },
-      { text: "Personal statement review", included: false },
-    ],
+    showPeriod: false,
+    included: [true, true, true, true, true, false, false, false, false, false],
   },
   {
     id: "pro",
-    name: "Professional",
-    price: "£29.99",
-    period: "per month",
-    description: "Comprehensive guidance with personalised roadmap and full resource access.",
     icon: Star,
     iconStyle: "gradient-purple text-white",
     borderColor: "border-primary",
     highlight: true,
-    ctaText: "Upgrade to Professional",
     ctaClass: "gradient-purple text-white border-0",
-    features: [
-      { text: "Career roadmap (15 milestones)", included: true },
-      { text: "Advanced onboarding assessment", included: true },
-      { text: "Full resources library access", included: true },
-      { text: "Official links directory", included: true },
-      { text: "AI chat (unlimited)", included: true },
-      { text: "Personalised AI roadmap", included: true },
-      { text: "Interview preparation guides", included: true },
-      { text: "CV & portfolio review tips", included: true },
-      { text: "1-to-1 guidance sessions", included: false },
-      { text: "Personal statement review", included: false },
-    ],
+    showPeriod: true,
+    included: [true, true, true, true, true, true, true, true, false, false],
   },
   {
     id: "premium",
-    name: "Premium",
-    price: "£79.99",
-    period: "per month",
-    description: "Complete 1-to-1 support from assessment to job offer.",
     icon: Crown,
     iconStyle: "gradient-orange text-white",
     borderColor: "border-amber-400",
     highlight: false,
-    ctaText: "Upgrade to Premium",
     ctaClass: "gradient-orange text-white border-0",
-    features: [
-      { text: "Career roadmap (20+ milestones)", included: true },
-      { text: "Comprehensive onboarding assessment", included: true },
-      { text: "Full resources library access", included: true },
-      { text: "Official links directory", included: true },
-      { text: "AI chat (unlimited + priority)", included: true },
-      { text: "Personalised AI roadmap", included: true },
-      { text: "Interview prep + mock sessions", included: true },
-      { text: "CV & personal statement review", included: true },
-      { text: "1-to-1 guidance (4 sessions/month)", included: true },
-      { text: "Direct agency introductions", included: true },
-    ],
+    showPeriod: true,
+    included: [true, true, true, true, true, true, true, true, true, true],
   },
 ];
 
 function PageHeader({ tier }: { tier: string }) {
+  const t = useT();
   const tierConfig = TIER_CONFIG[tier as keyof typeof TIER_CONFIG] || TIER_CONFIG.free;
   const TierIcon = tierConfig.icon;
   return (
@@ -108,11 +70,11 @@ function PageHeader({ tier }: { tier: string }) {
         </div>
         <nav className="hidden md:flex items-center gap-1">
           {[
-            { href: "/dashboard", label: "Dashboard" },
-            { href: "/roadmap", label: "Roadmap" },
-            { href: "/workspaces", label: "AI Workspaces" },
-            { href: "/resources", label: "Resources" },
-            { href: "/links", label: "Official Links" },
+            { href: "/dashboard", label: t("pricing.nav.dashboard") },
+            { href: "/roadmap", label: t("pricing.nav.roadmap") },
+            { href: "/workspaces", label: t("pricing.nav.workspaces") },
+            { href: "/resources", label: t("pricing.nav.resources") },
+            { href: "/links", label: t("pricing.nav.links") },
           ].map(item => (
             <Link key={item.href} href={item.href}>
               <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">{item.label}</Button>
@@ -120,7 +82,8 @@ function PageHeader({ tier }: { tier: string }) {
           ))}
         </nav>
         <div className="flex items-center gap-2">
-          <Badge className={tierConfig.color}><TierIcon className="w-3 h-3 me-1" />{tierConfig.label}</Badge>
+          <LanguageToggle />
+          <Badge className={tierConfig.color}><TierIcon className="w-3 h-3 me-1" />{t(`pricing.tiers.${tierConfig.tierKey}`)}</Badge>
           <div className="w-8 h-8 rounded-full gradient-purple flex items-center justify-center">
             <User className="w-4 h-4 text-white" />
           </div>
@@ -132,6 +95,8 @@ function PageHeader({ tier }: { tier: string }) {
 
 export default function Pricing() {
   const { user, isAuthenticated } = useAuth();
+  const t = useT();
+  const { dict } = useLanguage();
   const [upgrading, setUpgrading] = useState<string | null>(null);
   const upgradeTier = trpc.subscription.upgrade.useMutation();
   const utils = trpc.useUtils();
@@ -148,9 +113,10 @@ export default function Pricing() {
     try {
       await upgradeTier.mutateAsync({ tier: planId as "pro" | "premium" });
       utils.auth.me.invalidate();
-      toast.success(`Successfully upgraded to ${planId === "pro" ? "Professional" : "Premium"}!`);
+      const planName = planId === "pro" ? t("pricing.tiers.pro") : t("pricing.tiers.premium");
+      toast.success(t("pricing.upgradeSuccess", { plan: planName }));
     } catch (e: any) {
-      toast.error(e.message || "Upgrade failed. Please try again.");
+      toast.error(e.message || t("pricing.upgradeFailed"));
     } finally {
       setUpgrading(null);
     }
@@ -163,47 +129,48 @@ export default function Pricing() {
       <div className="container py-12 max-w-5xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <Badge className="bg-primary/10 text-primary mb-4">Pricing Plans</Badge>
+          <Badge className="bg-primary/10 text-primary mb-4">{t("pricing.badge")}</Badge>
           <h1 className="text-3xl font-bold text-foreground mb-4">
-            Choose Your Career Acceleration Plan
+            {t("pricing.title")}
           </h1>
           <p className="text-muted-foreground max-w-xl mx-auto">
-            Whether you're just starting out or need intensive 1-to-1 support, we have a plan to help you succeed in the UK medical system.
+            {t("pricing.subtitle")}
           </p>
         </div>
 
         {/* Plans Grid */}
         <div className="grid md:grid-cols-3 gap-6 mb-12">
-          {PLANS.map(plan => {
-            const PlanIcon = plan.icon;
-            const isCurrentPlan = tier === plan.id;
-            const isLoading = upgrading === plan.id;
+          {PLAN_META.map((meta, planIndex) => {
+            const plan = dict.pricing.plans[planIndex];
+            const PlanIcon = meta.icon;
+            const isCurrentPlan = tier === meta.id;
+            const isLoading = upgrading === meta.id;
 
             return (
               <div
-                key={plan.id}
-                className={`bg-card border-2 rounded-2xl overflow-hidden transition-all relative ${plan.borderColor} ${plan.highlight ? "shadow-xl scale-105" : ""}`}
+                key={meta.id}
+                className={`bg-card border-2 rounded-2xl overflow-hidden transition-all relative ${meta.borderColor} ${meta.highlight ? "shadow-xl scale-105" : ""}`}
               >
-                {plan.highlight && (
+                {meta.highlight && (
                   <div className="gradient-purple text-white text-center text-xs font-semibold py-1.5 tracking-wide">
-                    MOST POPULAR
+                    {t("pricing.mostPopular")}
                   </div>
                 )}
 
                 <div className="p-6">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className={`w-10 h-10 rounded-xl ${plan.iconStyle} flex items-center justify-center`}>
+                    <div className={`w-10 h-10 rounded-xl ${meta.iconStyle} flex items-center justify-center`}>
                       <PlanIcon className="w-5 h-5" />
                     </div>
                     <div>
                       <h3 className="font-bold text-foreground">{plan.name}</h3>
-                      {isCurrentPlan && <Badge className="text-xs bg-green-100 text-green-700">Current Plan</Badge>}
+                      {isCurrentPlan && <Badge className="text-xs bg-green-100 text-green-700">{t("pricing.currentPlan")}</Badge>}
                     </div>
                   </div>
 
                   <div className="mb-4">
                     <span className="text-3xl font-bold text-foreground">{plan.price}</span>
-                    {plan.period !== "forever" && (
+                    {meta.showPeriod && (
                       <span className="text-muted-foreground text-sm ms-1">/{plan.period}</span>
                     )}
                   </div>
@@ -211,14 +178,14 @@ export default function Pricing() {
                   <p className="text-sm text-muted-foreground mb-6">{plan.description}</p>
 
                   <Button
-                    onClick={() => handleUpgrade(plan.id)}
-                    disabled={isCurrentPlan || isLoading || plan.id === "free"}
-                    className={`w-full ${plan.ctaClass} ${isCurrentPlan ? "opacity-60 cursor-not-allowed" : ""}`}
+                    onClick={() => handleUpgrade(meta.id)}
+                    disabled={isCurrentPlan || isLoading || meta.id === "free"}
+                    className={`w-full ${meta.ctaClass} ${isCurrentPlan ? "opacity-60 cursor-not-allowed" : ""}`}
                   >
                     {isLoading ? (
-                      <><Loader2 className="w-4 h-4 me-2 animate-spin" />Upgrading...</>
+                      <><Loader2 className="w-4 h-4 me-2 animate-spin" />{t("pricing.upgrading")}</>
                     ) : isCurrentPlan ? (
-                      "Current Plan"
+                      t("pricing.currentPlan")
                     ) : (
                       plan.ctaText
                     )}
@@ -227,18 +194,21 @@ export default function Pricing() {
 
                 <div className="px-6 pb-6">
                   <div className="border-t border-border pt-4 space-y-2.5">
-                    {plan.features.map((feature, i) => (
-                      <div key={i} className="flex items-center gap-2.5">
-                        {feature.included ? (
-                          <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
-                        ) : (
-                          <X className="w-4 h-4 text-muted-foreground/40 flex-shrink-0" />
-                        )}
-                        <span className={`text-sm ${feature.included ? "text-foreground" : "text-muted-foreground/60"}`}>
-                          {feature.text}
-                        </span>
-                      </div>
-                    ))}
+                    {plan.features.map((feature, i) => {
+                      const included = meta.included[i];
+                      return (
+                        <div key={i} className="flex items-center gap-2.5">
+                          {included ? (
+                            <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
+                          ) : (
+                            <X className="w-4 h-4 text-muted-foreground/40 flex-shrink-0" />
+                          )}
+                          <span className={`text-sm ${included ? "text-foreground" : "text-muted-foreground/60"}`}>
+                            {feature}
+                          </span>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
@@ -248,26 +218,9 @@ export default function Pricing() {
 
         {/* FAQ */}
         <div className="bg-card border border-border rounded-2xl p-8">
-          <h2 className="text-xl font-bold text-foreground mb-6 text-center">Frequently Asked Questions</h2>
+          <h2 className="text-xl font-bold text-foreground mb-6 text-center">{t("pricing.faqHeading")}</h2>
           <div className="grid md:grid-cols-2 gap-6">
-            {[
-              {
-                q: "Can I cancel anytime?",
-                a: "Yes, you can cancel your subscription at any time. You'll retain access until the end of your billing period.",
-              },
-              {
-                q: "What is the 1-to-1 guidance?",
-                a: "Premium members get 4 monthly sessions with a UK-trained medical career advisor who reviews your portfolio and guides your applications.",
-              },
-              {
-                q: "Is the access code required?",
-                a: "Yes, MedPath UK is currently invite-only. Each access code is linked to one email address and allows a single registration.",
-              },
-              {
-                q: "Can I upgrade or downgrade?",
-                a: "You can upgrade at any time. Downgrades take effect at the end of your current billing period.",
-              },
-            ].map((faq, i) => (
+            {dict.pricing.faqs.map((faq, i) => (
               <div key={i}>
                 <h3 className="font-semibold text-foreground mb-1">{faq.q}</h3>
                 <p className="text-sm text-muted-foreground">{faq.a}</p>
