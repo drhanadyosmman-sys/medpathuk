@@ -8,7 +8,7 @@ import {
   ArrowRight, BookOpen, CheckCircle2, ChevronRight, Circle,
   ClipboardList, Crown, ExternalLink, FileText, GraduationCap,
   Loader2, MessageSquare, Microscope, Stethoscope, Target,
-  TrendingUp, User, Zap, Star, Calendar, Flag, Lock,
+  TrendingUp, User, Zap, Star, Calendar, Flag, Lock, Languages,
 } from "lucide-react";
 import { Link } from "wouter";
 import { useState } from "react";
@@ -123,6 +123,15 @@ export default function Roadmap() {
   const categories: string[] = ["all", ...Array.from(new Set<string>(milestones.map((m: any) => m.category as string)))];
   const filteredMilestones = selectedCategory === "all" ? milestones : milestones.filter((m: any) => m.category === selectedCategory);
 
+  // The stored plan text is written once by the model; switching the UI language
+  // cannot translate it. Detect when the plan's language differs from the reader's
+  // and offer a one-click regenerate. Official terms (GMC, PLAB…) stay Latin either
+  // way, so we sample the prose — title, summary and the first few milestones.
+  const contentSample = [roadmapData?.title, roadmapData?.summary, ...milestones.slice(0, 3).flatMap((m: any) => [m.title, m.description])]
+    .filter(Boolean).join(" ");
+  const contentHasArabic = /[؀-ۿ]/.test(contentSample);
+  const languageMismatch = !!roadmapData && contentSample.trim().length > 0 && (language === "ar") !== contentHasArabic;
+
   const handleToggle = async (milestoneId: number, current: boolean) => {
     await toggleMilestone.mutateAsync({ milestoneId, isCompleted: !current });
     utils.roadmap.getActive.invalidate();
@@ -190,6 +199,19 @@ export default function Roadmap() {
           </div>
         ) : (
           <>
+            {/* Language mismatch — stored plan is in a different language than the reader */}
+            {languageMismatch && (
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 rounded-xl border border-primary/30 bg-primary/5 p-4 mb-8">
+                <Languages className="w-5 h-5 text-primary shrink-0" />
+                <p className="text-sm text-foreground flex-1">{t("roadmap.langMismatch.text")}</p>
+                <Button onClick={handleGenerate} disabled={generating} size="sm" className="gradient-purple text-white border-0 shrink-0">
+                  {generating
+                    ? <><Loader2 className="w-4 h-4 me-2 animate-spin" />{t("roadmap.langMismatch.regenerating")}</>
+                    : <><Zap className="w-4 h-4 me-2" />{t("roadmap.langMismatch.action")}</>}
+                </Button>
+              </div>
+            )}
+
             {/* Progress Overview */}
             <div className="gradient-hero rounded-2xl p-6 mb-8 text-white">
               <div className="flex items-center justify-between mb-4">

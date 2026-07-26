@@ -28,6 +28,12 @@ export const roadmap = {
     generating: "Generating…",
   },
 
+  langMismatch: {
+    text: "This plan was written in another language. Regenerate it to read it in your current language — this creates a fresh plan and resets your progress.",
+    action: "Regenerate in this language",
+    regenerating: "Regenerating…",
+  },
+
   empty: {
     title: "No Roadmap Yet",
     bodyReady: "Click the button above to generate your personalised AI roadmap.",
