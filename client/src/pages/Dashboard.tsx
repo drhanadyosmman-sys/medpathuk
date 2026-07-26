@@ -221,7 +221,7 @@ export default function Dashboard() {
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {QUICK_WORKSPACES.map(ws => (
-                  <Link key={ws.key} href="/workspaces">
+                  <Link key={ws.key} href={`/workspaces?ws=${ws.key}`}>
                     <div className="flex items-center gap-3 p-3 rounded-xl border border-border hover:border-primary/40 hover:bg-secondary/50 transition-all cursor-pointer group">
                       <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${ws.color} flex items-center justify-center flex-shrink-0`}>
                         <ws.icon className="w-4 h-4 text-white" />

@@ -96,6 +96,17 @@ export default function Chat() {
     setLocalMessages([]);
   };
 
+  // Open a specific workspace directly when linked as /workspaces?ws=audit,
+  // so a shortcut on the dashboard lands in that workspace instead of the
+  // chooser. Runs once; a bad or missing value just leaves the chooser up.
+  useEffect(() => {
+    const requested = new URLSearchParams(window.location.search).get("ws");
+    if (requested && WORKSPACES.some(w => w.key === requested)) {
+      setSelectedWorkspace(requested as WorkspaceKey);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
