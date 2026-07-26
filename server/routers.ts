@@ -92,28 +92,35 @@ export const appRouter = router({
         name: z.string().min(2, "Name must be at least 2 characters"),
         email: z.string().email("Invalid email address"),
         password: z.string().min(8, "Password must be at least 8 characters"),
-        code: z.string().regex(/^\d{6}$/, "Enter the 6-digit access code."),
+        code: z.string().optional(),
         whatsappNumber: z.string().optional(),
         graduationCountry: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         const email = input.email.trim().toLowerCase();
+        const isOwner = !!ENV.ownerEmail && email === ENV.ownerEmail;
+        const code = (input.code ?? "").trim();
 
-        // Registration is invite-only: it requires a valid 6-digit code that the
-        // owner issued for this exact email. Verify it fully before creating any
-        // account, so an invalid code never leaves a half-registered user behind.
-        const accessCode = await getAccessCodeByCode(input.code.trim());
-        if (!accessCode) {
-          throw new TRPCError({ code: "BAD_REQUEST", message: "Invalid access code." });
-        }
-        if (accessCode.isUsed) {
-          throw new TRPCError({ code: "BAD_REQUEST", message: "This access code has already been used." });
-        }
-        if (accessCode.email.toLowerCase() !== email) {
-          throw new TRPCError({ code: "BAD_REQUEST", message: "This code was issued for a different email address." });
-        }
-        if (accessCode.expiresAt && accessCode.expiresAt < new Date()) {
-          throw new TRPCError({ code: "BAD_REQUEST", message: "This access code has expired." });
+        // Registration is invite-only: everyone but the owner needs a valid
+        // 6-digit code issued for this exact email. Verify it fully before
+        // creating any account, so an invalid code never half-registers a user.
+        if (!isOwner) {
+          if (!/^\d{6}$/.test(code)) {
+            throw new TRPCError({ code: "BAD_REQUEST", message: "Enter the 6-digit access code." });
+          }
+          const accessCode = await getAccessCodeByCode(code);
+          if (!accessCode) {
+            throw new TRPCError({ code: "BAD_REQUEST", message: "Invalid access code." });
+          }
+          if (accessCode.isUsed) {
+            throw new TRPCError({ code: "BAD_REQUEST", message: "This access code has already been used." });
+          }
+          if (accessCode.email.toLowerCase() !== email) {
+            throw new TRPCError({ code: "BAD_REQUEST", message: "This code was issued for a different email address." });
+          }
+          if (accessCode.expiresAt && accessCode.expiresAt < new Date()) {
+            throw new TRPCError({ code: "BAD_REQUEST", message: "This access code has expired." });
+          }
         }
 
         const existing = await getUserByEmail(email);
@@ -129,8 +136,14 @@ export const appRouter = router({
           graduationCountry: input.graduationCountry || null,
         });
 
-        // Consume the code and apply its subscription tier to the new account.
-        await validateAndUseAccessCode(input.code.trim(), email, user.id);
+        if (isOwner) {
+          // The owner needs no code: grant admin and full access immediately.
+          await updateUserProfile(user.id, { subscriptionTier: "premium" });
+          await promoteToAdminByEmail(email);
+        } else {
+          // Consume the code and apply its subscription tier to the new account.
+          await validateAndUseAccessCode(code, email, user.id);
+        }
 
         const sessionToken = await sdk.createSessionToken(user.openId, { name: user.name || "", expiresInMs: ONE_YEAR_MS });
         const cookieOptions = getSessionCookieOptions(ctx.req);

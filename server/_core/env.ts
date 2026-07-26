@@ -12,9 +12,10 @@ export const ENV = {
   /**
    * The account that owns this deployment. On sign-in, a user whose email
    * matches this is made an admin — so the owner gets the admin panel without
-   * anyone editing the database by hand. Compared lowercased.
+   * anyone editing the database by hand. Compared lowercased. Falls back to the
+   * owner's known address so admin works even if OWNER_EMAIL is unset in Railway.
    */
-  ownerEmail: (process.env.OWNER_EMAIL ?? "").toLowerCase(),
+  ownerEmail: (process.env.OWNER_EMAIL || "healthcarequalityschool@gmail.com").toLowerCase(),
   isProduction: process.env.NODE_ENV === "production",
   /** Anthropic API key. The AI features do nothing without it. */
   anthropicApiKey: process.env.ANTHROPIC_API_KEY ?? "",

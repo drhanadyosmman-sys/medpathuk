@@ -73,7 +73,7 @@ export default function Register() {
     if (!form.password || form.password.length < 8) {
       newErrors.password = t("auth.register.errors.password");
     }
-    if (!/^\d{6}$/.test(form.code.trim())) {
+    if (form.code.trim() && !/^\d{6}$/.test(form.code.trim())) {
       newErrors.code = t("auth.register.errors.code");
     }
     setErrors(newErrors);
