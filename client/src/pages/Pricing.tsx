@@ -31,8 +31,8 @@ const PLAN_META = [
     borderColor: "border-border",
     highlight: false,
     ctaClass: "border border-border bg-transparent text-foreground hover:bg-secondary",
-    showPeriod: false,
-    included: [true, true, true, true, true, false, false, false, false, false],
+    showPeriod: true,
+    included: [true, true, true, true, true, false, false, false],
   },
   {
     id: "pro",
@@ -42,7 +42,7 @@ const PLAN_META = [
     highlight: true,
     ctaClass: "gradient-purple text-white border-0",
     showPeriod: true,
-    included: [true, true, true, true, true, true, true, true, false, false],
+    included: [true, true, true, true, true, true, true, false],
   },
   {
     id: "premium",
@@ -52,7 +52,7 @@ const PLAN_META = [
     highlight: false,
     ctaClass: "gradient-orange text-white border-0",
     showPeriod: true,
-    included: [true, true, true, true, true, true, true, true, true, true],
+    included: [true, true, true, true, true, true, true, true],
   },
 ];
 

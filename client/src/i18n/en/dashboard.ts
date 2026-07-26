@@ -73,11 +73,11 @@ export const dashboard = {
 
   subscription: {
     planSuffix: "Plan",
-    freeBody: "Upgrade for full AI workspace access, CV review, and interview coaching.",
+    freeBody: "Upgrade for unlimited AI, AI CV & portfolio review, and interview prep.",
     freeCta: "Upgrade Plan",
-    proBody: "Upgrade to Premium for 1-to-1 mentoring and unlimited AI interactions.",
+    proBody: "Upgrade to Premium for priority AI, AI mock interview practice, and more roadmap generations.",
     proCta: "Go Premium",
-    premiumBody: "You have full access to all features including 1-to-1 mentoring.",
+    premiumBody: "You have full access to every AI feature, including mock interview practice.",
   },
 
   quickLinks: {

@@ -16,6 +16,7 @@ import {
   getAllAccessCodes,
   getAllUsers,
   getActiveRoadmap,
+  countRoadmapsGenerated,
   getChatHistory,
   getExternalLinks,
   getLatestAssessment,
@@ -47,6 +48,14 @@ import { ENV } from "./_core/env";
 function getTierLevel(tier: string): number {
   const levels: Record<string, number> = { free: 0, pro: 1, premium: 2 };
   return levels[tier] ?? 0;
+}
+
+// How many times a subscriber may generate a roadmap. Each generation is an AI
+// call, so this caps cost. One base plan plus a few regenerations (for a changed
+// situation, or to switch the plan's language) on the higher tiers.
+function roadmapGenerationLimit(tier: string): number {
+  const limits: Record<string, number> = { free: 1, pro: 3, premium: 5 };
+  return limits[tier] ?? 1;
 }
 
 function generateCode(length = 12): string {
@@ -273,6 +282,14 @@ export const appRouter = router({
       return { ...roadmapWithoutContent, milestones };
     }),
 
+    // How many roadmap generations the subscriber has used and has left.
+    generationStatus: protectedProcedure.query(async ({ ctx }) => {
+      const tier = ctx.user.subscriptionTier ?? "free";
+      const limit = roadmapGenerationLimit(tier);
+      const used = await countRoadmapsGenerated(ctx.user.id);
+      return { used, limit, remaining: Math.max(0, limit - used), canGenerate: used < limit };
+    }),
+
     generate: protectedProcedure
       .input(z.object({
         assessmentId: z.number(),
@@ -283,6 +300,17 @@ export const appRouter = router({
         if (!assessment) throw new TRPCError({ code: "BAD_REQUEST", message: "Please complete the onboarding assessment first." });
 
         const tier = ctx.user.subscriptionTier ?? "free";
+
+        // Cap generations per subscription before spending an AI call.
+        const limit = roadmapGenerationLimit(tier);
+        const used = await countRoadmapsGenerated(ctx.user.id);
+        if (used >= limit) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: `You have used all ${limit} roadmap generations on your plan. Upgrade for more, or contact support.`,
+          });
+        }
+
         const milestoneCount = tier === "premium" ? 20 : tier === "pro" ? 15 : 10;
 
         const prompt = `You are an expert UK medical career advisor. Create a detailed, personalized career roadmap for a healthcare professional with the following profile:

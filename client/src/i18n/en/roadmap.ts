@@ -34,6 +34,11 @@ export const roadmap = {
     regenerating: "Regenerating…",
   },
 
+  generations: {
+    remaining: "{remaining} of {limit} plan generations left on your plan",
+    exhausted: "You've used all your plan generations on this subscription. Upgrade for more.",
+  },
+
   empty: {
     title: "No Roadmap Yet",
     bodyReady: "Click the button above to generate your personalised AI roadmap.",
@@ -83,7 +88,7 @@ export const roadmap = {
 
   upsell: {
     title: "Unlock Your Full Roadmap",
-    body: "Upgrade to Professional or Premium for up to 20 detailed milestones with resources and 1-to-1 guidance.",
+    body: "Upgrade to Professional or Premium for up to 20+ detailed milestones, unlimited AI, and more roadmap generations.",
     cta: "Upgrade Now",
   },
 

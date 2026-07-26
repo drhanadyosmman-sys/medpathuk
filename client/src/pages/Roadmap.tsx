@@ -79,6 +79,7 @@ export default function Roadmap() {
   const { t, dict, language } = useLanguage();
   const r = dict.roadmap;
   const { data: roadmapData, isLoading: roadmapLoading } = trpc.roadmap.getActive.useQuery(undefined, { enabled: isAuthenticated });
+  const { data: genStatus } = trpc.roadmap.generationStatus.useQuery(undefined, { enabled: isAuthenticated });
   const generateRoadmap = trpc.roadmap.generate.useMutation();
   const toggleMilestone = trpc.roadmap.toggleMilestone.useMutation();
   const utils = trpc.useUtils();
@@ -132,6 +133,9 @@ export default function Roadmap() {
   const contentHasArabic = /[؀-ۿ]/.test(contentSample);
   const languageMismatch = !!roadmapData && contentSample.trim().length > 0 && (language === "ar") !== contentHasArabic;
 
+  // Generation allowance: block once the subscriber's generations are spent.
+  const canGenerate = genStatus?.canGenerate ?? true;
+
   const handleToggle = async (milestoneId: number, current: boolean) => {
     await toggleMilestone.mutateAsync({ milestoneId, isCompleted: !current });
     utils.roadmap.getActive.invalidate();
@@ -143,6 +147,7 @@ export default function Roadmap() {
     try {
       await generateRoadmap.mutateAsync({ assessmentId: 0, language });
       utils.roadmap.getActive.invalidate();
+      utils.roadmap.generationStatus.invalidate();
       toast.success(t("roadmap.toast.generated"));
     } catch (e: any) {
       toast.error(e.message || t("roadmap.toast.generateFailed"));
@@ -168,7 +173,7 @@ export default function Roadmap() {
             <p className="text-muted-foreground mt-1">{t("roadmap.header.subtitle")}</p>
           </div>
           {!roadmapLoading && !roadmapData && user?.onboardingCompleted && (
-            <Button onClick={handleGenerate} disabled={generating} className="gradient-purple text-white border-0">
+            <Button onClick={handleGenerate} disabled={generating || !canGenerate} className="gradient-purple text-white border-0">
               {generating ? <><Loader2 className="w-4 h-4 me-2 animate-spin" />{t("roadmap.generate.generating")}</> : <><Zap className="w-4 h-4 me-2" />{t("roadmap.generate.idle")}</>}
             </Button>
           )}
@@ -204,12 +209,25 @@ export default function Roadmap() {
               <div className="flex flex-col sm:flex-row sm:items-center gap-3 rounded-xl border border-primary/30 bg-primary/5 p-4 mb-8">
                 <Languages className="w-5 h-5 text-primary shrink-0" />
                 <p className="text-sm text-foreground flex-1">{t("roadmap.langMismatch.text")}</p>
-                <Button onClick={handleGenerate} disabled={generating} size="sm" className="gradient-purple text-white border-0 shrink-0">
-                  {generating
-                    ? <><Loader2 className="w-4 h-4 me-2 animate-spin" />{t("roadmap.langMismatch.regenerating")}</>
-                    : <><Zap className="w-4 h-4 me-2" />{t("roadmap.langMismatch.action")}</>}
-                </Button>
+                {canGenerate ? (
+                  <Button onClick={handleGenerate} disabled={generating} size="sm" className="gradient-purple text-white border-0 shrink-0">
+                    {generating
+                      ? <><Loader2 className="w-4 h-4 me-2 animate-spin" />{t("roadmap.langMismatch.regenerating")}</>
+                      : <><Zap className="w-4 h-4 me-2" />{t("roadmap.langMismatch.action")}</>}
+                  </Button>
+                ) : (
+                  <span className="text-xs text-muted-foreground shrink-0">{t("roadmap.generations.exhausted")}</span>
+                )}
               </div>
+            )}
+
+            {/* Remaining generations allowance */}
+            {genStatus && (
+              <p className="text-xs text-muted-foreground mb-6">
+                {canGenerate
+                  ? t("roadmap.generations.remaining", { remaining: genStatus.remaining, limit: genStatus.limit })
+                  : t("roadmap.generations.exhausted")}
+              </p>
             )}
 
             {/* Progress Overview */}
