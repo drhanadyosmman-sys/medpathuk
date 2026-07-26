@@ -306,6 +306,10 @@ Readiness Score: ${assessment.readinessScore || 0}/100
 
 Generate a roadmap with exactly ${milestoneCount} milestones. Each milestone must be specific, actionable, and relevant to UK medical career progression.
 
+COVERAGE — the plan must address the portfolio domains that actually carry marks in UK specialty recruitment: research and publications, quality improvement, clinical audit, teaching, presentations, the required Royal College exams, and English/OET where relevant. Do not skew the plan toward whatever is easiest to do. Research and publications are among the most heavily weighted domains and the slowest to produce, so the plan MUST include concrete research/publication milestones unless the applicant already has strong evidence there OR the target specialty genuinely does not score research. Never omit research simply because the applicant currently has none — that is exactly the gap the plan should close.
+
+PRIORITY — set "high" for what most improves the application score and takes the longest to arrange (typically research and publications, exams with long lead times, and any hard eligibility requirement). Use "medium" for standard portfolio building. Use "low" only for optional polish, or for a domain where the applicant is already strong. Base priority on impact and time-sensitivity, never on how easy the task is. A domain the applicant is weak in and that scores heavily is high priority, not low.
+
 Return ONLY valid JSON in this exact format:
 {
   "title": "Your Personalised UK Career Roadmap",
@@ -734,6 +738,8 @@ Moderate domains (50–74%):
 ${moderateDomains.map(d => `- ${d.name}: ${d.score}/${d.maxScore} (${d.percentage}%)`).join("\n") || "None"}
 
 Generate a personalised improvement roadmap with specific, actionable milestones. For each weak or moderate domain, provide 2–3 concrete steps the doctor can take in the next 6–12 months. Be specific, realistic, and encouraging. Reference official UK resources where relevant (e.g., PubMed, NHS, Royal Colleges, NIHR, Oriel).
+
+Set priority by impact and time-sensitivity, not by ease: a domain that scores heavily and is weak is "high" priority (research and publications usually fall here — they carry heavy weight and take the longest to produce); "medium" for standard building; "low" only for optional polish or a domain already strong. Do not mark a weak, heavily-scored domain as low.
 
 Return a JSON object with this exact structure:
 {
