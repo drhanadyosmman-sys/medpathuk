@@ -35,7 +35,9 @@ export const questionnaire = {
     leadership: "Leadership or management experience",
 
     examsPreparing: "Exams Currently Preparing For",
+    examsOptionalHint: "Optional — select any that apply, or leave empty.",
     examsPassed: "Exams Already Passed",
+    examsPassedHint: "Leave empty if you haven't passed any exam yet — that's completely fine.",
 
     primaryGoal: "Primary Goal",
     availableHours: "Available Hours/Week:",

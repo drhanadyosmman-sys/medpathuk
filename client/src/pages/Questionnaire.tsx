@@ -330,7 +330,8 @@ export default function Questionnaire() {
         {step === 3 && (
           <div className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-foreground mb-3">{t("questionnaire.fields.examsPreparing")}</label>
+              <label className="block text-sm font-medium text-foreground mb-1">{t("questionnaire.fields.examsPreparing")}</label>
+              <p className="text-xs text-muted-foreground mb-3">{t("questionnaire.fields.examsOptionalHint")}</p>
               <div className="grid grid-cols-2 gap-2">
                 {EXAMS.map(e => (
                   <SelectButton key={e} value={e} selected={formData.currentExams.includes(e)} onClick={() => toggleExam(e, "currentExams")}>
@@ -340,7 +341,8 @@ export default function Questionnaire() {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-foreground mb-3">{t("questionnaire.fields.examsPassed")}</label>
+              <label className="block text-sm font-medium text-foreground mb-1">{t("questionnaire.fields.examsPassed")}</label>
+              <p className="text-xs text-muted-foreground mb-3">{t("questionnaire.fields.examsPassedHint")}</p>
               <div className="grid grid-cols-2 gap-2">
                 {EXAMS.map(e => (
                   <SelectButton key={e} value={e} selected={formData.examsPassed.includes(e)} onClick={() => toggleExam(e, "examsPassed")}>

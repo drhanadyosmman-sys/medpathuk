@@ -35,7 +35,9 @@ export const questionnaire = {
     leadership: "خبرة في القيادة أو الإدارة",
 
     examsPreparing: "الامتحانات التي تستعدّ لها حالياً",
+    examsOptionalHint: "اختياري — اختر ما ينطبق عليك، أو اتركه فارغاً.",
     examsPassed: "الامتحانات التي اجتزتها",
+    examsPassedHint: "اتركه فارغاً إن لم تجتَز أي امتحان بعد — هذا طبيعي تماماً.",
 
     primaryGoal: "الهدف الأساسي",
     availableHours: "الساعات المتاحة أسبوعياً:",
