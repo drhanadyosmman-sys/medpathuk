@@ -1,4 +1,5 @@
 import { useAuth } from "@/_core/hooks/useAuth";
+import UserMenu from "@/components/UserMenu";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
@@ -66,9 +67,7 @@ function PageHeader({ tier }: { tier: string }) {
         <div className="flex items-center gap-2">
           <LanguageToggle className="hidden sm:inline-flex" />
           <Badge className={tierConfig.color}><TierIcon className="w-3 h-3 me-1" />{t(`roadmap.tiers.${tierKey}`)}</Badge>
-          <div className="w-8 h-8 rounded-full gradient-purple flex items-center justify-center">
-            <User className="w-4 h-4 text-white" />
-          </div>
+          <UserMenu />
         </div>
       </div>
     </header>

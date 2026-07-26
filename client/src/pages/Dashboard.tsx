@@ -1,4 +1,5 @@
 import { useAuth } from "@/_core/hooks/useAuth";
+import UserMenu from "@/components/UserMenu";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
@@ -125,9 +126,7 @@ export default function Dashboard() {
               <TierIcon className="w-3 h-3 me-1" />
               {t(`dashboard.tiers.${tier}`)}
             </Badge>
-            <div className="w-8 h-8 rounded-full gradient-purple flex items-center justify-center">
-              <User className="w-4 h-4 text-white" />
-            </div>
+            <UserMenu />
           </div>
         </div>
       </header>

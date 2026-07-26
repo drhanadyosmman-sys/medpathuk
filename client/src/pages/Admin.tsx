@@ -1,4 +1,5 @@
 import { useAuth } from "@/_core/hooks/useAuth";
+import UserMenu from "@/components/UserMenu";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -128,9 +129,7 @@ export default function Admin() {
           </nav>
           <div className="flex items-center gap-3">
             <LanguageToggle />
-            <div className="w-8 h-8 rounded-full gradient-purple flex items-center justify-center">
-              <User className="w-4 h-4 text-white" />
-            </div>
+            <UserMenu />
           </div>
         </div>
       </header>
