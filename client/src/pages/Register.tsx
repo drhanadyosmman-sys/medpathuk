@@ -12,15 +12,15 @@ import { useT } from "@/contexts/LanguageContext";
 import LanguageToggle from "@/components/LanguageToggle";
 import { useEffect } from "react";
 
-// Common graduation countries for UK IMG doctors
+// Common graduation countries for UK IMG doctors — listed alphabetically so a
+// reader can find their country quickly, with "Other" kept last.
 const GRADUATION_COUNTRIES = [
   "Egypt", "Pakistan", "India", "Nigeria", "Sudan", "Iraq", "Libya", "Jordan",
   "Saudi Arabia", "Yemen", "Syria", "Morocco", "Algeria", "Tunisia", "Lebanon",
   "Bangladesh", "Sri Lanka", "Ghana", "Kenya", "Zimbabwe", "South Africa",
   "Philippines", "Malaysia", "Myanmar", "Nepal", "Afghanistan", "Iran",
   "Turkey", "Romania", "Bulgaria", "Poland", "Hungary", "Ukraine",
-  "Other"
-];
+].sort((a, b) => a.localeCompare(b)).concat("Other");
 
 export default function Register() {
   const [, navigate] = useLocation();
