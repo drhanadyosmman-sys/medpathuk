@@ -76,7 +76,7 @@ function PageHeader({ tier }: { tier: string }) {
 
 export default function Roadmap() {
   const { user, isAuthenticated, loading } = useAuth();
-  const { t, dict } = useLanguage();
+  const { t, dict, language } = useLanguage();
   const r = dict.roadmap;
   const { data: roadmapData, isLoading: roadmapLoading } = trpc.roadmap.getActive.useQuery(undefined, { enabled: isAuthenticated });
   const generateRoadmap = trpc.roadmap.generate.useMutation();
@@ -132,7 +132,7 @@ export default function Roadmap() {
   const handleGenerate = async () => {
     setGenerating(true);
     try {
-      await generateRoadmap.mutateAsync({ assessmentId: 0 });
+      await generateRoadmap.mutateAsync({ assessmentId: 0, language });
       utils.roadmap.getActive.invalidate();
       toast.success(t("roadmap.toast.generated"));
     } catch (e: any) {
