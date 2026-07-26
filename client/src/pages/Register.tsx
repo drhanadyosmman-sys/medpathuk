@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Eye, EyeOff, Stethoscope, ArrowRight, User, Mail, Lock, Phone, Globe } from "lucide-react";
+import { Eye, EyeOff, Stethoscope, ArrowRight, User, Mail, Lock, Phone, Globe, KeyRound } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useT } from "@/contexts/LanguageContext";
 import LanguageToggle from "@/components/LanguageToggle";
@@ -33,6 +33,7 @@ export default function Register() {
     name: "",
     email: "",
     password: "",
+    code: "",
     whatsappNumber: "",
     graduationCountry: "",
   });
@@ -53,6 +54,8 @@ export default function Register() {
     onError: (err) => {
       if (err.message.includes("already exists")) {
         setErrors({ email: t("auth.register.errors.exists") });
+      } else if (err.message.toLowerCase().includes("code")) {
+        setErrors({ code: err.message });
       } else {
         toast.error(err.message || t("auth.register.errors.failed"));
       }
@@ -70,6 +73,9 @@ export default function Register() {
     if (!form.password || form.password.length < 8) {
       newErrors.password = t("auth.register.errors.password");
     }
+    if (!/^\d{6}$/.test(form.code.trim())) {
+      newErrors.code = t("auth.register.errors.code");
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -81,6 +87,7 @@ export default function Register() {
       name: form.name.trim(),
       email: form.email.trim().toLowerCase(),
       password: form.password,
+      code: form.code.trim(),
       whatsappNumber: form.whatsappNumber.trim() || undefined,
       graduationCountry: form.graduationCountry || undefined,
     });
@@ -196,6 +203,29 @@ export default function Register() {
                 />
               </div>
               {errors.email && <p className="text-destructive text-sm">{errors.email}</p>}
+            </div>
+
+            {/* Access Code */}
+            <div className="space-y-1.5">
+              <Label htmlFor="code" className="text-foreground font-medium">
+                {t("auth.register.code")} <span className="text-destructive">*</span>
+              </Label>
+              <div className="relative">
+                <KeyRound className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  id="code"
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={6}
+                  placeholder="000000"
+                  value={form.code}
+                  onChange={(e) => setForm(p => ({ ...p, code: e.target.value.replace(/\D/g, "").slice(0, 6) }))}
+                  className={`ps-10 bg-card border-border text-foreground placeholder:text-muted-foreground tracking-[0.4em] font-mono ${errors.code ? "border-destructive" : ""}`}
+                />
+              </div>
+              {errors.code
+                ? <p className="text-destructive text-sm">{errors.code}</p>
+                : <p className="text-muted-foreground text-xs">{t("auth.register.codeHint")}</p>}
             </div>
 
             {/* Password */}

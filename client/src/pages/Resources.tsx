@@ -95,19 +95,6 @@ export default function Resources() {
           <p className="text-muted-foreground mt-1">{t("resources.subtitle")}</p>
         </div>
 
-        {tier === "free" && (
-          <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 mb-8 flex items-center gap-3">
-            <Star className="w-5 h-5 text-primary flex-shrink-0" />
-            <div>
-              <p className="text-sm font-medium text-foreground">{t("resources.upsell.title")}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{t("resources.upsell.body")}</p>
-            </div>
-            <Link href="/pricing" className="ms-auto">
-              <Button size="sm" className="gradient-purple text-white border-0 whitespace-nowrap">{t("resources.upsell.cta")}</Button>
-            </Link>
-          </div>
-        )}
-
         <div className="space-y-8">
           {RESOURCE_STRUCTURE.map((section, s) => {
             const SectionIcon = section.icon;
@@ -169,8 +156,7 @@ export default function Resources() {
                             <div className="flex items-center gap-2">
                               <Lock className="w-3.5 h-3.5 text-muted-foreground" />
                               <span className="text-xs text-muted-foreground">
-                                {t("resources.locked.requires", { tier: t(`resources.tiers.${minTier}`) })}{" "}
-                                <Link href="/pricing" className="text-primary hover:underline">{t("resources.locked.upgrade")}</Link>
+                                {t("resources.locked.requires", { tier: t(`resources.tiers.${minTier}`) })}
                               </span>
                             </div>
                           </div>

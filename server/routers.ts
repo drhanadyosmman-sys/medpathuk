@@ -17,6 +17,7 @@ import {
   getAllUsers,
   getActiveRoadmap,
   countRoadmapsGenerated,
+  getAccessCodeByCode,
   getChatHistory,
   getExternalLinks,
   getLatestAssessment,
@@ -58,14 +59,21 @@ function roadmapGenerationLimit(tier: string): number {
   return limits[tier] ?? 1;
 }
 
-function generateCode(length = 12): string {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+// A 6-digit numeric access code (leading zeros allowed), e.g. "049213".
+function generateCode(): string {
   let code = "";
-  for (let i = 0; i < length; i++) {
-    if (i > 0 && i % 4 === 0) code += "-";
-    code += chars[Math.floor(Math.random() * chars.length)];
-  }
+  for (let i = 0; i < 6; i++) code += Math.floor(Math.random() * 10);
   return code;
+}
+
+// Generate a 6-digit code that is not already in the database.
+async function generateUniqueCode(): Promise<string> {
+  for (let attempt = 0; attempt < 20; attempt++) {
+    const code = generateCode();
+    const existing = await getAccessCodeByCode(code);
+    if (!existing) return code;
+  }
+  throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Could not allocate a unique code, please try again." });
 }
 
 export const appRouter = router({
@@ -84,22 +92,46 @@ export const appRouter = router({
         name: z.string().min(2, "Name must be at least 2 characters"),
         email: z.string().email("Invalid email address"),
         password: z.string().min(8, "Password must be at least 8 characters"),
+        code: z.string().regex(/^\d{6}$/, "Enter the 6-digit access code."),
         whatsappNumber: z.string().optional(),
         graduationCountry: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
-        const existing = await getUserByEmail(input.email);
+        const email = input.email.trim().toLowerCase();
+
+        // Registration is invite-only: it requires a valid 6-digit code that the
+        // owner issued for this exact email. Verify it fully before creating any
+        // account, so an invalid code never leaves a half-registered user behind.
+        const accessCode = await getAccessCodeByCode(input.code.trim());
+        if (!accessCode) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Invalid access code." });
+        }
+        if (accessCode.isUsed) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "This access code has already been used." });
+        }
+        if (accessCode.email.toLowerCase() !== email) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "This code was issued for a different email address." });
+        }
+        if (accessCode.expiresAt && accessCode.expiresAt < new Date()) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "This access code has expired." });
+        }
+
+        const existing = await getUserByEmail(email);
         if (existing) {
           throw new TRPCError({ code: "CONFLICT", message: "An account with this email already exists." });
         }
         const passwordHash = await bcrypt.hash(input.password, 12);
         const user = await createEmailUser({
           name: input.name,
-          email: input.email,
+          email,
           passwordHash,
           whatsappNumber: input.whatsappNumber || null,
           graduationCountry: input.graduationCountry || null,
         });
+
+        // Consume the code and apply its subscription tier to the new account.
+        await validateAndUseAccessCode(input.code.trim(), email, user.id);
+
         const sessionToken = await sdk.createSessionToken(user.openId, { name: user.name || "", expiresInMs: ONE_YEAR_MS });
         const cookieOptions = getSessionCookieOptions(ctx.req);
         ctx.res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
@@ -494,10 +526,14 @@ Return ONLY valid JSON in this exact format:
   }),
   // ─── Subscription ─────────────────────────────────────────────────────────
   subscription: router({
+    // Tiers are granted by the access code a user registers with; there is no
+    // self-serve upgrade (billing is handled off-site). Kept as an admin-only
+    // override so a plan can be corrected by hand if needed.
     upgrade: protectedProcedure
-      .input(z.object({ tier: z.enum(["pro", "premium"]) }))
+      .input(z.object({ tier: z.enum(["pro", "premium"]), userId: z.number().optional() }))
       .mutation(async ({ ctx, input }) => {
-        await updateUserProfile(ctx.user.id, { subscriptionTier: input.tier });
+        if (ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN" });
+        await updateUserProfile(input.userId ?? ctx.user.id, { subscriptionTier: input.tier });
         return { success: true, tier: input.tier };
       }),
   }),
@@ -597,7 +633,7 @@ IMPORTANT: Be professional, supportive, and evidence-based. If you reference off
       }))
       .mutation(async ({ ctx, input }) => {
         if (ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN" });
-        const code = generateCode();
+        const code = await generateUniqueCode();
         const expiresAt = input.expiresInDays
           ? new Date(Date.now() + input.expiresInDays * 24 * 60 * 60 * 1000)
           : undefined;

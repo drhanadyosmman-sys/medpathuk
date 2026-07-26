@@ -8,7 +8,7 @@ import {
   ArrowRight, BookOpen, CheckCircle2, ChevronRight, Circle,
   ClipboardList, Crown, ExternalLink, FileText, GraduationCap,
   Loader2, MessageSquare, Microscope, Stethoscope, Target,
-  TrendingUp, User, Zap, Star, Calendar, Flag, Lock, Languages,
+  TrendingUp, User, Zap, Star, Calendar, Flag, Languages,
 } from "lucide-react";
 import { Link } from "wouter";
 import { useState } from "react";
@@ -335,16 +335,6 @@ export default function Roadmap() {
               })}
             </div>
 
-            {tier === "free" && (
-              <div className="mt-8 gradient-hero rounded-2xl p-6 text-center text-white">
-                <Lock className="w-8 h-8 mx-auto mb-3 text-white/70" />
-                <h3 className="font-bold text-lg mb-2">{t("roadmap.upsell.title")}</h3>
-                <p className="text-white/70 text-sm mb-4">{t("roadmap.upsell.body")}</p>
-                <Link href="/pricing">
-                  <Button className="gradient-orange text-white border-0">{t("roadmap.upsell.cta")}</Button>
-                </Link>
-              </div>
-            )}
           </>
         )}
       </div>

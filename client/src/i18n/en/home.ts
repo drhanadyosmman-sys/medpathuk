@@ -17,9 +17,9 @@ export const home = {
     positioning:
       "A planning and preparation tool for UK specialty training — not a recruitment agency or a jobs board.",
     goToDashboard: "Go to Dashboard",
-    ctaPrimary: "Check my specialty free",
+    ctaPrimary: "Explore my specialty",
     ctaSignIn: "Sign In",
-    note: "Free to start. No access code needed.",
+    note: "Registration is invite-only — you'll need a 6-digit access code.",
   },
 
   problem: {
@@ -181,7 +181,7 @@ export const home = {
 
   cta: {
     title: "Find out where you actually stand",
-    body: "Pick your specialty, work through its scoring domains, and see the gaps. It takes about ten minutes and costs nothing.",
+    body: "Pick your specialty, work through its scoring domains, and see the gaps. It takes about ten minutes.",
     button: "Start my self-assessment",
   },
 

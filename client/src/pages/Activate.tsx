@@ -139,10 +139,11 @@ export default function Activate() {
                   <KeyRound className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
                   <Input
                     value={code}
-                    onChange={(e) => setCode(e.target.value.toUpperCase())}
-                    placeholder="XXXX-XXXX-XXXX"
-                    className="ps-10 bg-white/10 border-white/20 text-white placeholder:text-white/30 focus:border-purple-400 uppercase tracking-widest font-mono"
-                    maxLength={20}
+                    inputMode="numeric"
+                    onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                    placeholder="000000"
+                    className="ps-10 bg-white/10 border-white/20 text-white placeholder:text-white/30 focus:border-purple-400 tracking-[0.4em] font-mono"
+                    maxLength={6}
                   />
                 </div>
               </div>

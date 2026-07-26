@@ -322,20 +322,10 @@ export default function Dashboard() {
                 <span className={`font-semibold ${tier === "premium" ? "text-white" : "text-foreground"}`}>{t(`dashboard.tiers.${tier}`)} {t("dashboard.subscription.planSuffix")}</span>
               </div>
               {tier === "free" && (
-                <>
-                  <p className="text-sm text-muted-foreground mb-4">{t("dashboard.subscription.freeBody")}</p>
-                  <Link href="/pricing">
-                    <Button size="sm" className="gradient-purple text-white border-0 w-full">{t("dashboard.subscription.freeCta")}</Button>
-                  </Link>
-                </>
+                <p className="text-sm text-muted-foreground">{t("dashboard.subscription.freeBody")}</p>
               )}
               {tier === "pro" && (
-                <>
-                  <p className="text-sm text-muted-foreground mb-4">{t("dashboard.subscription.proBody")}</p>
-                  <Link href="/pricing">
-                    <Button size="sm" className="gradient-orange text-white border-0 w-full">{t("dashboard.subscription.proCta")}</Button>
-                  </Link>
-                </>
+                <p className="text-sm text-muted-foreground">{t("dashboard.subscription.proBody")}</p>
               )}
               {tier === "premium" && (
                 <p className="text-sm text-white/70">{t("dashboard.subscription.premiumBody")}</p>

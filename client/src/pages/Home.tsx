@@ -305,47 +305,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Pricing */}
-      <section className="py-24 bg-secondary/30">
-        <div className="container">
-          <div className="text-center mb-16">
-            <Badge variant="secondary" className="mb-4">{h.pricing.badge}</Badge>
-            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">{h.pricing.title}</h2>
-            <p className="text-lg text-muted-foreground">{h.pricing.body}</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {h.pricing.plans.map((plan, i) => {
-              const highlight = i === 1;
-              return (
-                <div
-                  key={plan.name}
-                  className={`p-8 rounded-2xl border ${highlight ? "border-primary bg-card shadow-lg scale-[1.02]" : "border-border bg-card"}`}
-                >
-                  {highlight && <Badge className="mb-4 gradient-orange text-white border-0">{h.pricing.mostPopular}</Badge>}
-                  <h3 className="text-xl font-bold text-foreground mb-1">{plan.name}</h3>
-                  <p className="text-sm text-muted-foreground mb-4">{plan.desc}</p>
-                  <div className="text-3xl font-bold text-foreground mb-6">{plan.price}</div>
-                  <ul className="space-y-3 mb-8">
-                    {plan.features.map((feature) => (
-                      <li key={feature} className="flex items-start gap-2 text-sm text-muted-foreground">
-                        <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                  <a href="/register" className="block">
-                    <Button className={`w-full ${highlight ? "gradient-orange text-white border-0" : ""}`} variant={highlight ? "default" : "outline"}>
-                      {plan.cta}
-                    </Button>
-                  </a>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
       {/* CTA */}
       <section className="py-24 gradient-hero relative overflow-hidden">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -383,7 +342,6 @@ export default function Home() {
                 <li><Link href="/sas" className="hover:text-foreground transition-colors">{h.footer.selfAssessment}</Link></li>
                 <li><Link href="/resources" className="hover:text-foreground transition-colors">{h.footer.resources}</Link></li>
                 <li><Link href="/links" className="hover:text-foreground transition-colors">{h.footer.officialLinks}</Link></li>
-                <li><Link href="/pricing" className="hover:text-foreground transition-colors">{h.footer.pricing}</Link></li>
               </ul>
             </div>
 
