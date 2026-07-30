@@ -27,6 +27,31 @@ import {
 import { sasAr } from "../../shared/sas-i18n-ar";
 import { resources as enResources } from "../../client/src/i18n/en/resources";
 import { resources as arResources } from "../../client/src/i18n/ar/resources";
+import { GENERAL_COURSES, RESEARCH_COURSES, type Course } from "../../shared/courses";
+
+// Arabic blurbs for the HCQS courses (courses.ts is English-only). Keyed by
+// course id; the title and URL stay as published.
+const COURSE_AR: Record<string, string> = {
+  qip: "إدارة مشروع تحسين الجودة من البداية للنهاية، بما فيها دورات PDSA التي يطلب التسجيل إثباتها.",
+  audit: "تصميم حلقة تدقيق سريري وإغلاقها، وتوثيق دورك فيها.",
+  "research-im": "أخذ مشروع في الطب الباطني من المنهجية حتى النشر.",
+  "research-resp": "أخذ مشروع في طب الصدر من المنهجية حتى النشر.",
+  "research-endo": "أخذ مشروع في الغدد الصماء من المنهجية حتى النشر.",
+  "research-paeds": "أخذ مشروع في طب الأطفال من المنهجية حتى النشر.",
+  "research-ortho": "أخذ مشروع في جراحة العظام من المنهجية حتى النشر.",
+  "research-og": "أخذ مشروع في النساء والولادة من المنهجية حتى النشر.",
+  "research-surgery": "أخذ مشروع جراحي من المنهجية حتى النشر.",
+};
+
+// Every distinct course, general first, then research courses (deduped by id).
+const UNIQUE_COURSES: Course[] = (() => {
+  const seen = new Set<string>();
+  const out: Course[] = [];
+  for (const c of [...Object.values(GENERAL_COURSES), ...Object.values(RESEARCH_COURSES)]) {
+    if (!seen.has(c.id)) { seen.add(c.id); out.push(c); }
+  }
+  return out;
+})();
 
 type Lang = "en" | "ar";
 
@@ -89,6 +114,9 @@ const T = {
     ch3Intro: "The specialties below have published criteria verified against an official source. Each shows its application route, whether the MSRA is required, its scoring model, and — where self-assessed — the full points matrix. Specialties without a published self-assessment score are listed at the end of this chapter.",
     ch4Title: "Building your portfolio",
     ch4Intro: "These are the domains that earn marks across most specialties, with practical guidance for each. They are drawn from the MedPath UK resource library.",
+    coursesTitle: "Training courses from Healthcare Quality School",
+    coursesIntro: "These courses, offered by Healthcare Quality School — the publisher of this guide — are built around the portfolio domains that recruitment scores. They are our own courses, not independent recommendations.",
+    courseCallout: "HCQS research & publication course for this pathway",
     ch5Title: "Official links",
     ch5Intro: "The official sources you will use throughout your journey. Always prefer these over third-party summaries.",
     appxTitle: "Sources & provenance",
@@ -144,6 +172,9 @@ const T = {
     ch3Intro: "التخصصات التالية لها معايير منشورة تم التحقق منها مقابل مصدر رسمي. يعرض كل تخصص مسار التقديم، وهل MSRA مطلوب، ونموذج التقييم، و — حيث يكون ذاتياً — مصفوفة النقاط كاملة. أما التخصصات بلا درجة تقييم ذاتي منشورة فمذكورة في آخر هذا الفصل.",
     ch4Title: "بناء ملفك المهني",
     ch4Intro: "هذه هي المجالات التي تكسب الدرجات في معظم التخصصات، مع إرشاد عملي لكل منها، مأخوذة من مكتبة مصادر MedPath UK.",
+    coursesTitle: "دورات تدريبية من Healthcare Quality School",
+    coursesIntro: "هذه الدورات، المقدَّمة من Healthcare Quality School — ناشر هذا الدليل — مبنية حول مجالات الملف المهني التي يقيّمها التسجيل. وهي دوراتنا الخاصة، وليست توصيات مستقلة.",
+    courseCallout: "دورة HCQS للبحث والنشر لهذا المسار",
     ch5Title: "الروابط الرسمية",
     ch5Intro: "المصادر الرسمية التي ستستخدمها طوال رحلتك. فضّلها دائماً على الملخّصات من أطراف أخرى.",
     appxTitle: "المصادر والتوثيق",
@@ -256,11 +287,17 @@ function renderSpecialty(lang: Lang, s: SASSpecialty, tt: typeof T["en"]): strin
     }
   }
 
+  const rc = RESEARCH_COURSES[s.id];
+  const callout = rc
+    ? `<div class="course-callout"><span class="cc-label">${esc(tt.courseCallout)}:</span> <a href="${esc(rc.url)}">${esc(rc.title)}</a></div>`
+    : "";
+
   return `<section class="specialty">
     <h3 class="spec-h">${esc(name)} <span class="spec-short">${esc(s.shortName)}</span></h3>
     <p class="spec-desc">${esc(desc)}</p>
     <table class="meta"><tbody>${rows.join("")}</tbody></table>
     ${body}
+    ${callout}
   </section>`;
 }
 
@@ -297,16 +334,23 @@ function buildBody(lang: Lang): string {
     unverified.map(s => {
       const name = lang === "ar" ? arText(s.id, "name", s.name) : s.name;
       const desc = lang === "ar" ? arText(s.id, "description", s.description) : s.description;
-      return `<section class="specialty compact"><h3 class="spec-h">${esc(name)} <span class="spec-short">${esc(s.shortName)}</span></h3><p class="spec-desc">${esc(desc)}</p><table class="meta"><tbody><tr><th>${L.model}</th><td>${esc(modelLabel(lang, getVerification(s.id).scoringModel))}</td></tr><tr><th>${L.source}</th><td>${s.sourceUrl ? `<a href="${esc(s.sourceUrl)}">${esc(s.sourceUrl)}</a>` : L.na}</td></tr></tbody></table></section>`;
+      const rc = RESEARCH_COURSES[s.id];
+      const callout = rc ? `<div class="course-callout"><span class="cc-label">${esc(tt.courseCallout)}:</span> <a href="${esc(rc.url)}">${esc(rc.title)}</a></div>` : "";
+      return `<section class="specialty compact"><h3 class="spec-h">${esc(name)} <span class="spec-short">${esc(s.shortName)}</span></h3><p class="spec-desc">${esc(desc)}</p><table class="meta"><tbody><tr><th>${L.model}</th><td>${esc(modelLabel(lang, getVerification(s.id).scoringModel))}</td></tr><tr><th>${L.source}</th><td>${s.sourceUrl ? `<a href="${esc(s.sourceUrl)}">${esc(s.sourceUrl)}</a>` : L.na}</td></tr></tbody></table>${callout}</section>`;
     }).join("");
   const ch3 = chapter("3", tt.ch3Title, ch3Body);
 
   // Ch4 — resources
   const res = (lang === "ar" ? arResources : enResources) as any;
+  const coursesHtml = `<div class="res-section"><h3 class="subch">${esc(tt.coursesTitle)}</h3><p class="res-desc">${esc(tt.coursesIntro)}</p>` +
+    UNIQUE_COURSES.map(c => {
+      const blurb = lang === "ar" ? (COURSE_AR[c.id] || c.blurb) : c.blurb;
+      return `<div class="course"><div class="link-name">${esc(c.title)}</div><div class="link-desc">${esc(blurb)}</div><a href="${esc(c.url)}">${esc(c.url)}</a></div>`;
+    }).join("") + `</div>`;
   const ch4Body = `<p class="ch-intro">${esc(tt.ch4Intro)}</p>` + res.sections.map((sec: any) =>
     `<div class="res-section"><h3 class="subch">${esc(sec.title)}</h3><p class="res-desc">${esc(sec.description)}</p>` +
     sec.items.map((it: any) => `<div class="res-item"><h4>${esc(it.title)}</h4>${renderContent(it.content)}</div>`).join("") +
-    `</div>`).join("");
+    `</div>`).join("") + coursesHtml;
   const ch4 = chapter("4", tt.ch4Title, ch4Body);
 
   // Ch5 — links
@@ -336,6 +380,122 @@ function buildBody(lang: Lang): string {
   const toc = `<section class="toc"><h2>${esc(tt.tocTitle)}</h2><ol>${tt.toc.map(x => `<li>${esc(x)}</li>`).join("")}</ol></section>`;
 
   return about + toc + ch1 + ch2 + ch3 + ch4 + ch5 + appx;
+}
+
+// ── Shared content CSS (used by both the standalone doc and the artifact) ─────
+const CONTENT_CSS = `
+  h2.ch-title { font-size:21pt; margin:.1em 0 .6em; color:var(--ink); }
+  .ch-num { color:var(--accent); font-weight:700; font-size:12pt; letter-spacing:.15em; }
+  .ch-intro { color:var(--muted); font-size:11.5pt; margin-bottom:1.4em; }
+  .subch { font-size:14pt; margin:1.6em 0 .5em; color:var(--accent); border-bottom:1px solid var(--line); padding-bottom:.25em; }
+  h4 { margin:1em 0 .4em; font-size:12pt; }
+  p { margin:.5em 0; }
+  .owner { color:var(--muted); font-size:10pt; border-top:1px solid var(--line); padding-top:12px; margin-top:20px; }
+  .toc h2 { font-size:19pt; }
+  .toc ol { font-size:12.5pt; line-height:2; padding-inline-start:1.4em; }
+  .models { margin:1em 0; }
+  .model { background:var(--accent-soft); border-radius:8px; padding:12px 16px; margin:10px 0; }
+  .model h4 { margin:0 0 .2em; color:var(--accent); }
+  .model p { margin:0; font-size:10.5pt; }
+  .specialty { margin:0 0 22px; padding-top:8px; }
+  .spec-h { font-size:15pt; margin:.6em 0 .2em; border-bottom:2px solid var(--accent); padding-bottom:.2em; }
+  .spec-short { color:var(--muted); font-size:10pt; font-weight:400; }
+  .spec-desc { font-size:10.5pt; color:var(--muted); margin:.3em 0 .7em; }
+  table.meta { width:100%; border-collapse:collapse; margin:.4em 0 .9em; font-size:10pt; }
+  table.meta th { text-align:start; width:42%; color:var(--muted); font-weight:600; vertical-align:top; padding:3px 8px; border-bottom:1px solid var(--line); }
+  table.meta td { padding:3px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
+  .domain { margin:.8em 0; }
+  .domain-h { font-size:11.5pt; margin:.6em 0 .3em; background:var(--accent-soft); padding:5px 10px; border-radius:5px; }
+  .domain-max { float:inline-end; color:var(--accent); font-size:9.5pt; font-weight:600; }
+  table.crit-table { width:100%; border-collapse:collapse; font-size:10pt; }
+  table.crit-table td { padding:6px 10px; border-bottom:1px solid var(--line); vertical-align:top; }
+  td.crit { width:82%; }
+  td.pts { text-align:end; white-space:nowrap; color:var(--accent); font-weight:600; font-size:9.5pt; }
+  .crit-text { font-weight:600; }
+  .evidence { color:var(--muted); font-size:9pt; margin-top:2px; }
+  ul.options { margin:.35em 0 0; padding-inline-start:1.1em; list-style:none; }
+  ul.options li { font-size:9.5pt; margin:2px 0; color:var(--ink); }
+  .opt-pts { display:inline-block; min-width:1.6em; text-align:center; background:var(--accent); color:#fff; border-radius:4px; font-size:8.5pt; font-weight:700; padding:0 4px; margin-inline-end:6px; }
+  .note { background:#fff7ed; border-inline-start:3px solid #f59e0b; padding:8px 12px; font-size:10pt; border-radius:4px; }
+  .res-desc, .link-desc { color:var(--muted); font-size:10pt; }
+  .res-item { margin:.6em 0 1em; }
+  .subhead { font-weight:700; margin-top:.6em; }
+  .link { padding:8px 0; border-bottom:1px solid var(--line); }
+  .link-name { font-weight:700; }
+  .link a { font-size:9.5pt; }
+  table.provenance { width:100%; border-collapse:collapse; font-size:9.5pt; }
+  table.provenance th { background:var(--accent-soft); text-align:start; padding:6px 8px; border-bottom:2px solid var(--accent); }
+  table.provenance td { padding:5px 8px; border-bottom:1px solid var(--line); }
+  .course-callout { background:var(--accent-soft); border-radius:6px; padding:7px 12px; margin:.7em 0 .2em; font-size:9.5pt; }
+  .course-callout .cc-label { color:var(--accent); font-weight:700; }
+  .course { padding:10px 0; border-bottom:1px solid var(--line); }
+  .course .link-name { font-weight:700; }
+  .course a { font-size:9.5pt; }
+`;
+
+function coverInner(tt: typeof T["en"]): string {
+  return `<div class="brand">${esc(tt.brand)}</div>
+    <h1>${esc(tt.title)}</h1>
+    <div class="sub">${esc(tt.subtitle)}</div>
+    <div class="meta">${esc(tt.by)} · ${esc(tt.edition)}</div>`;
+}
+
+// ── Combined artifact (both languages, one page, language toggle) ─────────────
+function artifactHtml(): string {
+  const style = `<style>
+  :root { --ink:#1a1a2e; --muted:#5b5b73; --line:#dcdce6; --accent:#6d28d9; --accent-soft:#f3effe; }
+  .ebook-root { background:#e9e9f0; color:var(--ink); min-height:100vh; }
+  .toolbar { position:sticky; top:0; z-index:10; display:flex; gap:8px; justify-content:center; padding:12px; background:#fff; border-bottom:1px solid var(--line); }
+  .toolbar button { font:600 13px/1 system-ui,-apple-system,sans-serif; padding:9px 20px; border-radius:999px; border:1px solid var(--line); background:#fff; color:var(--muted); cursor:pointer; }
+  .toolbar button[aria-pressed="true"] { background:var(--accent); color:#fff; border-color:var(--accent); }
+  .toolbar button:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  .book { max-width:820px; margin:0 auto; background:#fff; padding:44px 52px; line-height:1.6; font-size:11pt; box-shadow:0 2px 18px rgba(0,0,0,.10); }
+  #book-en { font-family:Georgia,'Times New Roman',serif; }
+  #book-ar { font-family:'Segoe UI',Tahoma,'Traditional Arabic',sans-serif; }
+  .book a { color:var(--accent); text-decoration:none; word-break:break-word; }
+  .cover2 { text-align:center; padding:70px 30px 54px; border-bottom:1px solid var(--line); margin-bottom:32px; }
+  .cover2 .brand { color:var(--accent); font-weight:700; letter-spacing:.05em; font-size:14pt; margin-bottom:22px; }
+  .cover2 h1 { font-size:27pt; line-height:1.25; margin:0 0 14px; }
+  .cover2 .sub { color:var(--muted); font-size:13pt; max-width:34em; margin:0 auto 28px; }
+  .cover2 .meta { color:var(--muted); font-size:11pt; border-top:1px solid var(--line); padding-top:16px; display:inline-block; }
+  ${CONTENT_CSS}
+  @media print {
+    .toolbar { display:none; }
+    .ebook-root { background:#fff; }
+    .book { max-width:none; margin:0; padding:0; box-shadow:none; }
+    .book[hidden] { display:none !important; }
+    .chapter, .toc { page-break-after:always; }
+    .cover2 { min-height:86vh; display:flex; flex-direction:column; justify-content:center; page-break-after:always; }
+    .specialty { page-break-inside:avoid; }
+    @page { size:A4; margin:18mm 16mm; }
+    a { color:var(--ink); }
+  }
+</style>`;
+  const en = `<div id="book-en" class="book" dir="ltr" lang="en"><div class="cover2">${coverInner(T.en)}</div>${buildBody("en")}</div>`;
+  const ar = `<div id="book-ar" class="book" dir="rtl" lang="ar" hidden><div class="cover2">${coverInner(T.ar)}</div>${buildBody("ar")}</div>`;
+  const script = `<script>
+  (function(){
+    var btns = document.querySelectorAll('.toolbar button');
+    var books = { en: document.getElementById('book-en'), ar: document.getElementById('book-ar') };
+    btns.forEach(function(b){ b.addEventListener('click', function(){
+      var lang = b.getAttribute('data-lang');
+      books.en.hidden = lang !== 'en';
+      books.ar.hidden = lang !== 'ar';
+      btns.forEach(function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+      window.scrollTo(0, 0);
+    }); });
+  })();
+</script>`;
+  return `${style}
+<div class="ebook-root">
+  <div class="toolbar">
+    <button data-lang="en" aria-pressed="true">English</button>
+    <button data-lang="ar" aria-pressed="false">العربية</button>
+  </div>
+  ${en}
+  ${ar}
+</div>
+${script}`;
 }
 
 // ── Page shell ───────────────────────────────────────────────────────────────
@@ -457,4 +617,7 @@ for (const lang of ["en", "ar"] as Lang[]) {
   writeFileSync(file, html(lang), "utf8");
   console.log("wrote", file);
 }
+const artifactFile = join(outDir, "medpath-guide-artifact.html");
+writeFileSync(artifactFile, artifactHtml(), "utf8");
+console.log("wrote", artifactFile);
 console.log("done");
